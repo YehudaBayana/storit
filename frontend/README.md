@@ -1,6 +1,6 @@
-# Soundstream Frontend
+# Storit Frontend
 
-This is the Next.js frontend for the Soundstream music streaming platform.
+This is the Next.js frontend for the Storit music streaming platform.
 
 ## Features
 

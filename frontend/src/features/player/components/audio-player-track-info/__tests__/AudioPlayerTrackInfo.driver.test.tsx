@@ -5,7 +5,7 @@ describe("AudioPlayerTrackInfo", () => {
     const driver = new AudioPlayerTrackInfoDriver();
     driver.render({ dataHook: "track-info" });
     expect(driver.getTitle("track-info")).toBe("No track playing");
-    expect(driver.getStatus("track-info")).toBe("YouTube Soundstream");
+    expect(driver.getStatus("track-info")).toBe("YouTube Storit");
   });
 
   it("shows the current title and loading status", () => {

@@ -31,12 +31,12 @@ func TestLoadBuildsDatabaseURLFromParts(t *testing.T) {
 	t.Setenv("PORT", "8080")
 	t.Setenv("DB_HOST", "127.0.0.1")
 	t.Setenv("DB_PORT", "5432")
-	t.Setenv("DB_USER", "soundstream")
+	t.Setenv("DB_USER", "storit")
 	t.Setenv("DB_PASSWORD", "test-password")
-	t.Setenv("DB_NAME", "soundstream_test")
+	t.Setenv("DB_NAME", "storit_test")
 
 	got := config.Load()
-	want := "postgres://soundstream:test-password@127.0.0.1:5432/soundstream_test?sslmode=disable"
+	want := "postgres://storit:test-password@127.0.0.1:5432/storit_test?sslmode=disable"
 	if got.DatabaseURL != want {
 		t.Errorf("DatabaseURL = %q, want %q", got.DatabaseURL, want)
 	}

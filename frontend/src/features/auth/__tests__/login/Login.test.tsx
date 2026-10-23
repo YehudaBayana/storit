@@ -37,17 +37,17 @@ describe("Login Feature Component", () => {
     it("updates input values and calls login mutation on submit", () => {
       driver.render();
 
-      driver.typeEmail("user@soundstream.com");
+      driver.typeEmail("user@storit.com");
       driver.typePassword("password123");
 
-      expect(driver.getEmailValue()).toBe("user@soundstream.com");
+      expect(driver.getEmailValue()).toBe("user@storit.com");
       expect(driver.getPasswordValue()).toBe("password123");
 
       driver.submit();
 
       expect(mockMutate).toHaveBeenCalledTimes(1);
       expect(mockMutate).toHaveBeenCalledWith({
-        email: "user@soundstream.com",
+        email: "user@storit.com",
         password: "password123",
       });
     });

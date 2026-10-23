@@ -11,7 +11,7 @@ export default function Footer({ dataHook = "dashboard-footer" }: FooterProps) {
   return (
     <Box as="footer" dataHook={dataHook} py={12} px={6} border="top" borderTone="subtle">
       <Text variant="caption" color="muted" align="center">
-        &copy; {new Date().getFullYear()} Soundstream. Built for learning backend engineering.
+        &copy; {new Date().getFullYear()} Storit. Built for learning backend engineering.
       </Text>
     </Box>
   );

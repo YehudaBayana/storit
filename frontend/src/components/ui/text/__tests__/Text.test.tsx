@@ -9,9 +9,9 @@ describe("Text Component", () => {
 
   describe("rendering", () => {
     it("renders text children correctly", () => {
-      driver.render({ children: "Soundstream music catalog" });
+      driver.render({ children: "Storit music catalog" });
       expect(driver.exists()).toBe(true);
-      expect(driver.getText()).toBe("Soundstream music catalog");
+      expect(driver.getText()).toBe("Storit music catalog");
     });
 
     it("renders as paragraph by default for body variant", () => {

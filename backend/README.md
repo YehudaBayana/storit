@@ -1,6 +1,6 @@
-# Soundstream Backend
+# Storit Backend
 
-This is the high-performance Go backend for the Soundstream music streaming platform.
+This is the high-performance Go backend for the Storit music streaming platform.
 
 ## Architecture & Design Decisions
 

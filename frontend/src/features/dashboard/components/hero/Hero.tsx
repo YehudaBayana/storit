@@ -24,7 +24,7 @@ export default function Hero({
       overflow="hidden"
     >
       {/* Background Image with Overlay */}
-      <Image src="/hero.jpg" alt="Soundstream Hero" fill dimmed showSkeleton={false} lazy={false} />
+      <Image src="/hero.jpg" alt="Storit Hero" fill dimmed showSkeleton={false} lazy={false} />
 
       {/* Content Container */}
       <Flex direction="col" align="center" gap={10} position="relative" z="10" px={8}>

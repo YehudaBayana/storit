@@ -1,6 +1,6 @@
 # Frontend rules for agents
 
-Read this before changing anything under `frontend/`. All UI in SoundStream is built strictly with the atomic design system under `src/components/ui`.
+Read this before changing anything under `frontend/`. All UI in Storit is built strictly with the atomic design system under `src/components/ui`.
 
 ## Atomic Design System Rules
 

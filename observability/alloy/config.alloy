@@ -10,7 +10,7 @@ discovery.relabel "containers" {
   // Only ship this stack's containers (names are fixed in docker-compose.yml).
   rule {
     source_labels = ["__meta_docker_container_name"]
-    regex         = "/soundstream-(db|backend)"
+    regex         = "/storit-(db|backend)"
     action        = "keep"
   }
 

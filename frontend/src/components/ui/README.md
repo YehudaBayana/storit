@@ -1,6 +1,6 @@
-# SoundStream Base UI Components
+# Storit Base UI Components
 
-This directory contains the atomic UI components for the SoundStream application. These components are designed to be reusable, accessible, and consistent.
+This directory contains the atomic UI components for the Storit application. These components are designed to be reusable, accessible, and consistent.
 
 ## 🏗 Architecture
 

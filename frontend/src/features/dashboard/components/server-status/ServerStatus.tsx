@@ -178,7 +178,7 @@ export default function ServerStatus({ dataHook = "server-status" }: ServerStatu
                 Service:
               </Text>
               <Text variant="small" weight="medium" mono>
-                Soundstream API
+                Storit API
               </Text>
             </Flex>
 

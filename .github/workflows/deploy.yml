@@ -18,7 +18,7 @@
 #           username: ubuntu
 #           key: ${{ secrets.SSH_PRIVATE_KEY }}
 #           script: |
-#             cd ~/soundstream
+#             cd ~/storit
 #             git pull origin main
 #             docker compose down
 #             docker compose up -d --build

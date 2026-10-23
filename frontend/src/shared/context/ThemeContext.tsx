@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
 import { ThemeName, ThemeDefinition, themes, getTheme, DEFAULT_THEME } from "@/config/themes";
 
-const STORAGE_KEY = "soundstream-theme";
+const STORAGE_KEY = "storit-theme";
 
 interface ThemeContextValue {
   /** Current active theme name */

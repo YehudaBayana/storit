@@ -15,7 +15,7 @@ describe("PlaylistDetailView", () => {
     id: "playlist-1",
     title: "Focus mix",
     description: "Instrumental tracks",
-    uploader: "Soundstream",
+    uploader: "Storit",
     thumbnails: [],
     playlist_count: 0,
   };

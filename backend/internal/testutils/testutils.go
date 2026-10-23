@@ -30,7 +30,7 @@ func DatabaseURL() string {
 	port := envOrDefault("DB_PORT", "5432")
 	user := envOrDefault("DB_USER", "postgres")
 	password := envOrDefault("DB_PASSWORD", "postgres")
-	databaseName := envOrDefault("DB_NAME", "soundstream")
+	databaseName := envOrDefault("DB_NAME", "storit")
 	return fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable", user, password, host, port, databaseName)
 }
 

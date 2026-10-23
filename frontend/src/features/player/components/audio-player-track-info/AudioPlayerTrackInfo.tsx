@@ -41,7 +41,7 @@ export default function AudioPlayerTrackInfo({
           truncate
           dataHook={dataHook ? `${dataHook}-status` : undefined}
         >
-          {isLoading ? "Streaming from Go API..." : hasError ? "Error" : "YouTube Soundstream"}
+          {isLoading ? "Streaming from Go API..." : hasError ? "Error" : "YouTube Storit"}
         </Text>
       </Flex>
     </Flex>
