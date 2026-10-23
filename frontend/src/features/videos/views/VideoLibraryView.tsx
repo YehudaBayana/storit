@@ -20,6 +20,7 @@ import {
   Progress,
   Link,
   EmptyState,
+  Form,
 } from "@/components/ui";
 
 export default function VideoLibraryView({
@@ -103,7 +104,7 @@ export default function VideoLibraryView({
             </Stack>
           </Flex>
 
-          <Card as="form" onSubmit={handleSubmit} variant="secondary" rounded="2xl" padding="md">
+          <Form onSubmit={handleSubmit}>
             <Stack gap={4}>
               <Grid cols={2} colsMobile={1} gap={4}>
                 <Grid.Item colSpan={2} colSpanTablet={2}>
@@ -145,11 +146,11 @@ export default function VideoLibraryView({
                 </Grid.Item>
               </Grid>
 
-              {error && <Alert variant="danger">{error}</Alert>}
+              {error && <Alert variant="error">{error}</Alert>}
 
               {uploadVideoMutation.isPending && (
                 <Stack gap={2}>
-                  <Progress value={Math.round(progress * 100)} variant="primary" />
+                  <Progress value={Math.round(progress * 100)} variant="default" />
                   <Text variant="caption" color="muted">
                     Uploading {Math.round(progress * 100)}%. Keep this tab open until it finishes.
                   </Text>
@@ -184,7 +185,7 @@ export default function VideoLibraryView({
                 </Flex>
               </Flex>
             </Stack>
-          </Card>
+          </Form>
 
           <Grid cols={3} colsMobile={1} gap={4}>
             <Card variant="secondary" rounded="2xl" padding="md">
@@ -227,15 +228,11 @@ export default function VideoLibraryView({
                 Loading videos...
               </Text>
             ) : isError ? (
-              <Alert variant="danger">
+              <Alert variant="error">
                 {listError instanceof Error ? listError.message : "Unable to load videos."}
               </Alert>
             ) : videos.length === 0 ? (
-              <EmptyState
-                icon="🎥"
-                title="No videos uploaded yet"
-                description="Add your first clip to start building a private progress journal."
-              />
+              <EmptyState type="library"></EmptyState>
             ) : (
               <Stack gap={3}>
                 {videos.map((video) => (

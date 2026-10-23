@@ -82,7 +82,7 @@ export default function VideoWatchView() {
     return (
       <Container size="lg">
         <Stack gap={4}>
-          <Alert variant="danger">Missing video id.</Alert>
+          <Alert variant="error">Missing video id.</Alert>
           <Link href="/videos" variant="back">
             ← Back to library
           </Link>
@@ -105,7 +105,7 @@ export default function VideoWatchView() {
     return (
       <Container size="lg">
         <Stack gap={4}>
-          <Alert variant="danger">{error ?? "Video not found."}</Alert>
+          <Alert variant="error">{error ?? "Video not found."}</Alert>
           <Link href="/videos" variant="back">
             ← Back to library
           </Link>
