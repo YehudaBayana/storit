@@ -8,6 +8,11 @@ export interface FlexDriverProps {
   direction?: FlexDirection;
   gap?: number;
   as?: "div" | "section";
+  position?: "static" | "relative" | "absolute" | "fixed" | "sticky";
+  inset?: "0" | "x-0" | "y-0";
+  z?: "0" | "10" | "20" | "30" | "40" | "50";
+  overflow?: "visible" | "hidden" | "auto" | "scroll";
+  group?: boolean;
 }
 
 export class FlexDriver {

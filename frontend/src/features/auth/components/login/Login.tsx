@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useLogin } from "../../query/useAuth";
+import { Card, Stack, Heading, Text, Form, FormField, Input, Button, Flex } from "@/components/ui";
 
 interface LoginProps {
   onSwitchToRegister: () => void;
@@ -11,74 +12,66 @@ export const Login: React.FC<LoginProps> = ({ onSwitchToRegister, dataHook }) =>
   const [password, setPassword] = useState("");
   const { mutate: login } = useLogin();
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = () => {
     login({ email, password });
   };
 
   return (
-    <div
-      className="w-full max-w-md p-8 bg-white rounded-xl shadow-lg border border-gray-100"
-      data-hook={dataHook}
-    >
-      <div className="mb-6 text-center">
-        <h2 className="text-2xl font-bold text-gray-900" data-hook="login-heading">
-          Welcome Back
-        </h2>
-        <p className="text-sm text-gray-500 mt-1">Please enter your details to sign in</p>
-      </div>
+    <Card variant="elevated" padding="lg" dataHook={dataHook}>
+      <Stack gap={6}>
+        <Stack gap={1} align="center">
+          <Heading level={2} size="2xl" align="center" dataHook="login-heading">
+            Welcome Back
+          </Heading>
+          <Text variant="body-sm" color="muted" align="center">
+            Please enter your details to sign in
+          </Text>
+        </Stack>
 
-      <form onSubmit={handleSubmit} className="space-y-4" data-hook="login-form">
-        <div>
-          <label className="block text-xs font-semibold uppercase tracking-wider text-gray-600 mb-1">
-            Email
-          </label>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all"
-            placeholder="you@example.com"
-            data-hook="login-email-input"
-          />
-        </div>
+        <Form onSubmit={handleSubmit} gap={4} dataHook="login-form">
+          <FormField label="Email" htmlFor="login-email-input" required>
+            <Input
+              id="login-email-input"
+              type="email"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+              required
+              placeholder="you@example.com"
+              dataHook="login-email"
+            />
+          </FormField>
 
-        <div>
-          <label className="block text-xs font-semibold uppercase tracking-wider text-gray-600 mb-1">
-            Password
-          </label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all"
-            placeholder="••••••••"
-            data-hook="login-password-input"
-          />
-        </div>
+          <FormField label="Password" htmlFor="login-password-input" required>
+            <Input
+              id="login-password-input"
+              type="password"
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              required
+              placeholder="••••••••"
+              dataHook="login-password"
+            />
+          </FormField>
 
-        <button
-          type="submit"
-          className="w-full mt-2 py-2.5 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-sm rounded-lg shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-          data-hook="login-submit-button"
-        >
-          Sign In
-        </button>
-      </form>
+          <Button type="submit" variant="primary" fullWidth dataHook="login-submit-button">
+            Sign In
+          </Button>
+        </Form>
 
-      <div className="mt-6 text-center text-sm text-gray-500">
-        Do not have an account?{" "}
-        <button
-          type="button"
-          onClick={onSwitchToRegister}
-          className="font-medium text-indigo-600 hover:text-indigo-500 focus:outline-none underline"
-          data-hook="login-switch-to-register-button"
-        >
-          Sign up
-        </button>
-      </div>
-    </div>
+        <Flex align="center" justify="center" gap={1}>
+          <Text variant="body-sm" color="muted">
+            Do not have an account?
+          </Text>
+          <Button
+            variant="link"
+            size="sm"
+            onClick={onSwitchToRegister}
+            dataHook="login-switch-to-register-button"
+          >
+            Sign up
+          </Button>
+        </Flex>
+      </Stack>
+    </Card>
   );
 };

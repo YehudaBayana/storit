@@ -3,8 +3,7 @@
 import { useEffect, useRef } from "react";
 import { useHistory } from "../query/useHistory";
 import TrackItem from "@/features/player/components/TrackItem";
-import { Box } from "@/components/ui/layout";
-import Text from "@/components/ui/text/Text";
+import { Box, Button, Flex, Stack, Text } from "@/components/ui";
 
 interface HistoryViewProps {
   dataHook?: string;
@@ -21,7 +20,7 @@ export default function HistoryView({ dataHook = "history-view-container" }: His
     isPending,
     refetch,
   } = useHistory();
-  const loadMoreRef = useRef<HTMLDivElement>(null);
+  const loadMoreRef = useRef<HTMLElement>(null);
   const tracks = data?.pages.flat() ?? [];
 
   useEffect(() => {
@@ -42,58 +41,66 @@ export default function HistoryView({ dataHook = "history-view-container" }: His
   }, [fetchNextPage, hasNextPage, isError, isFetchingNextPage]);
 
   return (
-    <Box className="p-10 flex flex-col gap-4" dataHook={dataHook}>
-      <Text variant="h1" dataHook="history-view-heading">
-        History
-      </Text>
-      {isPending && (
-        <Text role="status" dataHook="history-loading-text">
-          Loading history...
+    <Box p={10} dataHook={dataHook}>
+      <Stack gap={4}>
+        <Text variant="h1" dataHook="history-view-heading">
+          History
         </Text>
-      )}
-      {isError && tracks.length === 0 && (
-        <Box className="flex items-center gap-3" dataHook="history-error-container">
-          <Text role="alert" dataHook="history-error-text">
-            {error?.message || "Could not load history."}
+        {isPending && (
+          <Text role="status" dataHook="history-loading-text">
+            Loading history...
           </Text>
-          <button type="button" onClick={() => void refetch()} data-hook="history-retry-button">
-            Try again
-          </button>
-        </Box>
-      )}
-      {!isPending && !isError && tracks.length === 0 && (
-        <Text dataHook="history-empty-text">No listening history yet.</Text>
-      )}
-      {tracks.map((track, index) => (
-        <TrackItem track={track} index={index} key={`${track.id}-${index}`} showCover />
-      ))}
-      {tracks.length > 0 && hasNextPage && (
-        <div
-          ref={loadMoreRef}
-          className="min-h-8"
-          aria-hidden="true"
-          data-hook="history-loadmore-trigger"
-        />
-      )}
-      {isFetchingNextPage && (
-        <Text role="status" dataHook="history-fetching-more-text">
-          Loading more history...
-        </Text>
-      )}
-      {isError && tracks.length > 0 && (
-        <Box className="flex items-center gap-3" dataHook="history-loadmore-error-container">
-          <Text role="alert" dataHook="history-loadmore-error-text">
-            Could not load more history.
+        )}
+        {isError && tracks.length === 0 && (
+          <Flex align="center" gap={3} dataHook="history-error-container">
+            <Text role="alert" dataHook="history-error-text">
+              {error?.message || "Could not load history."}
+            </Text>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => void refetch()}
+              dataHook="history-retry-button"
+            >
+              Try again
+            </Button>
+          </Flex>
+        )}
+        {!isPending && !isError && tracks.length === 0 && (
+          <Text dataHook="history-empty-text">No listening history yet.</Text>
+        )}
+        {tracks.map((track, index) => (
+          <TrackItem track={track} index={index} key={`${track.id}-${index}`} showCover />
+        ))}
+        {tracks.length > 0 && hasNextPage && (
+          <Box
+            ref={loadMoreRef}
+            style={{ minHeight: "2rem" }}
+            aria-hidden="true"
+            dataHook="history-loadmore-trigger"
+          />
+        )}
+        {isFetchingNextPage && (
+          <Text role="status" dataHook="history-fetching-more-text">
+            Loading more history...
           </Text>
-          <button
-            type="button"
-            onClick={() => void fetchNextPage()}
-            data-hook="history-loadmore-retry-button"
-          >
-            Retry
-          </button>
-        </Box>
-      )}
+        )}
+        {isError && tracks.length > 0 && (
+          <Flex align="center" gap={3} dataHook="history-loadmore-error-container">
+            <Text role="alert" dataHook="history-loadmore-error-text">
+              Could not load more history.
+            </Text>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => void fetchNextPage()}
+              dataHook="history-loadmore-retry-button"
+            >
+              Retry
+            </Button>
+          </Flex>
+        )}
+      </Stack>
     </Box>
   );
 }

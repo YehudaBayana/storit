@@ -1,14 +1,9 @@
-import Card from "@/components/ui/card/Card";
+import { Badge, Box, Card, Flex, Heading, Image, Text } from "@/components/ui";
 import { Playlist } from "@/types/global.types";
-import Flex from "@/components/ui/layout/Flex";
-import Image from "@/components/ui/image/Image";
-import Heading from "@/components/ui/heading/Heading";
-import Text from "@/components/ui/text/Text";
 
 interface PlaylistCardProps {
   pl: Playlist;
   onClick: (playlist: Playlist) => void;
-  className?: string;
   dataHook?: string;
 }
 
@@ -18,57 +13,59 @@ export const PlaylistCard = ({ onClick, pl: playlist, dataHook }: PlaylistCardPr
       key={playlist.id}
       clickable
       hoverable
-      variant="default"
+      group
+      variant="surface"
       onClick={() => onClick(playlist)}
       dataHook={dataHook}
-      className="bg-[var(--bg-surface)] border border-[var(--border-default)] hover:border-emerald-500/50 transition-all duration-300 group flex flex-col h-full overflow-hidden"
     >
-      <Card.Body padding="sm" className="flex flex-col h-full justify-between gap-3">
-        <Flex direction="col" gap={2}>
-          <div className="relative aspect-video w-full rounded-lg overflow-hidden bg-[var(--bg-surface-hover)] border border-[var(--border-subtle)]">
-            {playlist.thumbnails.length > 0 ? (
-              <Image
-                src={playlist.thumbnails[0].url}
-                alt={playlist.title}
-                fit="cover"
-                showSkeleton
-                className="w-full h-full group-hover:scale-105 transition-transform duration-300"
-              />
-            ) : (
-              <Flex align="center" justify="center" className="w-full h-full text-2xl">
-                🎶
-              </Flex>
-            )}
-            {playlist.playlist_count > 0 && (
-              <div className="absolute bottom-2 right-2 px-2 py-0.5 rounded bg-black/75 backdrop-blur-sm text-[10px] font-mono text-white z-10">
-                {playlist.playlist_count} videos
-              </div>
-            )}
-          </div>
+      <Card.Body padding="sm">
+        <Flex direction="col" gap={3} h="full" justify="between">
+          <Flex direction="col" gap={2}>
+            <Box
+              position="relative"
+              aspect="video"
+              w="full"
+              rounded="lg"
+              overflow="hidden"
+              border="all"
+              borderTone="subtle"
+              bg="bg-[var(--bg-surface-hover)]"
+            >
+              {playlist.thumbnails.length > 0 ? (
+                <Image
+                  src={playlist.thumbnails[0].url}
+                  alt={playlist.title}
+                  fit="cover"
+                  showSkeleton
+                  fill
+                />
+              ) : (
+                <Flex align="center" justify="center" w="full" h="full">
+                  🎶
+                </Flex>
+              )}
+              {playlist.playlist_count > 0 && (
+                <Box position="absolute" z="10" style={{ bottom: "0.5rem", right: "0.5rem" }}>
+                  <Badge variant="default" size="sm" pill>
+                    {playlist.playlist_count} videos
+                  </Badge>
+                </Box>
+              )}
+            </Box>
 
-          <Heading
-            level={4}
-            size="sm"
-            className="font-semibold text-[var(--text-primary)] line-clamp-2 leading-snug group-hover:text-emerald-400 transition-colors mt-1"
-          >
-            {playlist.title}
-          </Heading>
-        </Flex>
+            <Heading level={4} size="sm" clamp={2}>
+              {playlist.title}
+            </Heading>
+          </Flex>
 
-        <Flex
-          justify="between"
-          align="center"
-          className="pt-2 border-t border-[var(--border-subtle)]"
-        >
-          <Text variant="caption" color="muted" className="truncate max-w-[130px] text-[11px]">
-            {playlist.channel || playlist.uploader || "YouTube"}
-          </Text>
-          <Text
-            variant="caption"
-            className="text-emerald-400 font-semibold text-[11px] group-hover:translate-x-0.5 transition-transform"
-          >
-            View →
-          </Text>
+          <Flex justify="between" align="center" pt={2} border="top" borderTone="subtle">
+            <Text variant="caption" color="muted" truncate>
+              {playlist.channel || playlist.uploader || "YouTube"}
+            </Text>
+            <Text variant="caption" color="primary" weight="semibold">
+              View →
+            </Text>
+          </Flex>
         </Flex>
       </Card.Body>
     </Card>

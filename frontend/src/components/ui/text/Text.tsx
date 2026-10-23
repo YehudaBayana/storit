@@ -4,7 +4,17 @@ import React from "react";
  * Text variant types defining different typographic styles.
  */
 export type TextVariant =
-  "h1" | "h2" | "h3" | "h4" | "body" | "body-sm" | "small" | "caption" | "label" | "lead";
+  | "h1"
+  | "h2"
+  | "h3"
+  | "h4"
+  | "body"
+  | "body-sm"
+  | "small"
+  | "caption"
+  | "label"
+  | "lead"
+  | "inherit";
 
 /**
  * Available text colors.
@@ -18,6 +28,8 @@ export type TextColor =
   | "warning" // Amber
   | "success" // Green
   | "info" // Blue
+  | "white" // Explicit white text
+  | "gradient" // Emerald to teal gradient
   | "inherit"; // Inherit from parent
 
 /**
@@ -48,6 +60,14 @@ interface TextProps extends React.HTMLAttributes<HTMLElement> {
   align?: TextAlign;
   /** Truncate text with ellipsis */
   truncate?: boolean;
+  /** Clamp text to a maximum number of lines */
+  clamp?: 2 | 3;
+  /** Transform text to uppercase with wide tracking */
+  uppercase?: boolean;
+  /** Hide the text when its hover group parent is hovered */
+  hideOnGroupHover?: boolean;
+  /** Monospace font */
+  mono?: boolean;
   /** HTML element to render */
   as?: TextElement;
   /** Additional CSS classes */
@@ -83,6 +103,8 @@ const getVariantClasses = (variant: TextVariant): string => {
       return "text-xs leading-normal";
     case "label":
       return "text-sm leading-normal font-medium";
+    case "inherit":
+      return "";
   }
 };
 
@@ -112,6 +134,10 @@ const getColorClasses = (color: TextColor, variant: TextVariant): string => {
       return "text-green-600 dark:text-green-400";
     case "info":
       return "text-blue-600 dark:text-blue-400";
+    case "white":
+      return "text-white";
+    case "gradient":
+      return "bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent";
     case "inherit":
       return "";
   }
@@ -195,6 +221,10 @@ const Text: React.FC<TextProps> = ({
   weight,
   align,
   truncate = false,
+  clamp,
+  uppercase = false,
+  hideOnGroupHover = false,
+  mono = false,
   as,
   className = "",
   htmlFor,
@@ -206,7 +236,11 @@ const Text: React.FC<TextProps> = ({
     getColorClasses(color, variant),
     getWeightClasses(weight),
     getAlignClasses(align),
+    mono ? "font-mono" : "",
     truncate ? "truncate" : "",
+    clamp ? `line-clamp-${clamp}` : "",
+    uppercase ? "uppercase tracking-wider" : "",
+    hideOnGroupHover ? "group-hover:hidden" : "",
     className,
   ]
     .filter(Boolean)

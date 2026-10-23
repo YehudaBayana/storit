@@ -18,7 +18,7 @@ export default function HomeView({ dataHook = "home-view" }: HomeViewProps) {
   console.log("dummy commit");
   return (
     <Box dataHook={dataHook}>
-      <Container className="px-6 py-8 max-w-[1200px] space-y-12">
+      <Container size="xl">
         {/* Server Status Widget */}
         <ServerStatus />
 
@@ -26,8 +26,8 @@ export default function HomeView({ dataHook = "home-view" }: HomeViewProps) {
         <Grid gap={8} cols={2} colsMobile={1}>
           {/* Featured Tracks Showcase */}
           <Flex direction="col" gap={4}>
-            <Flex align="center" justify="between" className="px-1">
-              <Heading level={3} size="md" className="font-bold text-[var(--text-primary)]">
+            <Flex align="center" justify="between">
+              <Heading level={3} size="md">
                 Featured Sessions
               </Heading>
               <Text variant="caption" color="muted">
@@ -38,8 +38,8 @@ export default function HomeView({ dataHook = "home-view" }: HomeViewProps) {
 
           {/* Recently Played */}
           <Flex direction="col" gap={4}>
-            <Flex align="center" justify="between" className="px-1">
-              <Heading level={3} size="md" className="font-bold text-[var(--text-primary)]">
+            <Flex align="center" justify="between">
+              <Heading level={3} size="md">
                 Latest Reviews
               </Heading>
               {/* {history1.length > 0 && (
@@ -80,9 +80,9 @@ export default function HomeView({ dataHook = "home-view" }: HomeViewProps) {
 
         {/* Popular Playlists Section */}
         <Flex direction="col" gap={4}>
-          <Flex align="center" justify="between" className="px-1">
+          <Flex align="center" justify="between">
             <Flex align="center" gap={3}>
-              <Heading level={3} size="md" className="font-bold text-[var(--text-primary)]">
+              <Heading level={3} size="md">
                 Practice Timeline
               </Heading>
               <Badge variant="success" size="sm">

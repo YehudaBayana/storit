@@ -108,6 +108,7 @@ Use the `leftIcon` and `rightIcon` props for adding icons to buttons or inputs.
 - `Skeleton`: Placeholder for loading content.
 - `Alert`: Inline feedback messages.
 - `Badge`: Status or count indicators.
+- `StatusDot`: Small status indicator dot (connectivity, health, live state).
 - `Tooltip`: Contextual information on hover.
 
 ### Modals & Overlays

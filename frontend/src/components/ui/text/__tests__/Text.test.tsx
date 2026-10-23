@@ -47,6 +47,16 @@ describe("Text Component", () => {
       expect(driver.getClasses()).toContain("text-gray-500");
     });
 
+    it("applies line clamp class", () => {
+      driver.render({ clamp: 2 });
+      expect(driver.getClasses()).toContain("line-clamp-2");
+    });
+
+    it("applies group-hover hidden class", () => {
+      driver.render({ hideOnGroupHover: true });
+      expect(driver.getClasses()).toContain("group-hover:hidden");
+    });
+
     it("applies font weight class", () => {
       driver.render({ weight: "bold" });
       expect(driver.getClasses()).toContain("font-bold");

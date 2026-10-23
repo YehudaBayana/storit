@@ -3,7 +3,8 @@ import React from "react";
 /**
  * Badge variant options.
  */
-export type BadgeVariant = "default" | "primary" | "success" | "warning" | "danger" | "info";
+export type BadgeVariant =
+  "default" | "primary" | "success" | "warning" | "danger" | "info" | "secondary" | "surface";
 
 /**
  * Badge size options.
@@ -53,6 +54,10 @@ const getVariantClasses = (variant: BadgeVariant, outlined: boolean): string => 
         return "border-rose-500 text-rose-600 dark:text-rose-400";
       case "info":
         return "border-blue-500 text-blue-600 dark:text-blue-400";
+      case "secondary":
+        return "border-[var(--border-default)] text-[var(--text-secondary)]";
+      case "surface":
+        return "border-[var(--border-subtle)] text-[var(--text-secondary)]";
     }
   }
 
@@ -69,6 +74,10 @@ const getVariantClasses = (variant: BadgeVariant, outlined: boolean): string => 
       return "bg-rose-100 dark:bg-rose-900/50 text-rose-700 dark:text-rose-300";
     case "info":
       return "bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300";
+    case "secondary":
+      return "bg-[var(--bg-secondary)] text-[var(--text-secondary)] border border-[var(--border-default)]";
+    case "surface":
+      return "bg-[var(--bg-surface)] text-[var(--text-secondary)] border border-[var(--border-subtle)]";
   }
 };
 
@@ -117,6 +126,9 @@ const getDotColorClasses = (variant: BadgeVariant): string => {
       return "bg-rose-500";
     case "info":
       return "bg-blue-500";
+    case "secondary":
+    case "surface":
+      return "bg-emerald-500";
   }
 };
 

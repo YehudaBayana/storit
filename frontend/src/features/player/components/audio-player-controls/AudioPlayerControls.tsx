@@ -41,7 +41,7 @@ export default function AudioPlayerControls({
       direction="col"
       align="center"
       gap={1}
-      className="w-[40%] min-w-[280px]"
+      style={{ width: "40%", minWidth: "280px" }}
       dataHook={dataHook}
     >
       <Flex align="center" gap={4}>
@@ -50,10 +50,8 @@ export default function AudioPlayerControls({
           size="sm"
           aria-label="Previous track"
           disabled={!currentTrack}
-          className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors duration-200"
-        >
-          <span>⏮</span>
-        </IconButton>
+          icon="⏮"
+        />
 
         <IconButton
           variant="primary"
@@ -64,31 +62,23 @@ export default function AudioPlayerControls({
           aria-label={isPlaying ? "Pause" : "Play"}
           dataHook={dataHook ? `${dataHook}-play-pause` : undefined}
           loading={isLoading}
-          className="bg-[var(--text-primary)] text-[var(--bg-primary)] hover:bg-emerald-500 hover:text-white transition-all duration-300 shadow-md scale-105 active:scale-95"
-        >
-          <span>{isPlaying ? "⏸" : "▶"}</span>
-        </IconButton>
+          icon={isPlaying ? "⏸" : "▶"}
+        />
 
         <IconButton
           variant="ghost"
           size="sm"
           aria-label="Next track"
           disabled={!currentTrack}
-          className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors duration-200"
-        >
-          <span>⏭</span>
-        </IconButton>
+          icon="⏭"
+        />
       </Flex>
 
-      <Flex align="center" gap={3} className="w-full">
-        <Text
-          variant="caption"
-          color="muted"
-          className="w-[45px] text-center font-mono text-[11px] select-none"
-        >
+      <Flex align="center" gap={3} w="full">
+        <Text variant="caption" color="muted" mono align="center">
           {convertSecondsToTime(currentTime)}
         </Text>
-        <Box className="flex-1">
+        <Box grow>
           <Slider
             ref={progressRef}
             dataHook={dataHook ? `${dataHook}-seek` : undefined}
@@ -103,25 +93,15 @@ export default function AudioPlayerControls({
             onMouseUp={onDragEnd}
             onTouchEnd={onDragEnd}
             disabled={!currentTrack || isLoading}
-            className="w-full"
           />
         </Box>
-        <Text
-          variant="caption"
-          color="muted"
-          className="w-[35px] text-center font-mono text-[11px] select-none"
-        >
+        <Text variant="caption" color="muted" mono align="center">
           {currentTrack?.duration ? convertSecondsToTime(currentTrack.duration) : "0:00"}
         </Text>
       </Flex>
 
       {error && (
-        <Text
-          variant="small"
-          color="danger"
-          weight="medium"
-          className="text-[11px] -mt-1 select-none"
-        >
+        <Text variant="small" color="danger" weight="medium">
           {error}
         </Text>
       )}

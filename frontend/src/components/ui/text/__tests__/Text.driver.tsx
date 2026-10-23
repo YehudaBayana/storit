@@ -10,6 +10,8 @@ export interface TextDriverProps {
   weight?: TextWeight;
   align?: TextAlign;
   truncate?: boolean;
+  clamp?: 2 | 3;
+  hideOnGroupHover?: boolean;
   as?: "p" | "span" | "div" | "label" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
   className?: string;
   htmlFor?: string;

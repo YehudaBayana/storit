@@ -1,14 +1,9 @@
 "use client";
 
 import React from "react";
-import Text from "@/components/ui/text/Text";
-import IconButton from "@/components/ui/icon-button/IconButton";
-import Flex from "@/components/ui/layout/Flex";
-import Box from "@/components/ui/layout/Box";
-import Menu from "@/components/ui/menu/Menu";
+import { Box, Flex, IconButton, Image, Menu, Text } from "@/components/ui";
 import { usePlaybackStore } from "@/features/player/store/usePlaybackStore";
 import { Track } from "@/types/global.types";
-import Image from "@/components/ui/image/Image";
 import { convertSecondsToTime } from "@/shared/utils";
 import { usePostLiked } from "@/features/liked/query/useLiked";
 import { useLikedStore } from "@/features/liked/store/useLikedStore";
@@ -53,15 +48,20 @@ export default function TrackItem({
       align="center"
       justify="between"
       gap={4}
-      className={`group w-full p-3 rounded-xl border border-transparent transition-all duration-200 select-none hover:bg-[var(--bg-surface-hover)] hover:border-[var(--border-default)] ${
-        isCurrent ? "bg-[var(--bg-surface)] border-[var(--border-default)]" : ""
-      }`}
+      group
+      hoverable
+      w="full"
+      p={3}
+      rounded="xl"
+      border="all"
+      borderTone={isCurrent ? "default" : "transparent"}
+      bg={isCurrent ? "bg-[var(--bg-surface)]" : undefined}
       dataHook={dataHook}
     >
       {/* Left Part: Play/Index, Cover, Title */}
-      <Flex align="center" gap={4} className="min-w-0 flex-1">
+      <Flex align="center" gap={4} minW="0" grow>
         {/* Play Button or Index */}
-        <Box className="relative w-8 h-8 flex items-center justify-center flex-shrink-0">
+        <Flex align="center" justify="center" w="8" h="8" position="relative">
           {isCurrent ? (
             <IconButton
               size="xs"
@@ -69,17 +69,12 @@ export default function TrackItem({
               onClick={handlePlayClick}
               aria-label={isPlaying ? "Pause" : "Play"}
               dataHook={dataHook ? `${dataHook}-play-button` : undefined}
-              className="text-emerald-400 group-hover:scale-110 transition-transform"
-              icon={<span>{isPlaying ? "⏸" : "▶"}</span>}
+              icon={isPlaying ? "⏸" : "▶"}
             />
           ) : (
             <>
               {index !== undefined && (
-                <Text
-                  variant="body-sm"
-                  color="muted"
-                  className="font-mono group-hover:hidden transition-all duration-100"
-                >
+                <Text variant="body-sm" color="muted" mono hideOnGroupHover>
                   {String(index + 1).padStart(2, "0")}
                 </Text>
               )}
@@ -89,43 +84,40 @@ export default function TrackItem({
                 onClick={handlePlayClick}
                 aria-label="Play"
                 dataHook={dataHook ? `${dataHook}-play-button` : undefined}
-                className="hidden group-hover:flex text-white hover:text-emerald-400 group-hover:scale-110 transition-transform"
-                icon={<span>▶</span>}
+                showOnGroupHover
+                icon="▶"
               />
             </>
           )}
-        </Box>
+        </Flex>
 
-        {/* Emoji Cover Icon */}
+        {/* Track Cover */}
         {showCover && (
-          <Flex
-            align="center"
-            justify="center"
-            className={`w-10 h-10 rounded-lg flex-shrink-0 text-xl bg-gradient-to-br transition-all duration-300 ${
-              isCurrent
-                ? "from-emerald-500/20 to-teal-500/20 border border-emerald-500/30 rotate-[-2deg] scale-105 shadow-[0_4px_12px_rgba(16,185,129,0.15)]"
-                : "from-[var(--bg-surface-hover)] to-[var(--bg-surface)] border border-[var(--border-default)] group-hover:from-[var(--bg-surface-active)] group-hover:rotate-[-2deg] group-hover:scale-105"
-            }`}
+          <Box
+            position="relative"
+            w="10"
+            h="10"
+            rounded="lg"
+            overflow="hidden"
+            border="all"
+            borderTone={isCurrent ? "default" : "subtle"}
           >
             <Image
               src={track.thumbnails?.[track.thumbnails.length - 1].url || track.thumbnail}
               alt={track.title}
-              className="w-full h-full object-cover"
+              fit="cover"
+              fill
             />
-          </Flex>
+          </Box>
         )}
 
         {/* Text Info */}
-        <Flex direction="col" className="min-w-0 flex-1">
+        <Flex direction="col" minW="0" grow>
           <Text
             variant="body-sm"
             weight={isCurrent ? "semibold" : "medium"}
+            color={isCurrent ? "primary" : "default"}
             truncate
-            className={`transition-colors duration-200 ${
-              isCurrent
-                ? "text-emerald-400"
-                : "text-[var(--text-primary)] group-hover:text-emerald-400"
-            }`}
             dataHook={dataHook ? `${dataHook}-title` : undefined}
           >
             {track.title}
@@ -134,27 +126,9 @@ export default function TrackItem({
       </Flex>
 
       {/* Middle/Right Part: Category and Actions */}
-      <Flex align="center" gap={4} className="flex-shrink-0">
-        {/* Category Badge */}
-        {/* {showCategory && (
-          <Box className="hidden sm:block">
-            <Badge
-              variant="default"
-              outlined
-              size="sm"
-              className="border-[var(--border-default)] text-[var(--text-secondary)] bg-[var(--bg-surface)] rounded-full"
-            >
-              {track.category}
-            </Badge>
-          </Box>
-        )} */}
-
+      <Flex align="center" gap={4}>
         {/* Duration */}
-        <Text
-          variant="small"
-          color="muted"
-          className="font-mono text-xs tracking-wider select-none w-10 text-right"
-        >
+        <Text variant="small" color="muted" mono align="right">
           {convertSecondsToTime(track.duration)}
         </Text>
 
@@ -168,12 +142,8 @@ export default function TrackItem({
           }}
           aria-label={isCurrentLiked ? "Unlike" : "Like"}
           dataHook={dataHook ? `${dataHook}-like-button` : undefined}
-          className={`transition-colors duration-200 ${
-            isCurrentLiked
-              ? "text-emerald-500 hover:text-emerald-400"
-              : "text-[var(--text-muted)] hover:text-[var(--text-primary)] opacity-0 group-hover:opacity-100"
-          }`}
-          icon={<span>{isCurrentLiked ? "❤️" : "🤍"}</span>}
+          hideUntilGroupHover={!isCurrentLiked}
+          icon={isCurrentLiked ? "❤️" : "🤍"}
         />
 
         {/* Playlist Action Menu */}
@@ -185,8 +155,8 @@ export default function TrackItem({
               size="sm"
               variant="ghost"
               aria-label="Track options"
-              className="text-[var(--text-muted)] hover:text-[var(--text-primary)] opacity-0 group-hover:opacity-100"
-              icon={<span>⋮</span>}
+              hideUntilGroupHover
+              icon="⋮"
             />
           }
         >
@@ -195,7 +165,7 @@ export default function TrackItem({
           {playlistId && (
             <>
               <Menu.Divider />
-              <Menu.Item danger icon={<span>✕</span>}>
+              <Menu.Item danger icon="✕">
                 Remove from Playlist
               </Menu.Item>
             </>

@@ -3,12 +3,13 @@ import React from "react";
 /**
  * Card variant options.
  */
-export type CardVariant = "default" | "elevated" | "outlined" | "ghost";
+export type CardVariant =
+  "default" | "elevated" | "outlined" | "ghost" | "secondary" | "surface" | "dashed";
 
 /**
  * Card padding options.
  */
-export type CardPadding = "none" | "sm" | "md" | "lg";
+export type CardPadding = "none" | "sm" | "md" | "lg" | "xl";
 
 // ----------------------------------------------------------------------------
 // Card Header
@@ -74,6 +75,8 @@ const getPaddingClasses = (padding: CardPadding): string => {
       return "p-4 sm:p-6";
     case "lg":
       return "p-6 sm:p-8";
+    case "xl":
+      return "p-6 sm:p-8 md:p-10";
   }
 };
 
@@ -155,15 +158,21 @@ const CardFooter: React.FC<CardFooterProps> = ({
 // Card
 // ----------------------------------------------------------------------------
 
+export type CardRounded = "none" | "sm" | "md" | "lg" | "xl" | "2xl" | "3xl" | "full";
+
 interface CardProps extends React.HTMLAttributes<HTMLElement> {
   /** Card content */
   children: React.ReactNode;
   /** Card style variant */
   variant?: CardVariant;
+  /** Card border radius */
+  rounded?: CardRounded;
   /** Whether the card is clickable/interactive */
   hoverable?: boolean;
   /** Make the entire card a clickable button */
   clickable?: boolean;
+  /** Marks the card as a hover group for group-hover children */
+  group?: boolean;
   /** HTML element to render */
   as?: "div" | "article" | "section" | "button";
   /** Optional padding for the whole card (if not using Card.Body) */
@@ -200,6 +209,45 @@ const getVariantClasses = (variant: CardVariant): string => {
         shadow-none
         border-0
       `;
+    case "secondary":
+      return `
+        bg-[var(--bg-secondary)]
+        border border-[var(--border-default)]
+      `;
+    case "surface":
+      return `
+        bg-[var(--bg-surface)]
+        border border-[var(--border-default)]
+      `;
+    case "dashed":
+      return `
+        bg-[var(--bg-secondary)]
+        border border-dashed border-[var(--border-default)]
+      `;
+  }
+};
+
+/**
+ * Get rounded classes.
+ */
+const getRoundedClasses = (rounded: CardRounded): string => {
+  switch (rounded) {
+    case "none":
+      return "rounded-none";
+    case "sm":
+      return "rounded-sm";
+    case "md":
+      return "rounded-md";
+    case "lg":
+      return "rounded-lg";
+    case "xl":
+      return "rounded-xl";
+    case "2xl":
+      return "rounded-2xl";
+    case "3xl":
+      return "rounded-3xl";
+    case "full":
+      return "rounded-full";
   }
 };
 
@@ -216,8 +264,10 @@ const Card: React.FC<CardProps> & {
 } = ({
   children,
   variant = "default",
+  rounded = "xl",
   hoverable = false,
   clickable = false,
+  group = false,
   onClick,
   as,
   className = "",
@@ -232,13 +282,15 @@ const Card: React.FC<CardProps> & {
     : "";
 
   const classes = [
-    "rounded-xl overflow-hidden",
+    getRoundedClasses(rounded),
+    "overflow-hidden",
     getVariantClasses(variant),
     hoverClasses,
     padding ? getPaddingClasses(padding) : "",
     clickable
       ? "w-full text-left focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900"
       : "",
+    group ? "group" : "",
     className,
   ]
     .filter(Boolean)

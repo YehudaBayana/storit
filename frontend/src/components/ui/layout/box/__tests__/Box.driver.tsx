@@ -7,6 +7,13 @@ export interface BoxDriverProps {
   dataHook?: string;
   as?: "div" | "section" | "article";
   p?: number;
+  position?: "static" | "relative" | "absolute" | "fixed" | "sticky";
+  inset?: "0" | "x-0" | "y-0";
+  z?: "0" | "10" | "20" | "30" | "40" | "50";
+  overflow?: "visible" | "hidden" | "auto" | "scroll";
+  overflowY?: "visible" | "hidden" | "auto" | "scroll";
+  aspect?: "video" | "square";
+  group?: boolean;
   className?: string;
   children?: React.ReactNode;
 }

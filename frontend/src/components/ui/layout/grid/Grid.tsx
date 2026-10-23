@@ -109,7 +109,61 @@ const getColsClasses = (cols: GridCols, colsMobile?: GridCols, colsTablet?: Grid
   return classes.join(" ");
 };
 
-const Grid: React.FC<GridProps> = ({
+export type GridColSpan = 1 | 2 | 3 | 4 | 5 | 6 | 12 | "full";
+
+const colSpanMap: Record<GridColSpan, string> = {
+  1: "col-span-1",
+  2: "col-span-2",
+  3: "col-span-3",
+  4: "col-span-4",
+  5: "col-span-5",
+  6: "col-span-6",
+  12: "col-span-12",
+  full: "col-span-full",
+};
+
+const tabletColSpanMap: Record<GridColSpan, string> = {
+  1: "md:col-span-1",
+  2: "md:col-span-2",
+  3: "md:col-span-3",
+  4: "md:col-span-4",
+  5: "md:col-span-5",
+  6: "md:col-span-6",
+  12: "md:col-span-12",
+  full: "md:col-span-full",
+};
+
+export interface GridItemProps {
+  children: React.ReactNode;
+  colSpan?: GridColSpan;
+  colSpanTablet?: GridColSpan;
+  className?: string;
+  dataHook?: string;
+}
+
+export const GridItem: React.FC<GridItemProps> = ({
+  children,
+  colSpan,
+  colSpanTablet,
+  className = "",
+  dataHook,
+}) => {
+  const classes = [
+    colSpan ? colSpanMap[colSpan] : "",
+    colSpanTablet ? tabletColSpanMap[colSpanTablet] : "",
+    className,
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  return (
+    <div className={classes} data-hook={dataHook}>
+      {children}
+    </div>
+  );
+};
+
+const Grid: React.FC<GridProps> & { Item: typeof GridItem } = ({
   children,
   cols = 1,
   colsMobile,
@@ -140,5 +194,7 @@ const Grid: React.FC<GridProps> = ({
     </Element>
   );
 };
+
+Grid.Item = GridItem;
 
 export default Grid;

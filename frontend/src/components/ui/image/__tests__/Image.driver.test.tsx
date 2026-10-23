@@ -21,6 +21,19 @@ describe("Image", () => {
     expect(driver.getRootClassName()).toContain("rounded-lg");
   });
 
+  it("fills the nearest positioned ancestor when fill is set", () => {
+    driver.render({ fill: true });
+
+    expect(driver.getRootClassName()).toContain("absolute");
+    expect(driver.getRootClassName()).toContain("inset-0");
+  });
+
+  it("dims the image when dimmed is set", () => {
+    driver.render({ dimmed: true });
+
+    expect(driver.getImageClassName()).toContain("brightness-[0.35]");
+  });
+
   it("removes the loading skeleton after the image loads", async () => {
     driver.render({ showSkeleton: true });
     expect(driver.hasSkeleton()).toBe(true);

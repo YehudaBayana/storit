@@ -4,7 +4,7 @@ import { KeyboardEvent, useState } from "react";
 import { useSearchBy } from "../store/useSearch";
 import Input from "@/components/ui/input/Input";
 import TrackItem from "@/features/player/components/TrackItem";
-import { Box } from "@/components/ui/layout";
+import { Box, Stack } from "@/components/ui";
 
 interface SearchViewProps {
   dataHook?: string;
@@ -23,8 +23,8 @@ export default function SearchView({ dataHook = "search-view" }: SearchViewProps
   };
 
   return (
-    <>
-      <Box className="p-10 flex flex-col gap-4" dataHook={dataHook}>
+    <Box p={10} dataHook={dataHook}>
+      <Stack gap={4}>
         <Input
           dataHook={dataHook}
           value={draftTerm}
@@ -34,7 +34,7 @@ export default function SearchView({ dataHook = "search-view" }: SearchViewProps
         {data?.results.map((track) => {
           return <TrackItem track={track} key={track.id} showCover />;
         })}
-      </Box>
-    </>
+      </Stack>
+    </Box>
   );
 }

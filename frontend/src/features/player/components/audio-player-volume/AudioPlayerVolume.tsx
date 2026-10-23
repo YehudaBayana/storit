@@ -1,7 +1,5 @@
 import type { ChangeEvent } from "react";
-import Flex from "@/components/ui/layout/Flex";
-import IconButton from "@/components/ui/icon-button/IconButton";
-import Slider from "@/components/ui/slider/Slider";
+import { Box, Flex, IconButton, Slider } from "@/components/ui";
 
 interface AudioPlayerVolumeProps {
   hasTrack: boolean;
@@ -25,7 +23,7 @@ export default function AudioPlayerVolume({
       justify="end"
       align="center"
       gap={4}
-      className="w-[30%] min-w-[150px]"
+      style={{ width: "30%", minWidth: "150px" }}
       dataHook={dataHook}
     >
       <Flex align="center" gap={2}>
@@ -36,24 +34,21 @@ export default function AudioPlayerVolume({
           disabled={!hasTrack}
           aria-label={isMuted ? "Unmute" : "Mute"}
           dataHook={dataHook ? `${dataHook}-mute` : undefined}
-          className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors duration-200"
-        >
-          <span>
-            {isMuted || volume === 0 ? "🔇" : volume < 0.4 ? "🔈" : volume < 0.7 ? "🔉" : "🔊"}
-          </span>
-        </IconButton>
-        <Slider
-          size="sm"
-          color="secondary"
-          min={0}
-          max={1}
-          step={0.05}
-          value={isMuted ? 0 : volume}
-          dataHook={dataHook ? `${dataHook}-volume` : undefined}
-          onChange={onVolumeChange}
-          disabled={!hasTrack}
-          className="w-20"
+          icon={isMuted || volume === 0 ? "🔇" : volume < 0.4 ? "🔈" : volume < 0.7 ? "🔉" : "🔊"}
         />
+        <Box style={{ width: "5rem" }}>
+          <Slider
+            size="sm"
+            color="secondary"
+            min={0}
+            max={1}
+            step={0.05}
+            value={isMuted ? 0 : volume}
+            dataHook={dataHook ? `${dataHook}-volume` : undefined}
+            onChange={onVolumeChange}
+            disabled={!hasTrack}
+          />
+        </Box>
       </Flex>
     </Flex>
   );

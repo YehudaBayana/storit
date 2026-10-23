@@ -130,6 +130,9 @@ export type { AlertVariant } from "./alert/Alert";
 export { default as Badge } from "./badge/Badge";
 export type { BadgeVariant, BadgeSize } from "./badge/Badge";
 
+export { default as StatusDot } from "./status-dot/StatusDot";
+export type { StatusDotVariant, StatusDotSize } from "./status-dot/StatusDot";
+
 export { default as Kbd } from "./kbd/Kbd";
 export type { KbdProps } from "./kbd/Kbd";
 
@@ -196,3 +199,21 @@ export { default as TrendingSongSkeleton } from "./trending-song-skeleton/Trendi
 export { default as TableRowSkeleton } from "./table-row-skeleton/TableRowSkeleton";
 export { default as CommentSkeleton } from "./comment-skeleton/CommentSkeleton";
 export * from "./carousel/Carousel";
+
+// ============================================================================
+// Media Components
+// ============================================================================
+export { default as AudioVisualizer } from "./audio-visualizer/AudioVisualizer";
+export type {
+  AudioVisualizerSize,
+  AudioVisualizerVariant,
+} from "./audio-visualizer/AudioVisualizer";
+
+export { default as Video } from "./video/Video";
+export type { VideoAspectRatio, VideoRounded } from "./video/Video";
+
+export { default as Audio } from "./audio/Audio";
+export type { AudioProps } from "./audio/Audio";
+
+export { default as PlayerBar } from "./player-bar/PlayerBar";
+export type { PlayerBarProps } from "./player-bar/PlayerBar";

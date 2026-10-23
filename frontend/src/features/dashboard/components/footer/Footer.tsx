@@ -9,12 +9,8 @@ interface FooterProps {
 
 export default function Footer({ dataHook = "dashboard-footer" }: FooterProps) {
   return (
-    <Box
-      as="footer"
-      dataHook={dataHook}
-      className="w-full py-12 px-6 border-t border-white/8 text-center bg-black/20"
-    >
-      <Text variant="caption" color="muted" className="text-sm">
+    <Box as="footer" dataHook={dataHook} py={12} px={6} border="top" borderTone="subtle">
+      <Text variant="caption" color="muted" align="center">
         &copy; {new Date().getFullYear()} Soundstream. Built for learning backend engineering.
       </Text>
     </Box>

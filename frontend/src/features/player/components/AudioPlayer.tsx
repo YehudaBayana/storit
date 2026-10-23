@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import Flex from "@/components/ui/layout/Flex";
+import { Audio, Flex, PlayerBar } from "@/components/ui";
 import { useMSEPlayer } from "../hooks/useMSEPlayer";
 import { usePlaybackStore } from "@/features/player/store/usePlaybackStore";
 import AudioPlayerTrackInfo from "./audio-player-track-info/AudioPlayerTrackInfo";
@@ -135,19 +135,11 @@ export default function AudioPlayer({ dataHook = "audio-player" }: AudioPlayerPr
   };
 
   return (
-    <Flex
-      align="center"
-      className={`fixed left-4 right-4 md:left-[284px] md:right-6 h-[84px] z-[999] px-6 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-player)] backdrop-blur-xl shadow-[var(--shadow-player)] transition-all duration-500 cubic-bezier(0.16,1,0.3,1) ${
-        currentTrack?.id
-          ? "bottom-6 opacity-100 pointer-events-auto"
-          : "-bottom-[150px] opacity-0 pointer-events-none"
-      }`}
-      dataHook={dataHook}
-    >
+    <PlayerBar visible={Boolean(currentTrack?.id)} dataHook={dataHook}>
       {currentTrack?.id && (
-        <audio
+        <Audio
           ref={audioRef}
-          data-hook={`${dataHook}-audio`}
+          dataHook={`${dataHook}-audio`}
           onTimeUpdate={handleTimeUpdate}
           onDurationChange={handleDurationChange}
           onLoadStart={handleAudioLoadStart}
@@ -157,7 +149,7 @@ export default function AudioPlayer({ dataHook = "audio-player" }: AudioPlayerPr
         />
       )}
 
-      <Flex justify="between" align="center" gap={6} className="w-full">
+      <Flex justify="between" align="center" gap={6} w="full">
         <AudioPlayerTrackInfo
           dataHook={`${dataHook}-track-info`}
           track={currentTrack}
@@ -188,6 +180,6 @@ export default function AudioPlayer({ dataHook = "audio-player" }: AudioPlayerPr
           onVolumeChange={handleVolumeChange}
         />
       </Flex>
-    </Flex>
+    </PlayerBar>
   );
 }

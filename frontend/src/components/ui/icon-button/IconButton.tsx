@@ -23,6 +23,10 @@ interface IconButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> 
   "aria-label": string;
   /** Whether the button is round (circular) */
   rounded?: boolean;
+  /** Hide the button until its hover group parent is hovered (fade in) */
+  hideUntilGroupHover?: boolean;
+  /** Show the button only while its hover group parent is hovered (swap display) */
+  showOnGroupHover?: boolean;
   /** Additional CSS classes */
   className?: string;
   /** Alternative icon as child */
@@ -145,6 +149,8 @@ const IconButton: React.FC<IconButtonProps> = ({
   size = "md",
   loading = false,
   rounded = false,
+  hideUntilGroupHover = false,
+  showOnGroupHover = false,
   disabled,
   className = "",
   type = "button",
@@ -161,6 +167,8 @@ const IconButton: React.FC<IconButtonProps> = ({
     getVariantClasses(variant),
     getSizeClasses(size, rounded),
     isDisabled ? "opacity-50 cursor-not-allowed" : "",
+    hideUntilGroupHover ? "opacity-0 group-hover:opacity-100" : "",
+    showOnGroupHover ? "hidden group-hover:inline-flex" : "",
     className,
   ]
     .filter(Boolean)

@@ -2,10 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { apiUrl } from "@/config/constants";
-import Button from "@/components/ui/button/Button";
-import IconButton from "@/components/ui/icon-button/IconButton";
-import Text from "@/components/ui/text/Text";
-import { Box } from "@/components/ui/layout";
+import { Box, Button, Flex, IconButton, StatusDot, Text } from "@/components/ui";
 
 interface ServicesStatus {
   database: string;
@@ -30,7 +27,7 @@ export default function ServerStatus({ dataHook = "server-status" }: ServerStatu
   const [latency, setLatency] = useState<number | null>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const panelRef = useRef<HTMLDivElement>(null);
+  const panelRef = useRef<HTMLElement>(null);
 
   const checkHealth = async () => {
     setIsRefreshing(true);
@@ -103,49 +100,67 @@ export default function ServerStatus({ dataHook = "server-status" }: ServerStatu
     setIsOpen(!isOpen);
   };
 
+  const statusVariant =
+    status === "online" ? "success" : status === "offline" ? "danger" : "warning";
+
+  const statusLabel =
+    status === "online"
+      ? "Backend Connected"
+      : status === "offline"
+        ? "Backend Disconnected"
+        : "Connecting...";
+
+  const latencyColor =
+    latency !== null ? (latency < 50 ? "success" : latency < 150 ? "warning" : "danger") : "muted";
+
   return (
-    <Box className="fixed top-4 left-128 z-[1000] font-sans" ref={panelRef} dataHook={dataHook}>
+    <Box
+      position="fixed"
+      z="50"
+      ref={panelRef}
+      dataHook={dataHook}
+      style={{ top: "1rem", left: "32rem" }}
+    >
       <Button
-        className="flex items-center gap-3 px-4 py-2 rounded-full bg-black/75 backdrop-blur-md border border-white/8 shadow-[0_4px_6px_rgba(0,0,0,0.15),0_8px_32px_rgba(0,0,0,0.3)] transition-all duration-300 select-none cursor-pointer hover:bg-black/85 hover:border-white/20 hover:-translate-y-[1px] hover:shadow-[0_4px_6px_rgba(0,0,0,0.15),0_12px_40px_rgba(0,0,0,0.4)]"
+        variant="secondary"
+        size="sm"
+        pill
         onClick={togglePanel}
         aria-label="Toggle server health status"
         aria-expanded={isOpen}
         dataHook={`${dataHook}-toggle`}
+        leftIcon={<StatusDot variant={statusVariant} pulse />}
       >
-        <span
-          className={`w-2.5 h-2.5 rounded-full relative transition-all duration-300 ${
-            status === "online"
-              ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.7)] animate-pulse"
-              : status === "offline"
-                ? "bg-rose-500 shadow-[0_0_8px_rgba(239,68,68,0.7)] animate-pulse"
-                : "bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.7)] animate-pulse"
-          }`}
-        />
-        <span
-          className="text-sm font-medium text-white tracking-wide"
-          data-hook={`${dataHook}-connection`}
+        <Text
+          as="span"
+          variant="inherit"
+          weight="medium"
+          color="inherit"
+          dataHook={`${dataHook}-connection`}
         >
-          {status === "online" && "Backend Connected"}
-          {status === "offline" && "Backend Disconnected"}
-          {status === "checking" && "Connecting..."}
-        </span>
+          {statusLabel}
+        </Text>
         {status === "online" && latency !== null && (
-          <span className="text-xs text-slate-400 font-semibold ml-1">({latency}ms)</span>
+          <Text as="span" variant="small" color="muted" weight="semibold">
+            ({latency}ms)
+          </Text>
         )}
       </Button>
 
       {isOpen && (
         <Box
           dataHook={`${dataHook}-panel`}
-          className="absolute top-[calc(100%+12px)] left-0 w-[290px] p-5 rounded-xl bg-[#0f0f0f]/92 backdrop-blur-md border border-white/8 shadow-[0_20px_40px_rgba(0,0,0,0.6)] flex flex-col gap-3.5 origin-top-left animate-[slideDown_0.3s_cubic-bezier(0.16,1,0.3,1)_forwards] pointer-events-auto"
+          position="absolute"
+          z="50"
+          p={5}
+          rounded="xl"
+          border="all"
+          borderTone="subtle"
+          bg="bg-[var(--bg-status-panel)]"
+          style={{ top: "calc(100% + 12px)", left: 0, width: "290px" }}
         >
-          <Box className="flex justify-between items-center border-b border-white/8 pb-2">
-            <Text
-              variant="caption"
-              weight="bold"
-              color="default"
-              className="uppercase tracking-wider"
-            >
+          <Flex justify="between" align="center" border="bottom" borderTone="subtle" py={2}>
+            <Text variant="caption" weight="bold" color="default" uppercase>
               System Status
             </Text>
             <IconButton
@@ -153,125 +168,97 @@ export default function ServerStatus({ dataHook = "server-status" }: ServerStatu
               size="xs"
               onClick={() => setIsOpen(false)}
               aria-label="Close panel"
-              className="text-gray-400 hover:text-white"
-            >
-              ✕
-            </IconButton>
-          </Box>
+              icon="✕"
+            />
+          </Flex>
 
-          <Box className="flex flex-col gap-2">
-            <Box className="flex justify-between text-[13px]">
+          <Flex direction="col" gap={2} py={3}>
+            <Flex justify="between">
               <Text variant="small" color="muted">
                 Service:
               </Text>
-              <Text variant="small" weight="medium" className="font-mono text-white">
+              <Text variant="small" weight="medium" mono>
                 Soundstream API
               </Text>
-            </Box>
+            </Flex>
 
-            <Box className="flex justify-between text-[13px]">
+            <Flex justify="between">
               <Text variant="small" color="muted">
                 Status:
               </Text>
-              <span
-                className={`text-xs font-mono font-bold uppercase ${
-                  status === "online"
-                    ? "text-emerald-500"
-                    : status === "offline"
-                      ? "text-rose-500"
-                      : "text-amber-500"
-                }`}
-              >
-                {status === "online" && "ONLINE"}
-                {status === "offline" && "OFFLINE"}
-                {status === "checking" && "CHECKING..."}
-              </span>
-            </Box>
+              <Text variant="small" weight="bold" mono uppercase color={statusVariant}>
+                {status}
+              </Text>
+            </Flex>
 
             {status === "online" && latency !== null && (
-              <Box className="flex justify-between text-[13px]">
+              <Flex justify="between">
                 <Text variant="small" color="muted">
                   Latency:
                 </Text>
-                <span
-                  className={`text-xs font-mono font-bold ${
-                    latency < 50
-                      ? "text-emerald-500"
-                      : latency < 150
-                        ? "text-amber-500"
-                        : "text-rose-500"
-                  }`}
-                >
+                <Text variant="small" weight="bold" mono color={latencyColor}>
                   {latency}ms
-                </span>
-              </Box>
+                </Text>
+              </Flex>
             )}
 
             {data && (
               <>
-                <Box className="flex justify-between text-[13px]">
+                <Flex justify="between">
                   <Text variant="small" color="muted">
                     Version:
                   </Text>
-                  <Text variant="small" weight="medium" className="font-mono text-white">
+                  <Text variant="small" weight="medium" mono>
                     {data.version}
                   </Text>
-                </Box>
-                <Box className="flex justify-between text-[13px]">
+                </Flex>
+                <Flex justify="between">
                   <Text variant="small" color="muted">
                     Uptime:
                   </Text>
-                  <Text variant="small" weight="medium" className="font-mono text-white">
+                  <Text variant="small" weight="medium" mono>
                     {data.uptime}
                   </Text>
-                </Box>
+                </Flex>
               </>
             )}
 
-            <Box className="flex justify-between text-[13px]">
+            <Flex justify="between">
               <Text variant="small" color="muted">
                 Endpoint:
               </Text>
-              <span
-                className="text-[11px] font-mono text-white/80 overflow-hidden text-ellipsis whitespace-nowrap max-w-[170px]"
-                title={apiUrl}
-              >
+              <Text variant="small" mono truncate title={apiUrl} style={{ maxWidth: "170px" }}>
                 {apiUrl}
-              </span>
-            </Box>
-          </Box>
+              </Text>
+            </Flex>
+          </Flex>
 
           {status === "online" && data?.services && (
-            <Box className="border-t border-white/8 pt-3 flex flex-col gap-1.5">
-              <Text
-                variant="caption"
-                weight="bold"
-                color="muted"
-                className="uppercase tracking-wider mb-0.5"
-              >
+            <Flex direction="col" gap={1} border="top" borderTone="subtle" py={3}>
+              <Text variant="caption" weight="bold" color="muted" uppercase>
                 Backend Services
               </Text>
-              <Box className="flex justify-between text-[13px]">
+              <Flex justify="between">
                 <Text variant="small" color="muted">
                   Database (Postgres):
                 </Text>
-                <span className="text-xs font-mono font-medium text-amber-500">
+                <Text variant="small" weight="medium" mono color="warning">
                   {data.services.database.includes("disconnected")
                     ? "Pending Config"
                     : data.services.database}
-                </span>
-              </Box>
-              <Box className="flex justify-between text-[13px]">
+                </Text>
+              </Flex>
+              <Flex justify="between">
                 <Text variant="small" color="muted">
                   Cache (Redis):
                 </Text>
-                <span className="text-xs font-mono font-medium text-amber-500">
+                <Text variant="small" weight="medium" mono color="warning">
                   {data.services.cache.includes("disconnected")
                     ? "Pending Config"
                     : data.services.cache}
-                </span>
-              </Box>
-            </Box>
+                </Text>
+              </Flex>
+            </Flex>
           )}
 
           <Button
@@ -280,7 +267,6 @@ export default function ServerStatus({ dataHook = "server-status" }: ServerStatu
             fullWidth
             onClick={checkHealth}
             loading={isRefreshing}
-            className="py-1.5 font-semibold text-xs rounded-lg mt-1"
           >
             {isRefreshing ? "Checking..." : "Refresh Status"}
           </Button>

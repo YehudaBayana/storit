@@ -1,13 +1,6 @@
 "use client";
 import { useParams } from "next/navigation";
-import Container from "@/components/ui/layout/Container";
-import Flex from "@/components/ui/layout/Flex";
-import Box from "@/components/ui/layout/Box";
-import Heading from "@/components/ui/heading/Heading";
-import Text from "@/components/ui/text/Text";
-import Image from "@/components/ui/image/Image";
-import Badge from "@/components/ui/badge/Badge";
-import Spinner from "@/components/ui/spinner/Spinner";
+import { Badge, Box, Card, Container, Flex, Heading, Image, Spinner, Text } from "@/components/ui";
 import TrackItem from "@/features/player/components/TrackItem";
 import { usePlaylistDetails, usePlaylistTracks } from "@/features/playlists/query/usePlaylists";
 
@@ -34,71 +27,67 @@ const PlaylistDetailView = ({ dataHook = "playlist-detail-view" }: PlaylistDetai
 
   return (
     <Box dataHook={dataHook}>
-      <Container className="space-y-6">
+      <Container size="xl">
         {/* Playlist Header */}
-        <Flex
-          align="center"
-          gap={6}
-          className="bg-[var(--bg-surface)] p-6 rounded-2xl border border-[var(--border-default)]"
-        >
-          {headerImage && (
-            <Box className="w-32 h-32 flex-shrink-0 rounded-xl overflow-hidden shadow-lg border border-[var(--border-default)]">
-              <Image
-                src={headerImage}
-                alt={playlistDetails.title}
-                className="w-full h-full object-cover"
-              />
-            </Box>
-          )}
-          <Flex direction="col" gap={2} className="min-w-0 flex-1">
-            <Badge variant="primary" size="sm" className="w-fit">
-              PLAYLIST
-            </Badge>
-            <Heading level={1} size="xl" truncate dataHook={`${dataHook}-title`}>
-              {playlistDetails.title}
-            </Heading>
-            {playlistDetails.uploader && (
-              <Text variant="body-sm" color="muted">
-                By {playlistDetails.uploader}
-              </Text>
+        <Card variant="surface" rounded="2xl" padding="lg">
+          <Flex align="center" gap={6}>
+            {headerImage && (
+              <Box w="32" h="32" position="relative" rounded="xl" overflow="hidden" border="all">
+                <Image src={headerImage} alt={playlistDetails.title} fit="cover" fill />
+              </Box>
             )}
-            <Text variant="body" color="default" className="line-clamp-2">
-              {playlistDetails.description}
-            </Text>
-            <Text variant="caption" color="primary">
-              {playlistDetails.playlist_count
-                ? `${playlistDetails.playlist_count} tracks`
-                : `${tracks?.length} tracks`}
-            </Text>
+            <Flex direction="col" gap={2} minW="0" grow>
+              <Box>
+                <Badge variant="primary" size="sm">
+                  PLAYLIST
+                </Badge>
+              </Box>
+              <Heading level={1} size="xl" truncate dataHook={`${dataHook}-title`}>
+                {playlistDetails.title}
+              </Heading>
+              {playlistDetails.uploader && (
+                <Text variant="body-sm" color="muted">
+                  By {playlistDetails.uploader}
+                </Text>
+              )}
+              <Text variant="body" color="default" clamp={2}>
+                {playlistDetails.description}
+              </Text>
+              <Text variant="caption" color="primary">
+                {playlistDetails.playlist_count
+                  ? `${playlistDetails.playlist_count} tracks`
+                  : `${tracks?.length} tracks`}
+              </Text>
+            </Flex>
           </Flex>
-        </Flex>
+        </Card>
 
         {/* Playlist Tracks List */}
-        <Box className="mt-6">
+        <Box mt={6}>
           {isTracksLoading ? (
-            <Flex justify="center" align="center" className="py-16">
+            <Flex justify="center" align="center" py={16}>
               <Spinner size="lg" dataHook={`${dataHook}-tracks-loading`} />
             </Flex>
           ) : tracksError ? (
-            <Flex direction="col" align="center" justify="center" className="py-16 text-center">
-              <Text variant="h3" color="danger">
+            <Flex direction="col" align="center" justify="center" gap={2} py={16}>
+              <Text variant="h3" color="danger" align="center">
                 Failed to load tracks
               </Text>
               <Text
                 variant="body"
                 color="muted"
-                className="mt-2"
+                align="center"
                 dataHook={`${dataHook}-tracks-error`}
               >
                 {tracksError.message}
               </Text>
             </Flex>
           ) : tracks?.length === 0 ? (
-            <Flex direction="col" align="center" justify="center" className="py-16 text-center">
-              <Text variant="h3" dataHook={`${dataHook}-tracks-empty`}>
+            <Flex direction="col" align="center" justify="center" gap={2} py={16}>
+              <Text variant="h3" align="center" dataHook={`${dataHook}-tracks-empty`}>
                 No tracks found
               </Text>
-              <Text variant="body" color="muted" className="mt-2">
+              <Text variant="body" color="muted" align="center">
                 This playlist has no available tracks.
               </Text>
             </Flex>

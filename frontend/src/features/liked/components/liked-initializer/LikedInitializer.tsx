@@ -3,6 +3,7 @@
 import React, { useEffect, useMemo, useRef } from "react";
 import { useLikedStore } from "@/features/liked/store/useLikedStore";
 import { useGetLiked } from "@/features/liked/query/useLiked";
+import { Box } from "@/components/ui";
 
 interface LikedInitializerProps {
   children: React.ReactNode;
@@ -17,7 +18,7 @@ export default function LikedInitializer({
   const setLikedQueryState = useLikedStore((state) => state.setLikedQueryState);
   const { data, fetchNextPage, hasNextPage, isError, isFetchingNextPage, isPending, refetch } =
     useGetLiked();
-  const loadMoreRef = useRef<HTMLDivElement>(null);
+  const loadMoreRef = useRef<HTMLElement>(null);
   const tracks = useMemo(() => data?.pages.flat() ?? [], [data?.pages]);
 
   useEffect(() => {
@@ -47,16 +48,16 @@ export default function LikedInitializer({
   }, [setInitialLiked, isPending, data, tracks]);
 
   return (
-    <div data-hook={dataHook} style={{ display: "contents" }}>
+    <Box dataHook={dataHook} style={{ display: "contents" }}>
       {tracks.length > 0 && hasNextPage && (
-        <div
+        <Box
           ref={loadMoreRef}
-          className="min-h-8"
+          style={{ minHeight: "2rem" }}
           aria-hidden="true"
-          data-hook={`${dataHook}-load-more-trigger`}
+          dataHook={`${dataHook}-load-more-trigger`}
         />
       )}
       {children}
-    </div>
+    </Box>
   );
 }

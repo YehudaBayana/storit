@@ -26,6 +26,10 @@ interface ImageProps {
   lazy?: boolean;
   /** Border radius */
   rounded?: "none" | "sm" | "md" | "lg" | "xl" | "full";
+  /** Fill the nearest positioned ancestor (absolute inset-0) */
+  fill?: boolean;
+  /** Dim the image for use as a background behind content */
+  dimmed?: boolean;
   /** Additional CSS classes */
   className?: string;
   dataHook?: string;
@@ -140,6 +144,8 @@ const Image: React.FC<ImageProps> = ({
   showSkeleton = true,
   lazy = true,
   rounded = "none",
+  fill = false,
+  dimmed = false,
   className = "",
   dataHook,
 }) => {
@@ -182,7 +188,7 @@ const Image: React.FC<ImageProps> = ({
   };
 
   const containerClasses = `
-    relative overflow-hidden
+    ${fill ? "absolute inset-0" : "relative"} overflow-hidden
     ${getRoundedClass(rounded)}
     ${className}
   `;
@@ -233,6 +239,7 @@ const Image: React.FC<ImageProps> = ({
           className={`
             w-full h-full
             ${getFitClass(fit)}
+            ${dimmed ? "brightness-[0.35] saturate-[1.1]" : ""}
             ${isLoaded ? "opacity-100" : "opacity-0"}
             transition-opacity duration-300
           `}

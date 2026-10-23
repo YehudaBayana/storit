@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { Login } from "../../components/login/Login";
 import { Register } from "../../components/register/Register";
 import { useGetCurrentUser, useLogout } from "../../query/useAuth";
+import { Button, Flex, Heading, Stack, Text } from "@/components/ui";
 
 interface AuthViewProps {
   dataHook?: string;
@@ -23,39 +24,29 @@ export default function AuthView({ dataHook = "auth-view" }: AuthViewProps) {
 
   if (isLoading) {
     return (
-      <div
-        className="min-h-screen flex items-center justify-center bg-gray-50 px-4"
-        data-hook={dataHook}
-      >
-        <p>Loading...</p>
-      </div>
+      <Flex as="main" align="center" justify="center" h="screen" dataHook={dataHook}>
+        <Text>Loading...</Text>
+      </Flex>
     );
   }
 
   return (
-    <div
-      className="min-h-screen flex items-center justify-center bg-gray-50 px-4"
-      data-hook={dataHook}
-    >
+    <Flex as="main" align="center" justify="center" h="screen" dataHook={dataHook}>
       {/* Container View toggling between Login and Register */}
       {data?.user ? (
-        <div className="text-center" data-hook={`${dataHook}-authenticated`}>
-          <h2 className="text-2xl font-bold text-gray-900">
+        <Stack gap={4} align="center" dataHook={`${dataHook}-authenticated`}>
+          <Heading level={2} size="2xl" align="center">
             You are logged in to {data.user.email}
-          </h2>
-          <button
-            className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-            onClick={() => logout()}
-            data-hook={`${dataHook}-logout`}
-          >
+          </Heading>
+          <Button variant="danger" onClick={() => logout()} dataHook={`${dataHook}-logout`}>
             log out
-          </button>
-        </div>
+          </Button>
+        </Stack>
       ) : isLogin ? (
         <Login onSwitchToRegister={() => setIsLogin(false)} dataHook={`${dataHook}-login`} />
       ) : (
         <Register onSwitchToLogin={() => setIsLogin(true)} dataHook={`${dataHook}-register`} />
       )}
-    </div>
+    </Flex>
   );
 }

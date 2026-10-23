@@ -10,6 +10,8 @@ export interface IconButtonDriverProps {
   loading?: boolean;
   disabled?: boolean;
   rounded?: boolean;
+  hideUntilGroupHover?: boolean;
+  showOnGroupHover?: boolean;
   onClick?: () => void;
 }
 
@@ -28,6 +30,8 @@ export class IconButtonDriver {
         loading={props.loading}
         disabled={props.disabled}
         rounded={props.rounded}
+        hideUntilGroupHover={props.hideUntilGroupHover}
+        showOnGroupHover={props.showOnGroupHover}
         onClick={props.onClick}
       >
         <span>Icon</span>

@@ -1,14 +1,19 @@
 "use client";
 
 import { useState } from "react";
-import Text from "@/components/ui/text/Text";
-import Heading from "@/components/ui/heading/Heading";
-import Flex from "@/components/ui/layout/Flex";
-import Box from "@/components/ui/layout/Box";
-import Modal from "@/components/ui/modal/Modal";
-import Link from "next/link";
+import {
+  Avatar,
+  Box,
+  Button,
+  Card,
+  Flex,
+  Heading,
+  Link,
+  Modal,
+  Stack,
+  Text,
+} from "@/components/ui";
 import { usePathname } from "next/navigation";
-import Button from "@/components/ui/button/Button";
 import { useGetCurrentUser, useLogout } from "@/features/auth/query/useAuth";
 
 interface SidebarProps {
@@ -33,109 +38,87 @@ export default function Sidebar({ dataHook = "dashboard-sidebar" }: SidebarProps
   return (
     <Flex
       direction="col"
-      className="w-64 h-full bg-[var(--bg-secondary)] border-r border-[var(--border-default)] backdrop-blur-2xl flex-shrink-0 relative overflow-hidden select-none transition-colors duration-300"
+      h="full"
+      w="full"
+      border="right"
+      bg="bg-[var(--bg-secondary)]"
       dataHook={dataHook}
     >
       {/* Brand Header */}
-      <Flex align="center" gap={3} className="p-6 border-b border-[var(--border-default)]">
+      <Flex align="center" gap={3} p={6} border="bottom">
         <Flex
           align="center"
           justify="center"
-          className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 shadow-[0_0_15px_rgba(16,185,129,0.3)] text-lg text-white"
+          w="9"
+          h="9"
+          rounded="xl"
+          bg="bg-gradient-to-br from-emerald-500 to-teal-500"
         >
-          <span>🎵</span>
+          🎵
         </Flex>
         <Flex direction="col">
-          <Heading
-            level={1}
-            size="md"
-            className="font-extrabold tracking-wide text-[var(--text-primary)]"
-          >
+          <Heading level={1} size="md" weight="extrabold">
             DANCE JOURNAL
           </Heading>
-          <Text
-            variant="caption"
-            className="text-[10px] tracking-wider text-emerald-400 font-semibold -mt-0.5"
-          >
+          <Text variant="caption" color="primary">
             PRIVATE ARCHIVE
           </Text>
         </Flex>
       </Flex>
 
       {/* Navigation */}
-      <Flex direction="col" gap={1} className="px-3 py-4 border-b border-[var(--border-default)]">
-        {navItems.map((item, index) => {
-          const isActive = pathname === item.href;
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              data-hook={`${dataHook}-nav-${index}`}
-              className={`relative w-full flex items-center gap-3.5 px-4 py-3 rounded-xl text-left text-sm font-medium transition-all duration-200 cursor-pointer ${
-                isActive
-                  ? "bg-[var(--bg-surface-active)] text-emerald-400 shadow-[inset_0_1px_0_var(--border-default)]"
-                  : "text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface)]"
-              }`}
-            >
-              {isActive && (
-                <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 bg-emerald-500 rounded-r-full shadow-[0_0_8px_rgba(16,185,129,0.8)]" />
-              )}
-              <span className="text-base">{item.icon}</span>
-              <span>{item.label}</span>
-            </Link>
-          );
-        })}
+      <Flex direction="col" gap={1} px={3} py={4} border="bottom">
+        {navItems.map((item, index) => (
+          <Link
+            key={item.href}
+            href={item.href}
+            variant="nav"
+            active={pathname === item.href}
+            leftIcon={item.icon}
+            dataHook={`${dataHook}-nav-${index}`}
+          >
+            {item.label}
+          </Link>
+        ))}
       </Flex>
 
       {/* Journal section */}
-      <Flex direction="col" className="flex-1 min-h-0 py-4 px-3">
-        <Flex align="center" justify="between" className="px-4 mb-2">
-          <Text
-            variant="caption"
-            weight="bold"
-            color="muted"
-            className="tracking-wider uppercase text-[10px]"
-          >
+      <Flex direction="col" grow minW="0" px={3} py={4}>
+        <Box px={4} mb={2}>
+          <Text variant="caption" weight="bold" color="muted">
             Recent Videos
           </Text>
-        </Flex>
+        </Box>
 
-        <Box className="flex-1 overflow-y-auto pr-1 space-y-1">
-          <Box className="px-4 py-3 text-center rounded-xl bg-[var(--bg-surface)] border border-dashed border-[var(--border-default)]">
-            <Text variant="caption" color="muted" className="text-[11px]">
-              No videos yet. Upload your first practice session.
-            </Text>
-          </Box>
-          {currentUser?.user ? (
-            <Button onClick={() => logout()}>Logout</Button>
-          ) : (
-            <Link href="/auth" className="w-full" data-hook={`${dataHook}-login`}>
-              Login
-            </Link>
-          )}
+        <Box grow overflowY="auto">
+          <Stack gap={2}>
+            <Card variant="dashed" padding="sm">
+              <Text variant="caption" color="muted" align="center">
+                No videos yet. Upload your first practice session.
+              </Text>
+            </Card>
+            {currentUser?.user ? (
+              <Button variant="secondary" fullWidth onClick={() => logout()}>
+                Logout
+              </Button>
+            ) : (
+              <Link href="/auth" variant="primary" dataHook={`${dataHook}-login`}>
+                Login
+              </Link>
+            )}
+          </Stack>
         </Box>
       </Flex>
 
       {/* Bottom Profile/Watermark */}
-      <Box className="p-4 border-t border-[var(--border-default)] bg-[var(--bg-surface)] select-none">
+      <Box p={4} border="top" bg="bg-[var(--bg-surface)]">
         <Flex align="center" gap={3}>
-          <Flex
-            align="center"
-            justify="center"
-            className="w-8 h-8 rounded-full bg-slate-700 border border-[var(--border-subtle)] font-bold text-xs text-white"
-          >
-            YB
-          </Flex>
-          <Flex direction="col" className="min-w-0 flex-1">
-            <Text
-              variant="body-sm"
-              weight="semibold"
-              truncate
-              className="text-[var(--text-primary)] text-xs"
-            >
-              Yehuda Bayana
+          <Avatar name="Yehuda Bayana" size="sm" />
+          <Flex direction="col" minW="0" grow>
+            <Text variant="body-sm" weight="semibold" truncate>
+              {currentUser?.user.email}
             </Text>
-            <Text variant="caption" color="muted" className="text-[10px]">
+            <Text variant="caption" color="muted">
               Developer Mode
             </Text>
           </Flex>

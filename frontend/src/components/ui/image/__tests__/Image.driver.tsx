@@ -9,6 +9,8 @@ export interface ImageDriverProps {
   fit?: ImageFit;
   rounded?: "none" | "sm" | "md" | "lg" | "xl" | "full";
   showSkeleton?: boolean;
+  fill?: boolean;
+  dimmed?: boolean;
 }
 
 export class ImageDriver {
@@ -24,6 +26,8 @@ export class ImageDriver {
         fit={props.fit}
         rounded={props.rounded}
         showSkeleton={props.showSkeleton}
+        fill={props.fill}
+        dimmed={props.dimmed}
         lazy={false}
         dataHook={dataHook}
       />,

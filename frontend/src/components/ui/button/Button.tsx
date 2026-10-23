@@ -32,6 +32,8 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   rightIcon?: React.ReactNode;
   /** Full width button */
   fullWidth?: boolean;
+  /** Whether the button is pill-shaped (fully rounded) */
+  pill?: boolean;
   /** Additional CSS classes */
   className?: string;
   /** Button content */
@@ -197,6 +199,7 @@ const Button: React.FC<ButtonProps> = ({
   leftIcon,
   rightIcon,
   fullWidth = false,
+  pill = false,
   disabled,
   className = "",
   type = "button",
@@ -215,6 +218,7 @@ const Button: React.FC<ButtonProps> = ({
     "dark:focus:ring-offset-slate-900",
     getVariantClasses(variant),
     getSizeClasses(size, variant),
+    pill ? "!rounded-full" : "",
     fullWidth ? "w-full" : "",
     isDisabled ? "opacity-50 cursor-not-allowed" : "",
     className,

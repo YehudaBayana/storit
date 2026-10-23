@@ -21,4 +21,16 @@ describe("IconButton", () => {
     expect(driver.getClassName()).toContain("w-12 h-12");
     expect(driver.getClassName()).toContain("rounded-full");
   });
+
+  it("hides until group hover when hideUntilGroupHover is set", () => {
+    driver.render({ hideUntilGroupHover: true });
+    expect(driver.getClassName()).toContain("opacity-0");
+    expect(driver.getClassName()).toContain("group-hover:opacity-100");
+  });
+
+  it("shows only on group hover when showOnGroupHover is set", () => {
+    driver.render({ showOnGroupHover: true });
+    expect(driver.getClassName()).toContain("hidden");
+    expect(driver.getClassName()).toContain("group-hover:inline-flex");
+  });
 });

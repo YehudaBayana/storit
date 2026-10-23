@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useRegister } from "../../query/useAuth";
+import { Card, Stack, Heading, Text, Form, FormField, Input, Button, Flex } from "@/components/ui";
 
 interface RegisterProps {
   onSwitchToLogin: () => void;
@@ -14,74 +15,66 @@ export const Register: React.FC<RegisterProps> = ({
   const [password, setPassword] = useState("");
   const { mutate: register } = useRegister();
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Handle registration logic here
+  const handleSubmit = () => {
     register({ email, password });
-    console.log("Registering with:", { email, password });
   };
 
   return (
-    <div
-      className="w-full max-w-md p-8 bg-white rounded-xl shadow-lg border border-gray-100"
-      data-hook={dataHook}
-    >
-      <div className="mb-6 text-center">
-        <h2 className="text-2xl font-bold text-gray-900">Create Account</h2>
-        <p className="text-sm text-gray-500 mt-1">Get started with your new account</p>
-      </div>
+    <Card variant="elevated" padding="lg" dataHook={dataHook}>
+      <Stack gap={6}>
+        <Stack gap={1} align="center">
+          <Heading level={2} size="2xl" align="center" dataHook="register-heading">
+            Create Account
+          </Heading>
+          <Text variant="body-sm" color="muted" align="center">
+            Get started with your new account
+          </Text>
+        </Stack>
 
-      <form onSubmit={handleSubmit} className="space-y-4" data-hook={`${dataHook}-form`}>
-        <div>
-          <label className="block text-xs font-semibold uppercase tracking-wider text-gray-600 mb-1">
-            Email
-          </label>
-          <input
-            type="email"
-            data-hook={`${dataHook}-email-input`}
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all"
-            placeholder="you@example.com"
-          />
-        </div>
+        <Form onSubmit={handleSubmit} gap={4} dataHook={`${dataHook}-form`}>
+          <FormField label="Email" htmlFor="register-email-input" required>
+            <Input
+              id="register-email-input"
+              type="email"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+              required
+              placeholder="you@example.com"
+              dataHook={`${dataHook}-email`}
+            />
+          </FormField>
 
-        <div>
-          <label className="block text-xs font-semibold uppercase tracking-wider text-gray-600 mb-1">
-            Password
-          </label>
-          <input
-            type="password"
-            data-hook={`${dataHook}-password-input`}
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all"
-            placeholder="••••••••"
-          />
-        </div>
+          <FormField label="Password" htmlFor="register-password-input" required>
+            <Input
+              id="register-password-input"
+              type="password"
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              required
+              placeholder="••••••••"
+              dataHook={`${dataHook}-password`}
+            />
+          </FormField>
 
-        <button
-          type="submit"
-          data-hook={`${dataHook}-submit-button`}
-          className="w-full mt-2 py-2.5 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-sm rounded-lg shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-        >
-          Create Account
-        </button>
-      </form>
+          <Button type="submit" variant="primary" fullWidth dataHook={`${dataHook}-submit-button`}>
+            Create Account
+          </Button>
+        </Form>
 
-      <div className="mt-6 text-center text-sm text-gray-500">
-        Already have an account?{" "}
-        <button
-          type="button"
-          data-hook={`${dataHook}-switch-to-login-button`}
-          onClick={onSwitchToLogin}
-          className="font-medium text-indigo-600 hover:text-indigo-500 focus:outline-none underline"
-        >
-          Sign in
-        </button>
-      </div>
-    </div>
+        <Flex align="center" justify="center" gap={1}>
+          <Text variant="body-sm" color="muted">
+            Already have an account?
+          </Text>
+          <Button
+            variant="link"
+            size="sm"
+            onClick={onSwitchToLogin}
+            dataHook={`${dataHook}-switch-to-login-button`}
+          >
+            Sign in
+          </Button>
+        </Flex>
+      </Stack>
+    </Card>
   );
 };

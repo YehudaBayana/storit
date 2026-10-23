@@ -47,6 +47,8 @@ interface HeadingProps extends React.HTMLAttributes<HTMLHeadingElement> {
   align?: HeadingAlign;
   /** Truncate text with ellipsis */
   truncate?: boolean;
+  /** Clamp text to a maximum number of lines */
+  clamp?: 2 | 3;
   dataHook?: string;
 }
 
@@ -189,6 +191,7 @@ const Heading: React.FC<HeadingProps> = ({
   weight,
   align,
   truncate = false,
+  clamp,
   className = "",
   id,
   dataHook,
@@ -204,6 +207,7 @@ const Heading: React.FC<HeadingProps> = ({
     getWeightClasses(actualWeight),
     getAlignClasses(align),
     truncate ? "truncate" : "",
+    clamp ? `line-clamp-${clamp}` : "",
     className,
   ]
     .filter(Boolean)

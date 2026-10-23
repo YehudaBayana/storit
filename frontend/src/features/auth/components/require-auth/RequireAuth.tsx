@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useGetCurrentUser } from "@/features/auth/query/useAuth";
+import { Box, Button, Flex, Text } from "@/components/ui";
 
 interface RequireAuthProps {
   children: React.ReactNode;
@@ -24,29 +25,37 @@ export default function RequireAuth({ children, dataHook = "require-auth" }: Req
 
   if (isPending || unauthorized) {
     return (
-      <main
-        data-hook={dataHook}
-        className="flex min-h-screen items-center justify-center"
+      <Flex
+        as="main"
+        align="center"
+        justify="center"
+        h="screen"
+        dataHook={dataHook}
         aria-live="polite"
       >
-        <p>Loading...</p>
-      </main>
+        <Text>Loading...</Text>
+      </Flex>
     );
   }
 
   if (isError) {
     return (
-      <main
-        className="flex min-h-screen flex-col items-center justify-center gap-4"
-        data-hook={dataHook}
+      <Flex
+        as="main"
+        direction="col"
+        align="center"
+        justify="center"
+        gap={4}
+        h="screen"
+        dataHook={dataHook}
       >
-        <p role="alert" data-hook={`${dataHook}-error`}>
+        <Text role="alert" dataHook={`${dataHook}-error`}>
           Unable to verify your session. Please try again.
-        </p>
-        <button type="button" onClick={() => void refetch()} data-hook={`${dataHook}-retry`}>
+        </Text>
+        <Button variant="outline" onClick={() => void refetch()} dataHook={`${dataHook}-retry`}>
           Retry
-        </button>
-      </main>
+        </Button>
+      </Flex>
     );
   }
 
@@ -54,5 +63,5 @@ export default function RequireAuth({ children, dataHook = "require-auth" }: Req
     return null;
   }
 
-  return <div data-hook={dataHook}>{children}</div>;
+  return <Box dataHook={dataHook}>{children}</Box>;
 }
