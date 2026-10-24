@@ -7,10 +7,10 @@ discovery.docker "containers" {
 discovery.relabel "containers" {
   targets = discovery.docker.containers.targets
 
-  // Only ship this stack's containers (names are fixed in docker-compose.yml).
+  // Only ship this stack's containers (backend and postgres).
   rule {
-    source_labels = ["__meta_docker_container_name"]
-    regex         = "/storit-(db|backend)"
+    source_labels = ["__meta_docker_container_label_com_docker_compose_service"]
+    regex         = "(backend|postgres)"
     action        = "keep"
   }
 
