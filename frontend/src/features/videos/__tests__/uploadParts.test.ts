@@ -14,7 +14,10 @@ function readText(blob: Blob): Promise<string> {
 
 function makeDeps(putPart: PartUploadDeps["putPart"]): PartUploadDeps {
   return {
-    getPartUrl: async (partNumber) => ({ part_number: partNumber, url: `https://r2.test/part/${partNumber}` }),
+    getPartUrl: async (partNumber) => ({
+      part_number: partNumber,
+      url: `https://r2.test/part/${partNumber}`,
+    }),
     putPart,
   };
 }
@@ -47,7 +50,10 @@ describe("uploadParts", () => {
 
   it("retries a failed part with a fresh URL", async () => {
     let attempts = 0;
-    const getPartUrl = jest.fn(async (partNumber: number) => ({ part_number: partNumber, url: "https://r2.test/part/1" }));
+    const getPartUrl = jest.fn(async (partNumber: number) => ({
+      part_number: partNumber,
+      url: "https://r2.test/part/1",
+    }));
     const deps: PartUploadDeps = {
       getPartUrl,
       putPart: async () => {
@@ -57,7 +63,11 @@ describe("uploadParts", () => {
       },
     };
 
-    const parts = await uploadParts(new Blob(["aaaa"]), deps, { partSize: PART_SIZE, partCount: 1, retryDelayMs: 0 });
+    const parts = await uploadParts(new Blob(["aaaa"]), deps, {
+      partSize: PART_SIZE,
+      partCount: 1,
+      retryDelayMs: 0,
+    });
 
     expect(parts).toEqual([{ part_number: 1, etag: '"etag"' }]);
     expect(getPartUrl).toHaveBeenCalledTimes(3);
@@ -69,7 +79,12 @@ describe("uploadParts", () => {
     });
 
     await expect(
-      uploadParts(new Blob(["aaaa"]), deps, { partSize: PART_SIZE, partCount: 1, maxAttempts: 2, retryDelayMs: 0 }),
+      uploadParts(new Blob(["aaaa"]), deps, {
+        partSize: PART_SIZE,
+        partCount: 1,
+        maxAttempts: 2,
+        retryDelayMs: 0,
+      }),
     ).rejects.toThrow("storage down");
   });
 
