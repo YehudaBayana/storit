@@ -65,3 +65,30 @@ func TestLoadReadsStorageSettings(t *testing.T) {
 		t.Fatalf("MaxUploadBytes = %d, want %d", got.MaxUploadBytes, 21474836480)
 	}
 }
+
+func TestLoadReadsCommitVersionInfo(t *testing.T) {
+	t.Setenv("COMMIT_HASH", "abc1234")
+	t.Setenv("COMMIT_DATE", "2026-10-24 19:00:00 +0000")
+
+	got := config.Load()
+	if got.CommitHash != "abc1234" {
+		t.Errorf("CommitHash = %q, want abc1234", got.CommitHash)
+	}
+	if got.CommitDate != "2026-10-24 19:00:00 +0000" {
+		t.Errorf("CommitDate = %q, want 2026-10-24 19:00:00 +0000", got.CommitDate)
+	}
+}
+
+func TestLoadFallsBackForMissingCommitVersionInfo(t *testing.T) {
+	t.Setenv("COMMIT_HASH", "")
+	t.Setenv("COMMIT_DATE", "")
+
+	got := config.Load()
+	if got.CommitHash != "local" {
+		t.Errorf("CommitHash = %q, want local", got.CommitHash)
+	}
+	if got.CommitDate != "development" {
+		t.Errorf("CommitDate = %q, want development", got.CommitDate)
+	}
+}
+

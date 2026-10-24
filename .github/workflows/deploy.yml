@@ -24,5 +24,7 @@ jobs:
           script: |
             cd ~/storit
             git pull origin main
+            export COMMIT_HASH=$(git rev-parse --short HEAD)
+            export COMMIT_DATE=$(git log -1 --format=%cd --date=iso)
             docker compose down
             docker compose up -d --build

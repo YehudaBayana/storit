@@ -22,6 +22,8 @@ type Config struct {
 	R2Endpoint        string
 	UploadURLTTL      time.Duration
 	PlaybackURLTTL    time.Duration
+	CommitHash        string
+	CommitDate        string
 }
 
 // Load reads configuration from environment variables, applying sensible defaults
@@ -30,6 +32,16 @@ func Load() Config {
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
+	}
+
+	commitHash := os.Getenv("COMMIT_HASH")
+	if commitHash == "" {
+		commitHash = "local"
+	}
+
+	commitDate := os.Getenv("COMMIT_DATE")
+	if commitDate == "" {
+		commitDate = "development"
 	}
 
 	maxUploadBytes := DefaultMaxUploadBytes
@@ -73,6 +85,8 @@ func Load() Config {
 		R2Endpoint:        os.Getenv("R2_ENDPOINT"),
 		UploadURLTTL:      durationFromEnv("UPLOAD_URL_TTL", DefaultUploadURLTTL),
 		PlaybackURLTTL:    durationFromEnv("PLAYBACK_URL_TTL", DefaultPlaybackURLTTL),
+		CommitHash:        commitHash,
+		CommitDate:        commitDate,
 	}
 }
 

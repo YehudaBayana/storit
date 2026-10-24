@@ -21,6 +21,8 @@ func TestHTTPHandlerRegistersAPIEndpoints(t *testing.T) {
 	}{
 		{name: "health", method: http.MethodGet, target: "/health", wantStatus: http.StatusOK},
 		{name: "api health", method: http.MethodGet, target: "/api/health", wantStatus: http.StatusOK},
+		{name: "version", method: http.MethodGet, target: "/version", wantStatus: http.StatusOK},
+		{name: "api version", method: http.MethodGet, target: "/api/version", wantStatus: http.StatusOK},
 		{name: "register", method: http.MethodPost, target: "/api/auth/register", wantStatus: http.StatusBadRequest},
 		{name: "login", method: http.MethodPost, target: "/api/auth/login", wantStatus: http.StatusBadRequest},
 		{name: "logout", method: http.MethodPost, target: "/api/auth/logout", wantStatus: http.StatusUnauthorized},

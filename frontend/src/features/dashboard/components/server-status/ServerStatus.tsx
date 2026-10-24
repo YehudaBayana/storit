@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { apiUrl } from "@/config/constants";
-import { Box, Button, Flex, IconButton, StatusDot, Text } from "@/components/ui";
+import { Box, Button, Flex, StatusDot, Text } from "@/components/ui";
 
 interface ServicesStatus {
   database: string;
@@ -17,6 +17,11 @@ interface HealthData {
   services: ServicesStatus;
 }
 
+interface VersionData {
+  commitHash: string;
+  commitDate: string;
+}
+
 interface ServerStatusProps {
   dataHook?: string;
 }
@@ -24,6 +29,7 @@ interface ServerStatusProps {
 export default function ServerStatus({ dataHook = "server-status" }: ServerStatusProps) {
   const [status, setStatus] = useState<"checking" | "online" | "offline">("checking");
   const [data, setData] = useState<HealthData | null>(null);
+  const [versionData, setVersionData] = useState<VersionData | null>(null);
   const [latency, setLatency] = useState<number | null>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -31,27 +37,33 @@ export default function ServerStatus({ dataHook = "server-status" }: ServerStatu
 
   const checkHealth = async () => {
     setIsRefreshing(true);
-    const start = performance.now();
+    const startTime = performance.now();
 
     try {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 3000);
 
-      const res = await fetch(`${apiUrl}/health`, {
-        signal: controller.signal,
-        cache: "no-store",
-      });
+      const [healthResponse, versionResponse] = await Promise.all([
+        fetch(`${apiUrl}/api/health`, {
+          signal: controller.signal,
+          cache: "no-store",
+        }),
+        fetch(`${apiUrl}/api/version`, {
+          signal: controller.signal,
+          cache: "no-store",
+        }).catch(() => null),
+      ]);
 
       clearTimeout(timeoutId);
 
-      const end = performance.now();
+      const endTime = performance.now();
 
-      if (res.ok) {
-        const body: HealthData = await res.json();
+      if (healthResponse.ok) {
+        const body: HealthData = await healthResponse.json();
         if (body.status === "OK") {
           setStatus("online");
           setData(body);
-          setLatency(Math.round(end - start));
+          setLatency(Math.round(endTime - startTime));
         } else {
           setStatus("offline");
           setData(null);
@@ -62,10 +74,18 @@ export default function ServerStatus({ dataHook = "server-status" }: ServerStatu
         setData(null);
         setLatency(null);
       }
-    } catch (err) {
-      console.error("Failed to perform server health check:", err);
+
+      if (versionResponse && versionResponse.ok) {
+        const versionBody: VersionData = await versionResponse.json();
+        setVersionData(versionBody);
+      } else {
+        setVersionData(null);
+      }
+    } catch (error) {
+      console.error("Failed to perform server health check:", error);
       setStatus("offline");
       setData(null);
+      setVersionData(null);
       setLatency(null);
     } finally {
       setIsRefreshing(false);
@@ -152,36 +172,14 @@ export default function ServerStatus({ dataHook = "server-status" }: ServerStatu
           dataHook={`${dataHook}-panel`}
           position="absolute"
           z="50"
-          p={5}
+          p={3}
           rounded="xl"
           border="all"
           borderTone="subtle"
           bg="bg-[var(--bg-status-panel)]"
           style={{ top: "calc(100% + 12px)", left: 0, width: "290px" }}
         >
-          <Flex justify="between" align="center" border="bottom" borderTone="subtle" py={2}>
-            <Text variant="caption" weight="bold" color="default" uppercase>
-              System Status
-            </Text>
-            <IconButton
-              variant="ghost"
-              size="xs"
-              onClick={() => setIsOpen(false)}
-              aria-label="Close panel"
-              icon="✕"
-            />
-          </Flex>
-
           <Flex direction="col" gap={2} py={3}>
-            <Flex justify="between">
-              <Text variant="small" color="muted">
-                Service:
-              </Text>
-              <Text variant="small" weight="medium" mono>
-                Storit API
-              </Text>
-            </Flex>
-
             <Flex justify="between">
               <Text variant="small" color="muted">
                 Status:
@@ -206,14 +204,6 @@ export default function ServerStatus({ dataHook = "server-status" }: ServerStatu
               <>
                 <Flex justify="between">
                   <Text variant="small" color="muted">
-                    Version:
-                  </Text>
-                  <Text variant="small" weight="medium" mono>
-                    {data.version}
-                  </Text>
-                </Flex>
-                <Flex justify="between">
-                  <Text variant="small" color="muted">
                     Uptime:
                   </Text>
                   <Text variant="small" weight="medium" mono>
@@ -223,43 +213,35 @@ export default function ServerStatus({ dataHook = "server-status" }: ServerStatu
               </>
             )}
 
-            <Flex justify="between">
-              <Text variant="small" color="muted">
-                Endpoint:
-              </Text>
-              <Text variant="small" mono truncate title={apiUrl} style={{ maxWidth: "170px" }}>
-                {apiUrl}
-              </Text>
-            </Flex>
+            {versionData && (
+              <>
+                <Flex justify="between">
+                  <Text variant="small" color="muted">
+                    Commit:
+                  </Text>
+                  <Text variant="small" weight="medium" mono dataHook={`${dataHook}-commit-hash`}>
+                    {versionData.commitHash}
+                  </Text>
+                </Flex>
+                <Flex justify="between">
+                  <Text variant="small" color="muted">
+                    Commit Date:
+                  </Text>
+                  <Text
+                    variant="small"
+                    weight="medium"
+                    mono
+                    truncate
+                    title={versionData.commitDate}
+                    style={{ maxWidth: "170px" }}
+                    dataHook={`${dataHook}-commit-date`}
+                  >
+                    {versionData.commitDate}
+                  </Text>
+                </Flex>
+              </>
+            )}
           </Flex>
-
-          {status === "online" && data?.services && (
-            <Flex direction="col" gap={1} border="top" borderTone="subtle" py={3}>
-              <Text variant="caption" weight="bold" color="muted" uppercase>
-                Backend Services
-              </Text>
-              <Flex justify="between">
-                <Text variant="small" color="muted">
-                  Database (Postgres):
-                </Text>
-                <Text variant="small" weight="medium" mono color="warning">
-                  {data.services.database.includes("disconnected")
-                    ? "Pending Config"
-                    : data.services.database}
-                </Text>
-              </Flex>
-              <Flex justify="between">
-                <Text variant="small" color="muted">
-                  Cache (Redis):
-                </Text>
-                <Text variant="small" weight="medium" mono color="warning">
-                  {data.services.cache.includes("disconnected")
-                    ? "Pending Config"
-                    : data.services.cache}
-                </Text>
-              </Flex>
-            </Flex>
-          )}
 
           <Button
             variant="secondary"

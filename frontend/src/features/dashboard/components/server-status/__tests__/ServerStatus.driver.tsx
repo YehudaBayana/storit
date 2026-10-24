@@ -29,6 +29,18 @@ export class ServerStatusDriver {
     fireEvent.click(getByDataHook(this.getContainer(), `${dataHook}-toggle`));
   }
 
+  getCommitHash(dataHook = this.defaultDataHook): string {
+    return (
+      queryByDataHook(this.getContainer(), `${dataHook}-commit-hash`)?.textContent?.trim() ?? ""
+    );
+  }
+
+  getCommitDate(dataHook = this.defaultDataHook): string {
+    return (
+      queryByDataHook(this.getContainer(), `${dataHook}-commit-date`)?.textContent?.trim() ?? ""
+    );
+  }
+
   async flushHealthCheck(): Promise<void> {
     await act(async () => {
       await Promise.resolve();

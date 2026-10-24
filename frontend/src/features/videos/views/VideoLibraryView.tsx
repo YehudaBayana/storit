@@ -39,8 +39,8 @@ export default function VideoLibraryView({
   const uploadVideoMutation = useUploadVideo();
 
   const stats = useMemo(() => {
-    const total = videos.length;
-    const processing = videos.filter((video) => video.status === "processing").length;
+    const total = videos?.length;
+    const processing = videos?.filter((video) => video.status === "processing").length;
     return { total, processing };
   }, [videos]);
 
@@ -216,7 +216,7 @@ export default function VideoLibraryView({
                   Ready
                 </Text>
                 <Heading level={3} size="3xl">
-                  {videos.filter((video) => video.status === "ready").length}
+                  {videos?.filter((video) => video.status === "ready").length}
                 </Heading>
               </Stack>
             </Card>
@@ -231,11 +231,11 @@ export default function VideoLibraryView({
               <Alert variant="error">
                 {listError instanceof Error ? listError.message : "Unable to load videos."}
               </Alert>
-            ) : videos.length === 0 ? (
+            ) : videos?.length === 0 ? (
               <EmptyState type="library"></EmptyState>
             ) : (
               <Stack gap={3}>
-                {videos.map((video) => (
+                {videos?.map((video) => (
                   <Link key={video.id} href={`/videos/${video.id}`} variant="card">
                     <Stack gap={1}>
                       <Text variant="body" weight="medium">

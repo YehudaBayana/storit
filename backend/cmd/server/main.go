@@ -18,6 +18,7 @@ import (
 	"backend/internal/logging"
 	"backend/internal/middleware"
 	"backend/internal/storage"
+	"backend/internal/version"
 	"backend/internal/videos"
 
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -37,6 +38,7 @@ func newHTTPHandler(db *pgxpool.Pool, cfg config.Config) (http.Handler, *videos.
 	}
 
 	healthH := health.NewHandler(db)
+	versionH := version.NewHandler(cfg.CommitHash, cfg.CommitDate)
 
 	videoService := videos.NewService(videos.NewRepository(db), videoStore, videos.Settings{
 		MaxUploadBytes: cfg.MaxUploadBytes,
@@ -64,6 +66,8 @@ func newHTTPHandler(db *pgxpool.Pool, cfg config.Config) (http.Handler, *videos.
 	// Register handlers
 	mux.HandleFunc("GET /health", healthH.Handle)
 	mux.HandleFunc("GET /api/health", healthH.Handle)
+	mux.HandleFunc("GET /version", versionH.Handle)
+	mux.HandleFunc("GET /api/version", versionH.Handle)
 
 	mux.HandleFunc("POST /api/auth/register", authH.HandleRegister)
 	mux.HandleFunc("POST /api/auth/login", authH.HandleLogin)

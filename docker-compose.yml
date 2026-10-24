@@ -61,6 +61,8 @@ services:
       - UPLOAD_URL_TTL=${UPLOAD_URL_TTL:-}
       - PLAYBACK_URL_TTL=${PLAYBACK_URL_TTL:-}
       - MAX_UPLOAD_BYTES=${MAX_UPLOAD_BYTES:-21474836480}
+      - COMMIT_HASH=${COMMIT_HASH:-local}
+      - COMMIT_DATE=${COMMIT_DATE:-development}
 
   # Ships container logs to Grafana Cloud Loki. Enable with: docker compose --profile observability up -d
   alloy:
