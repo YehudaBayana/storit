@@ -1,5 +1,5 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { useRouter } from "next/navigation";
 import {
   FaMusic,
   FaHeart,
@@ -110,7 +110,7 @@ const EmptyState: React.FC<EmptyStateProps> = ({
   dataHook,
 }) => {
   const config = emptyStateConfig[type];
-  const navigate = useNavigate();
+  const router = useRouter();
 
   // Build the message, potentially including the search query
   let displayMessage = customMessage || config.message;
@@ -122,9 +122,9 @@ const EmptyState: React.FC<EmptyStateProps> = ({
     if (onAction) {
       onAction();
     } else if (actionLink) {
-      navigate(actionLink);
+      router.push(actionLink);
     } else if (config.actionLink) {
-      navigate(config.actionLink);
+      router.push(config.actionLink);
     }
   };
 
