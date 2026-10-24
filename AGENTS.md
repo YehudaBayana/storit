@@ -8,6 +8,12 @@ Area-specific rules live next to the code: `backend/AGENTS.md` and `frontend/AGE
 - A reference line says when to read the file, for example: "Logging a new feature: read `docs/LOGGING.md`".
 - Update the dedicated file when the behavior changes; do not copy its content into `AGENTS.md`.
 
+## Verification after changes
+
+After every change made in the codebase, you must run:
+1. From the root directory: `yarn test-server`
+2. From the `frontend/` directory: `yarn check-all` (which runs `yarn build`, `yarn lint`, `yarn format:check`, and `yarn test`)
+
 ## References
 
 - Logging, error reporting, Sentry, Grafana Loki, Alloy, Dozzle: `docs/LOGGING.md`. Read it for any new feature that logs or handles errors.

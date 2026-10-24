@@ -8,6 +8,7 @@ import (
 	"net/http/httptest"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 
@@ -20,13 +21,16 @@ import (
 
 func DatabaseURL() string {
 	if url := os.Getenv("TEST_DATABASE_URL"); url != "" {
-		return url
+		return strings.ReplaceAll(url, "@postgres:", "@127.0.0.1:")
 	}
 	if url := os.Getenv("DB_URL"); url != "" {
-		return url
+		return strings.ReplaceAll(url, "@postgres:", "@127.0.0.1:")
 	}
 
 	host := envOrDefault("DB_HOST", "127.0.0.1")
+	if host == "postgres" {
+		host = "127.0.0.1"
+	}
 	port := envOrDefault("DB_PORT", "5432")
 	user := envOrDefault("DB_USER", "postgres")
 	password := envOrDefault("DB_PASSWORD", "postgres")

@@ -34,7 +34,7 @@ const (
 	ProcessingTimeout    = time.Hour
 	ProcessingQueueSize  = 32
 	ThumbnailWidth       = 640
-	PlaybackMaxHeight    = 720
+	PlaybackMaxHeight    = 1440
 	FFmpegThreads        = 1
 	MaxCommandErrorBytes = 1000
 )

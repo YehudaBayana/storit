@@ -10,7 +10,9 @@
     "lint:fix": "eslint . --format json | remove-unused-vars && eslint . --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "test": "jest"
+    "test": "jest",
+    "check-all": "yarn build && yarn lint && yarn format:check && yarn test",
+    "verify": "yarn check-all"
   },
   "dependencies": {
     "@sentry/nextjs": "^11",

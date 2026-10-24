@@ -23,3 +23,6 @@ Read this before changing anything under `frontend/`. All UI in Storit is built 
 
 5. **Naming conventions**:
    - Descriptive, self-explanatory variable and component names only. No single-letter variable names.
+
+6. **Verification after changes**:
+   - After making changes in `frontend/`, run `yarn check-all` (which runs `yarn build`, `yarn lint`, `yarn format:check`, and `yarn test`).
