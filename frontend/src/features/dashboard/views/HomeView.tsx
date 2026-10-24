@@ -15,7 +15,6 @@ interface HomeViewProps {
 }
 
 export default function HomeView({ dataHook = "home-view" }: HomeViewProps) {
-  console.log("dummy commit");
   return (
     <Box dataHook={dataHook}>
       <Container size="xl">
