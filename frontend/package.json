@@ -11,7 +11,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test": "jest",
-    "check-all": "yarn build && yarn lint && yarn format:check && yarn test",
+    "check-all": "yarn build && yarn lint && yarn format && yarn format:check && yarn test",
     "verify": "yarn check-all"
   },
   "dependencies": {
