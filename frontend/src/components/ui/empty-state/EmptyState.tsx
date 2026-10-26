@@ -1,14 +1,6 @@
 import React from "react";
 import { useRouter } from "next/navigation";
-import {
-  FaMusic,
-  FaHeart,
-  FaFire,
-  FaSearch,
-  FaHistory,
-  FaFolderPlus,
-  FaYoutube,
-} from "react-icons/fa";
+import { FaMusic, FaHeart, FaSearch, FaYoutube } from "react-icons/fa";
 import { motion } from "framer-motion";
 import Button from "../button/Button";
 import Text from "../text/Text";
@@ -17,8 +9,7 @@ import { Box } from "../layout";
 // EmptyState: A reusable component for displaying empty states across the app
 // Shows a friendly message with an icon and optional action button
 
-export type EmptyStateType =
-  "library" | "liked" | "trending" | "search" | "history" | "playlist" | "generic";
+export type EmptyStateType = "library" | "liked" | "search" | "generic";
 
 interface EmptyStateProps {
   type: EmptyStateType;
@@ -60,35 +51,11 @@ const emptyStateConfig: Record<
     actionLink: "/",
     colorClass: "text-rose-500 bg-rose-500/10",
   },
-  trending: {
-    icon: <FaFire size={48} />,
-    title: "No trending songs",
-    message: "No songs have been played yet. Be the first to start listening!",
-    actionText: "Browse Songs",
-    actionLink: "/",
-    colorClass: "text-orange-500 bg-orange-500/10",
-  },
   search: {
     icon: <FaSearch size={48} />,
     title: "No results found",
     message: "Try adjusting your search terms or check the spelling.",
     colorClass: "text-slate-400 bg-slate-400/10",
-  },
-  history: {
-    icon: <FaHistory size={48} />,
-    title: "No listening history",
-    message: "Songs you listen to will appear here. Start streaming some music!",
-    actionText: "Start Listening",
-    actionLink: "/",
-    colorClass: "text-purple-500 bg-purple-500/10",
-  },
-  playlist: {
-    icon: <FaFolderPlus size={48} />,
-    title: "Empty playlist",
-    message: "This playlist has no songs yet. Add some music to get started!",
-    actionText: "Browse Music",
-    actionLink: "/",
-    colorClass: "text-indigo-500 bg-indigo-500/10",
   },
   generic: {
     icon: <FaYoutube size={48} />,

@@ -4,16 +4,20 @@
 
 import * as Sentry from "@sentry/nextjs";
 
-Sentry.init({
-  dsn: "https://243979e084d64741a6eba31224139692@o4512265335537664.ingest.de.sentry.io/4512265362538576",
+const isProduction = process.env.NODE_ENV === "production";
 
-  // Define how likely traces are sampled. Adjust this value in production, or use tracesSampler for greater control.
-  tracesSampleRate: 1,
+if (isProduction) {
+  Sentry.init({
+    dsn: "https://243979e084d64741a6eba31224139692@o4512265335537664.ingest.de.sentry.io/4512265362538576",
 
-  dataCollection: {
-    // To disable sending user data and HTTP bodies, uncomment the lines below. For more info visit:
-    // https://docs.sentry.io/platforms/javascript/guides/nextjs/configuration/options/#dataCollection
-    // userInfo: false,
-    // httpBodies: [],
-  },
-});
+    // Define how likely traces are sampled. Adjust this value in production, or use tracesSampler for greater control.
+    tracesSampleRate: 1,
+
+    dataCollection: {
+      // To disable sending user data and HTTP bodies, uncomment the lines below. For more info visit:
+      // https://docs.sentry.io/platforms/javascript/guides/nextjs/configuration/options/#dataCollection
+      // userInfo: false,
+      // httpBodies: [],
+    },
+  });
+}
