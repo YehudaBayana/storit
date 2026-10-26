@@ -33,6 +33,7 @@ interface ImageProps {
   /** Additional CSS classes */
   className?: string;
   dataHook?: string;
+  unoptimized?: boolean;
 }
 
 /**
@@ -148,6 +149,7 @@ const Image: React.FC<ImageProps> = ({
   dimmed = false,
   className = "",
   dataHook,
+  unoptimized = false,
 }) => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [hasError, setHasError] = useState(false);
@@ -236,6 +238,7 @@ const Image: React.FC<ImageProps> = ({
           onError={handleError}
           width={width || 50}
           height={height || 50}
+          unoptimized={unoptimized}
           className={`
             w-full h-full
             ${getFitClass(fit)}
