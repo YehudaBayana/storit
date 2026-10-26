@@ -2,13 +2,16 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { uploadVideo } from "@/features/videos/api/uploadVideo";
 import { getPlaybackUrl, listVideos, type Video } from "@/features/videos/api/videos";
 import { videoKeys } from "@/shared/api/keys";
+import { useGetCurrentUser } from "@/features/auth/query/useAuth";
 
 const PROCESSING_POLL_MS = 3000;
 
 export function useVideos(limit = 50, offset = 0) {
+  const { data: currentUser } = useGetCurrentUser();
   return useQuery<Video[]>({
     queryKey: videoKeys.list(limit, offset),
     queryFn: () => listVideos(limit, offset),
+    enabled: !!currentUser?.user.id,
     retry: false,
     // Keep polling while the server is still turning an upload into a playable video.
     refetchInterval: (query) =>

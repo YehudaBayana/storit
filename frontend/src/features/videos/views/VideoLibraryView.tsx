@@ -5,6 +5,7 @@ import { Alert, Card, Container, EmptyState, Flex, Heading, Stack, Text } from "
 import { UploadVideoForm } from "@/features/videos/components/UploadVideoForm/UploadVideoForm";
 import { VideoStatsGrid } from "@/features/videos/components/VideoStatsGrid/VideoStatsGrid";
 import { VideosList } from "@/features/videos/components/VideosList/VideosList";
+import { useGetCurrentUser } from "@/features/auth/query/useAuth";
 
 export default function VideoLibraryView({
   dataHook = "video-library-view",
@@ -12,7 +13,13 @@ export default function VideoLibraryView({
   dataHook?: string;
 }) {
   const { data: videos = [], isLoading, isError, error: listError } = useVideos();
-
+  const { data: currentUser, isLoading: isCurrentUserLoading } = useGetCurrentUser();
+  if (isCurrentUserLoading) {
+    return <Text>Loading user...</Text>;
+  }
+  if (!currentUser) {
+    return <Text>User not logged in.</Text>;
+  }
   return (
     <Container size="lg" dataHook={dataHook}>
       <Card variant="surface" rounded="3xl" padding="xl">

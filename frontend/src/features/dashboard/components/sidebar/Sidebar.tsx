@@ -15,7 +15,7 @@ export default function Sidebar({ dataHook = "dashboard-sidebar" }: SidebarProps
 
   const navItems = [
     { href: "/", label: "Home", icon: "🏠" },
-    { href: "/videos", label: "Videos", icon: "🎥" },
+    { href: "/auth/videos", label: "Videos", icon: "🎥" },
   ];
 
   return (
@@ -76,11 +76,9 @@ export default function Sidebar({ dataHook = "dashboard-sidebar" }: SidebarProps
               Logout
             </Button>
           ) : (
-            <Button>
-              <Link href="/auth" variant="primary" dataHook={`${dataHook}-login`}>
-                Login
-              </Link>
-            </Button>
+            <Link href="/auth" variant="primary" dataHook={`${dataHook}-login`}>
+              <Button>Login</Button>
+            </Link>
           )}
         </Flex>
       </Box>
