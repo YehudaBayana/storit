@@ -4,7 +4,7 @@ import { getPlaybackUrl, listVideos, type Video } from "@/features/videos/api/vi
 import { videoKeys } from "@/shared/api/keys";
 import { useGetCurrentUser } from "@/features/auth/query/useAuth";
 
-const PROCESSING_POLL_MS = 3000;
+const PROCESSING_POLL_MS = 20000;
 
 export function useVideos(limit = 50, offset = 0) {
   const { data: currentUser } = useGetCurrentUser();
