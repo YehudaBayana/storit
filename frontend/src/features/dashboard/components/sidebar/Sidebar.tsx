@@ -15,7 +15,7 @@ export default function Sidebar({ dataHook = "dashboard-sidebar" }: SidebarProps
 
   const navItems = [
     { href: "/", label: "Home", icon: "🏠" },
-    { href: "/auth/videos", label: "Videos", icon: "🎥" },
+    { href: "/videos", label: "Videos", icon: "🎥" },
   ];
 
   return (

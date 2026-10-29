@@ -31,6 +31,6 @@ describe("Sidebar", () => {
 
   it("links to the video library", () => {
     driver.render();
-    expect(screen.getByRole("link", { name: /Videos/ })).toHaveAttribute("href", "/auth/videos");
+    expect(screen.getByRole("link", { name: /Videos/ })).toHaveAttribute("href", "/videos");
   });
 });

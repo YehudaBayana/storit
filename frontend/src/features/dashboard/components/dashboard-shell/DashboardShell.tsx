@@ -22,7 +22,7 @@ export default function DashboardShell({
   // Helper to resolve title in the top bar
   const getHeaderTitle = () => {
     if (pathname === "/") return "Home";
-    if (pathname === "/auth/videos") return "Videos";
+    if (pathname === "/videos") return "Videos";
     if (pathname === "/search") return "Search";
     if (pathname === "/playlists") return "Playlists";
     if (pathname?.startsWith("/playlists/")) return "Playlist";
