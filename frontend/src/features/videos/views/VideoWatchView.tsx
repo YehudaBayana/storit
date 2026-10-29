@@ -83,7 +83,7 @@ export default function VideoWatchView() {
       <Container size="lg">
         <Stack gap={4}>
           <Alert variant="error">Missing video id.</Alert>
-          <Link href="/videos" variant="back">
+          <Link href="/auth/videos" variant="back">
             ← Back to library
           </Link>
         </Stack>
@@ -106,7 +106,7 @@ export default function VideoWatchView() {
       <Container size="lg">
         <Stack gap={4}>
           <Alert variant="error">{error ?? "Video not found."}</Alert>
-          <Link href="/videos" variant="back">
+          <Link href="/auth/videos" variant="back">
             ← Back to library
           </Link>
         </Stack>
@@ -118,7 +118,7 @@ export default function VideoWatchView() {
     <Container size="lg">
       <Stack gap={6}>
         <Flex justify="between" align="center" gap={3}>
-          <Link href="/videos" variant="back">
+          <Link href="/auth/videos" variant="back">
             ← Back to library
           </Link>
           <Badge variant="secondary" pill size="sm">

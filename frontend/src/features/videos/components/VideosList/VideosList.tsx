@@ -20,7 +20,7 @@ export function VideosList({ videos }: VideosListProps) {
       {/* Grid layout for video cards using atomic Grid component */}
       <Grid cols={5} colsTablet={3} colsMobile={2}>
         {videos.map((video: Video) => (
-          <Link key={video.id} href={`/videos/${video.id}`}>
+          <Link key={video.id} href={`/auth/videos/${video.id}`}>
             <VideoCard
               title={video.title}
               thumbnailUrl={getVideoThumbnailUrl(video.id)}
