@@ -96,7 +96,7 @@ export default function ServerStatus({ dataHook = "server-status" }: ServerStatu
     // eslint-disable-next-line react-hooks/set-state-in-effect
     checkHealth();
     // Poll the backend health every 100 seconds
-    const interval = setInterval(checkHealth, 100000);
+    const interval = setInterval(checkHealth, 10000000);
     return () => clearInterval(interval);
   }, []);
 
