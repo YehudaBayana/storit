@@ -66,12 +66,15 @@ func transcodeForPlayback(ctx context.Context, inputPath, outputPath string) err
 	threads := strconv.Itoa(config.FFmpegThreads)
 	_, err := runCommand(ctx, "ffmpeg",
 		"-hide_banner", "-loglevel", "error", "-nostdin", "-y",
-		"-threads", threads,
 		"-i", inputPath,
-		// Even width for yuv420p; the height cap bounds frame buffers so 4K clips fit in a small instance.
-		"-vf", fmt.Sprintf(`scale=-2:min(ih\,%d)`, config.PlaybackMaxHeight),
+		// Keep original resolution (even width) and original framerate (up to 60fps)
+		"-vf", "scale=-2:trunc(ih/2)*2",
+		"-r", "60", // Optional: caps at 60fps if input is higher, or let it match input naturally by omitting this
+		"-c:v", "libx264",
 		"-threads", threads,
-		"-c:v", "libx264", "-preset", "veryfast", "-crf", "23", "-pix_fmt", "yuv420p",
+		"-preset", "veryfast",
+		"-crf", "23", // Lower number (e.g., 20) = higher quality
+		"-pix_fmt", "yuv420p",
 		"-c:a", "aac",
 		"-movflags", "+faststart",
 		"-f", "mp4",

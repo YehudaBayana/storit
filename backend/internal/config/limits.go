@@ -35,7 +35,7 @@ const (
 	ProcessingQueueSize  = 32
 	ThumbnailWidth       = 640
 	PlaybackMaxHeight    = 1440
-	FFmpegThreads        = 1
+	FFmpegThreads        = 2
 	MaxCommandErrorBytes = 1000
 )
 

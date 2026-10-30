@@ -12,6 +12,13 @@
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.formatOnSave": true
   },
+  "[go]": {
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": "explicit"
+    },
+    "editor.defaultFormatter": "golang.Go"
+  },
   "chat.tools.terminal.autoApprove": {
     "yarn lint": true,
     "printf": true,
