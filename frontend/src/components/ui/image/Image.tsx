@@ -1,22 +1,14 @@
 "use client";
 import NextImage from "next/image";
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, ComponentPropsWithoutRef } from "react";
 
 /**
  * Image fit options.
  */
 export type ImageFit = "cover" | "contain" | "fill" | "none" | "scale-down";
 
-interface ImageProps {
-  /** Image source URL */
-  src?: string | null;
-  /** Alternative text */
-  alt: string;
-  /** Image width */
-  width?: number | undefined;
-  /** Image height */
-  height?: number | undefined;
-  /** Object fit behavior */
+interface ImageProps extends ComponentPropsWithoutRef<typeof NextImage> {
+  /** Image fit behavior */
   fit?: ImageFit;
   /** Fallback image source */
   fallbackSrc?: string;
@@ -26,14 +18,9 @@ interface ImageProps {
   lazy?: boolean;
   /** Border radius */
   rounded?: "none" | "sm" | "md" | "lg" | "xl" | "full";
-  /** Fill the nearest positioned ancestor (absolute inset-0) */
-  fill?: boolean;
   /** Dim the image for use as a background behind content */
   dimmed?: boolean;
-  /** Additional CSS classes */
-  className?: string;
   dataHook?: string;
-  unoptimized?: boolean;
 }
 
 /**
@@ -150,6 +137,7 @@ const Image: React.FC<ImageProps> = ({
   className = "",
   dataHook,
   unoptimized = false,
+  ...props
 }) => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [hasError, setHasError] = useState(false);
@@ -208,6 +196,8 @@ const Image: React.FC<ImageProps> = ({
           onError={handleError}
           className={`${getFitClass(fit)} ${getRoundedClass(rounded)} ${className}`}
           data-hook={dataHook}
+          loading="lazy"
+          {...props}
         />
       );
     }
@@ -247,6 +237,7 @@ const Image: React.FC<ImageProps> = ({
             transition-opacity duration-300
           `}
           data-hook={dataHook ? `${dataHook}-image` : undefined}
+          {...props}
         />
       )}
     </div>

@@ -13,7 +13,7 @@ export function VideoCard({ title, thumbnailUrl, duration }: VideoCardProps) {
     <Card>
       {/* Thumbnail section with the video length badge overlaid */}
       <Box position="relative">
-        <Image src={thumbnailUrl} alt={title} unoptimized={true} />
+        <Image loading="eager" src={thumbnailUrl} alt={title} unoptimized={true} />
         <Badge size="sm">{duration}</Badge>
       </Box>
 
