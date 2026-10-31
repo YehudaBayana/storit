@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 export interface FormFieldProps {
   label: string;
@@ -10,12 +10,10 @@ export interface FormFieldProps {
 export const FormField: React.FC<FormFieldProps> = ({ label, error, children }) => {
   return (
     <div className="flex flex-col gap-1.5 w-full">
-      <label className="text-sm font-semibold text-brand-dark">
-        {label}
-      </label>
-      
+      <label className="text-sm font-semibold text-brand-dark">{label}</label>
+
       {children}
-      
+
       {error && (
         <span className="text-sm text-red-500" role="alert">
           {error}

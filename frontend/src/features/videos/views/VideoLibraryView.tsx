@@ -1,17 +1,13 @@
 "use client";
 
 import { useVideos } from "@/features/videos/query/useVideos";
-import { Alert, Card, Container, EmptyState, Flex, Heading, Stack, Text } from "@/components/ui";
+import { Alert, Box, Card, EmptyState, Flex, Heading, Stack, Text } from "@/components/ui";
 import { UploadVideoForm } from "@/features/videos/components/UploadVideoForm/UploadVideoForm";
 import { VideoStatsGrid } from "@/features/videos/components/VideoStatsGrid/VideoStatsGrid";
 import { VideosList } from "@/features/videos/components/VideosList/VideosList";
 import { useGetCurrentUser } from "@/features/auth/query/useAuth";
 
-export default function VideoLibraryView({
-  dataHook = "video-library-view",
-}: {
-  dataHook?: string;
-}) {
+export default function VideoLibraryView({}: { dataHook?: string }) {
   const { data: videos = [], isLoading, isError, error: listError } = useVideos();
   const { data: currentUser, isLoading: isCurrentUserLoading } = useGetCurrentUser();
   if (isCurrentUserLoading) {
@@ -21,17 +17,13 @@ export default function VideoLibraryView({
     return <Text>User not logged in.</Text>;
   }
   return (
-    <Container size="lg" dataHook={dataHook}>
-      <Card variant="surface" rounded="3xl" padding="xl">
-        <Stack gap={8}>
-          <Flex justify="between" align="start" gap={4}>
-            <Stack gap={1}>
-              <Text variant="caption" color="primary" weight="semibold">
-                PRIVATE ARCHIVE
-              </Text>
-              <Heading level={2} size="3xl">
-                Your dance videos
-              </Heading>
+    <Box>
+      <Card variant="interactive">
+        <Stack gap={"lg"}>
+          <Flex justify="between" align="start" gap={"lg"}>
+            <Stack gap={"sm"}>
+              <Text>PRIVATE ARCHIVE</Text>
+              <Heading>Your dance videos</Heading>
             </Stack>
           </Flex>
 
@@ -39,23 +31,22 @@ export default function VideoLibraryView({
 
           <VideoStatsGrid videos={videos} />
 
-          <Card variant="dashed" rounded="2xl" padding="lg">
+          <Card variant="interactive">
             {isLoading ? (
-              <Text variant="body-sm" color="muted" align="center">
-                Loading videos...
-              </Text>
+              <Text>Loading videos...</Text>
             ) : isError ? (
-              <Alert variant="error">
-                {listError instanceof Error ? listError.message : "Unable to load videos."}
-              </Alert>
+              <Alert
+                title={listError instanceof Error ? listError.message : "Unable to load videos."}
+                variant="error"
+              />
             ) : videos.length === 0 ? (
-              <EmptyState type="library"></EmptyState>
+              <EmptyState title="you do not have any videos" />
             ) : (
               <VideosList videos={videos} />
             )}
           </Card>
         </Stack>
       </Card>
-    </Container>
+    </Box>
   );
 }

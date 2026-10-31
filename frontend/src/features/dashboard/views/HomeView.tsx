@@ -1,10 +1,10 @@
 "use client";
 
-import ServerStatus from "@/features/dashboard/components/ServerStatus";
 import { VideosList } from "@/features/videos/components/VideosList/VideosList";
 import { Box, Flex } from "@/components/ui";
 import { useVideos } from "@/features/videos/query/useVideos";
 import { useGetCurrentUser } from "@/features/auth/query/useAuth";
+import ServerStatus from "../components/server-status/ServerStatus";
 
 export default function HomeView() {
   const { data: videos = [], isLoading, isError, error: listError } = useVideos();

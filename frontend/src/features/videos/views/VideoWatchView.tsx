@@ -4,18 +4,7 @@ import { useParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { getVideo, type Video as VideoModel } from "@/features/videos/api/videos";
 import { usePlaybackUrl } from "@/features/videos/query/useVideos";
-import {
-  Container,
-  Card,
-  Flex,
-  Stack,
-  Heading,
-  Text,
-  Badge,
-  Link,
-  Alert,
-  Video,
-} from "@/components/ui";
+import { Card, Flex, Stack, Heading, Text, Badge, Link, Alert, Video, Box } from "@/components/ui";
 
 const MAX_PLAYBACK_RECOVERIES = 3;
 
@@ -80,67 +69,55 @@ export default function VideoWatchView() {
 
   if (!videoId) {
     return (
-      <Container size="lg">
-        <Stack gap={4}>
-          <Alert variant="error">Missing video id.</Alert>
-          <Link href="/videos" variant="back">
-            ← Back to library
-          </Link>
+      <Box>
+        <Stack gap={"md"}>
+          <Alert title="Error">Missing video id.</Alert>
+          <Link href="/videos">← Back to library</Link>
         </Stack>
-      </Container>
+      </Box>
     );
   }
 
   if (isLoading) {
     return (
-      <Container size="lg">
-        <Text variant="body" color="muted">
-          Loading video…
-        </Text>
-      </Container>
+      <Box>
+        <Text>Loading video…</Text>
+      </Box>
     );
   }
 
   if (error || !video) {
     return (
-      <Container size="lg">
-        <Stack gap={4}>
-          <Alert variant="error">{error ?? "Video not found."}</Alert>
-          <Link href="/videos" variant="back">
-            ← Back to library
-          </Link>
+      <Box>
+        <Stack gap={"md"}>
+          <Alert title="Error">{error ?? "Video not found."}</Alert>
+          <Link href="/videos">← Back to library</Link>
         </Stack>
-      </Container>
+      </Box>
     );
   }
 
   return (
-    <Container size="lg">
-      <Stack gap={6}>
-        <Flex justify="between" align="center" gap={3}>
-          <Link href="/videos" variant="back">
-            ← Back to library
-          </Link>
-          <Badge variant="secondary" pill size="sm">
-            {video.status}
-          </Badge>
+    <Box>
+      <Stack gap={"lg"}>
+        <Flex justify="between" align="center" gap={"md"}>
+          <Link href="/videos">← Back to library</Link>
+          <Badge size="sm">{video.status}</Badge>
         </Flex>
 
-        <Card variant="surface" rounded="3xl" padding="md">
+        <Card>
           {playback ? (
             <Video
               key={video.id}
               ref={videoElementRef}
               controls
-              playsInline
-              preload="metadata"
               src={playback.url}
               onError={handlePlaybackError}
               onLoadedMetadata={handleLoadedMetadata}
             />
           ) : (
-            <Flex align="center" justify="center" h="full" w="full">
-              <Text variant="body-sm" color="muted" align="center">
+            <Flex align="center" justify="center">
+              <Text>
                 {video.status === "ready" && "Loading video…"}
                 {video.status === "uploading" && "This video is still uploading."}
                 {video.status === "processing" && "This video is being prepared for playback."}
@@ -151,27 +128,23 @@ export default function VideoWatchView() {
           )}
         </Card>
 
-        <Card variant="surface" rounded="3xl" padding="lg">
-          <Stack gap={3}>
-            <Heading level={1} size="3xl">
-              {video.title || video.original_name}
-            </Heading>
-            <Text variant="caption" color="muted">
+        <Card>
+          <Stack gap={"md"}>
+            <Heading>{video.title || video.original_name}</Heading>
+            <Text>
               {video.recorded_at
                 ? new Date(video.recorded_at).toLocaleDateString()
                 : "Recorded date unavailable"}
             </Text>
 
             {video.notes ? (
-              <Text variant="body">{video.notes}</Text>
+              <Text>{video.notes}</Text>
             ) : (
-              <Text variant="body-sm" color="muted">
-                No notes recorded for this video.
-              </Text>
+              <Text>No notes recorded for this video.</Text>
             )}
           </Stack>
         </Card>
       </Stack>
-    </Container>
+    </Box>
   );
 }

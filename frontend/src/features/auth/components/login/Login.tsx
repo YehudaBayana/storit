@@ -17,19 +17,15 @@ export const Login: React.FC<LoginProps> = ({ onSwitchToRegister, dataHook }) =>
   };
 
   return (
-    <Card variant="elevated" padding="lg" dataHook={dataHook}>
-      <Stack gap={6}>
-        <Stack gap={1} align="center">
-          <Heading level={2} size="2xl" align="center" dataHook="login-heading">
-            Welcome Back
-          </Heading>
-          <Text variant="body-sm" color="muted" align="center">
-            Please enter your details to sign in
-          </Text>
+    <Card variant="bordered">
+      <Stack gap={"lg"}>
+        <Stack gap={"md"}>
+          <Heading>Welcome Back</Heading>
+          <Text>Please enter your details to sign in</Text>
         </Stack>
 
-        <Form onSubmit={handleSubmit} gap={4} dataHook="login-form">
-          <FormField label="Email" htmlFor="login-email-input" required>
+        <Form onSubmit={handleSubmit}>
+          <FormField label="Email">
             <Input
               id="login-email-input"
               type="email"
@@ -37,11 +33,10 @@ export const Login: React.FC<LoginProps> = ({ onSwitchToRegister, dataHook }) =>
               onChange={(event) => setEmail(event.target.value)}
               required
               placeholder="you@example.com"
-              dataHook="login-email"
             />
           </FormField>
 
-          <FormField label="Password" htmlFor="login-password-input" required>
+          <FormField label="Password">
             <Input
               id="login-password-input"
               type="password"
@@ -49,25 +44,17 @@ export const Login: React.FC<LoginProps> = ({ onSwitchToRegister, dataHook }) =>
               onChange={(event) => setPassword(event.target.value)}
               required
               placeholder="••••••••"
-              dataHook="login-password"
             />
           </FormField>
 
-          <Button type="submit" variant="primary" fullWidth dataHook="login-submit-button">
+          <Button type="submit" variant="primary">
             Sign In
           </Button>
         </Form>
 
-        <Flex align="center" justify="center" gap={1}>
-          <Text variant="body-sm" color="muted">
-            Do not have an account?
-          </Text>
-          <Button
-            variant="link"
-            size="sm"
-            onClick={onSwitchToRegister}
-            dataHook="login-switch-to-register-button"
-          >
+        <Flex align="center" justify="center" gap={"xs"}>
+          <Text>Do not have an account?</Text>
+          <Button variant="secondary" size="sm" onClick={onSwitchToRegister}>
             Sign up
           </Button>
         </Flex>

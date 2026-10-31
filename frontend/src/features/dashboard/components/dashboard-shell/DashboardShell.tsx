@@ -2,9 +2,9 @@
 
 import React from "react";
 import { Badge, Box, Flex, Text } from "@/components/ui";
-import Sidebar from "@/features/dashboard/components/Sidebar";
 import { usePathname } from "next/navigation";
-import { IoFolderOutline, IoStarOutline } from "react-icons/io5";
+import { sections, sidebarItems } from "../sidebar/items";
+import Sidebar from "../sidebar/Sidebar";
 
 interface DashboardShellProps {
   children: React.ReactNode;
@@ -13,28 +13,7 @@ interface DashboardShellProps {
 
 export default function DashboardShell({ children }: DashboardShellProps) {
   const pathname = usePathname();
-  const sidebarItems = [
-    {
-      id: "home",
-      label: "Home",
-      href: "/",
-      icon: IoFolderOutline,
-    },
-    {
-      id: "starred",
-      label: "Starred",
-      href: "/starred",
-      icon: IoStarOutline,
-      badge: "3",
-    },
-  ];
 
-  const sections = [
-    {
-      title: "Files",
-      items: sidebarItems,
-    },
-  ];
   const activeId = sidebarItems.find((item) => item.href === pathname)?.id || "home";
   // Helper to resolve title in the top bar
   const getHeaderTitle = () => {

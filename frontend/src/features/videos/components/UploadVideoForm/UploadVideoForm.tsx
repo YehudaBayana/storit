@@ -10,6 +10,7 @@ import {
   Form,
   FormField,
   Grid,
+  GridItem,
   Input,
   Progress,
   Stack,
@@ -74,10 +75,10 @@ export function UploadVideoForm() {
 
   return (
     <Form onSubmit={handleSubmit}>
-      <Stack gap={4}>
-        <Grid cols={2} colsMobile={1} gap={4}>
-          <Grid.Item colSpan={2} colSpanTablet={2}>
-            <FormField label="Video file" htmlFor="video-upload-input">
+      <Stack gap={"lg"}>
+        <Grid cols={2} gap={"lg"}>
+          <GridItem colSpan={2}>
+            <FormField label="Video file">
               <Input
                 id="video-upload-input"
                 type="file"
@@ -85,7 +86,7 @@ export function UploadVideoForm() {
                 onChange={handleFileChange}
               />
             </FormField>
-          </Grid.Item>
+          </GridItem>
 
           <FormField label="Title">
             <Input
@@ -103,7 +104,7 @@ export function UploadVideoForm() {
             />
           </FormField>
 
-          <Grid.Item colSpan={2} colSpanTablet={2}>
+          <GridItem colSpan={2}>
             <FormField label="Notes">
               <TextArea
                 value={notes}
@@ -112,30 +113,27 @@ export function UploadVideoForm() {
                 placeholder="What improved today?"
               />
             </FormField>
-          </Grid.Item>
+          </GridItem>
         </Grid>
 
-        {error && <Alert variant="error">{error}</Alert>}
+        {error && <Alert title={error} variant="error" />}
 
         {uploadVideoMutation.isPending && (
-          <Stack gap={2}>
-            <Progress value={Math.round(progress * 100)} variant="default" />
-            <Text variant="caption" color="muted">
+          <Stack gap={"sm"}>
+            <Progress value={Math.round(progress * 100)} />
+            <Text>
               Uploading {Math.round(progress * 100)}%. Keep this tab open until it finishes.
             </Text>
           </Stack>
         )}
 
-        <Flex justify="between" align="center" gap={3}>
-          <Text variant="caption" color="muted">
-            {file ? `Selected: ${file.name}` : "No file selected"}
-          </Text>
-          <Flex align="center" gap={3}>
+        <Flex justify="between" align="center" gap={"lg"}>
+          <Text>{file ? `Selected: ${file.name}` : "No file selected"}</Text>
+          <Flex align="center" gap={"lg"}>
             {uploadVideoMutation.isPending && (
               <Button
                 type="button"
                 variant="outline"
-                pill
                 onClick={() => uploadAbortRef.current?.abort()}
               >
                 Cancel
@@ -144,10 +142,7 @@ export function UploadVideoForm() {
             <Button
               type="submit"
               variant="primary"
-              pill
               disabled={!file || uploadVideoMutation.isPending}
-              loading={uploadVideoMutation.isPending}
-              loadingText="Uploading..."
             >
               Upload video
             </Button>
