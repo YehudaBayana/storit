@@ -131,11 +131,6 @@ export default function VideoWatchView() {
         <Card>
           <Stack gap={"md"}>
             <Heading>{video.title || video.original_name}</Heading>
-            <Text>
-              {video.recorded_at
-                ? new Date(video.recorded_at).toLocaleDateString()
-                : "Recorded date unavailable"}
-            </Text>
 
             {video.notes ? (
               <Text>{video.notes}</Text>

@@ -21,7 +21,8 @@ The `Grid` component abstracts CSS Grid layout rules into straightforward props,
     }
 
 ## Props
-| Prop | Type | Default | Description |
-| :--- | :--- | :--- | :--- |
-| `cols` | `1 | 2 | 3 | 4 | 5 | 6 | 12` | `1` | Number of equal-width columns. |
-| `gap` | `'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl'` | `'md'` | Standardized spacing between grid items. |
+
+| Prop   | Type    | Default | Description |
+| :----- | :------ | :------ | :---------- |
+| `cols` | `1      | 2       | 3           | 4    | 5    | 6     | 12`    | `1`                                      | Number of equal-width columns. |
+| `gap`  | `'none' | 'xs'    | 'sm'        | 'md' | 'lg' | 'xl'` | `'md'` | Standardized spacing between grid items. |

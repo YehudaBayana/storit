@@ -1,6 +1,6 @@
-import { render, screen } from '@testing-library/react';
-import React from 'react';
-import { Stack, StackProps } from '../Stack';
+import { render, screen } from "@testing-library/react";
+import React from "react";
+import { Stack, StackProps } from "../Stack";
 
 // The Driver pattern encapsulates DOM queries to keep our tests clean and readable.
 export class StackDriver {
@@ -10,7 +10,7 @@ export class StackDriver {
   }
 
   get element() {
-    return screen.getByTestId('stack-component');
+    return screen.getByTestId("stack-component");
   }
 
   hasClass(className: string) {

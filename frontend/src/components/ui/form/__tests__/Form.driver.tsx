@@ -1,6 +1,6 @@
-import { render, screen, fireEvent } from '@testing-library/react';
-import React from 'react';
-import { Form, FormProps } from '../Form';
+import { render, screen, fireEvent } from "@testing-library/react";
+import React from "react";
+import { Form, FormProps } from "../Form";
 
 export class FormDriver {
   render(props: FormProps) {
@@ -9,7 +9,7 @@ export class FormDriver {
   }
 
   get element() {
-    return screen.getByTestId('form-component');
+    return screen.getByTestId("form-component");
   }
 
   submit() {

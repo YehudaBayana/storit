@@ -65,7 +65,6 @@ func (service *Service) InitUpload(ctx context.Context, ownerID uuid.UUID, input
 		UploadExpiresAt: &expiresAt,
 		Title:           input.Title,
 		Notes:           input.Notes,
-		RecordedAt:      input.RecordedAt,
 		OriginalName:    originalName,
 		OriginalKey:     key,
 		MimeType:        mimeType,

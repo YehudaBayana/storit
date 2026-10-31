@@ -12,6 +12,7 @@ export const Image: React.FC<ImageProps> = ({
   rounded = "none",
   className = "",
   testId = "image",
+  style, // 1. Extract style from props so we can merge it safely
   ...props
 }) => {
   const roundedClasses = {
@@ -25,9 +26,15 @@ export const Image: React.FC<ImageProps> = ({
   return (
     <div
       data-testid={testId}
-      className={`overflow-hidden inline-block ${roundedClasses[rounded]} ${className} w-auto h-auto`}
+      // 2. You can remove w-auto and h-auto from this wrapper div
+      className={`overflow-hidden inline-block ${roundedClasses[rounded]} ${className}`}
     >
-      <NextImage alt={alt} {...props} />
+      <NextImage
+        alt={alt}
+        // 3. Apply the auto styles directly to the Next.js image
+        style={{ width: "auto", height: "auto", ...style }}
+        {...props}
+      />
     </div>
   );
 };

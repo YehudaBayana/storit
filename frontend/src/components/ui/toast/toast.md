@@ -12,19 +12,20 @@ The `Toast` component is used to show brief, temporary notifications, such as a 
 
     export default function MyComponent() {
       return (
-        <Toast 
-          variant="success" 
-          title="File Uploaded" 
-          message="Monthly_Report.pdf has been saved." 
-          onClose={() => console.log('closed')} 
+        <Toast
+          variant="success"
+          title="File Uploaded"
+          message="Monthly_Report.pdf has been saved."
+          onClose={() => console.log('closed')}
         />
       );
     }
 
 ## Props
-| Prop | Type | Default | Description |
-| :--- | :--- | :--- | :--- |
-| `title` | `string` | Required | Main notification text. |
-| `message` | `string` | `undefined` | Secondary detailed text. |
-| `variant` | `'success' | 'error' | 'info'` | `'success'` | Visual style and icon. |
+
+| Prop      | Type         | Default     | Description                               |
+| :-------- | :----------- | :---------- | :---------------------------------------- |
+| `title`   | `string`     | Required    | Main notification text.                   |
+| `message` | `string`     | `undefined` | Secondary detailed text.                  |
+| `variant` | `'success'   | 'error'     | 'info'`                                   | `'success'` | Visual style and icon. |
 | `onClose` | `() => void` | `undefined` | Optional callback to show a close button. |

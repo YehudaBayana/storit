@@ -17,8 +17,9 @@ The `Progress` component visually displays the completion status of a task, such
     }
 
 ## Props
-| Prop | Type | Default | Description |
-| :--- | :--- | :--- | :--- |
-| `value` | `number` | Required | Percentage of progress (0 to 100). |
-| `size` | `'sm' | 'md' | 'lg'` | `'md'` | Height of the progress bar. |
+
+| Prop     | Type     | Default      | Description                                |
+| :------- | :------- | :----------- | :----------------------------------------- |
+| `value`  | `number` | Required     | Percentage of progress (0 to 100).         |
+| `size`   | `'sm'    | 'md'         | 'lg'`                                      | `'md'` | Height of the progress bar. |
 | `testId` | `string` | `'progress'` | Data-testid attribute for testing drivers. |

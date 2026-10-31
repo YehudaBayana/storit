@@ -21,7 +21,6 @@ import {
 export function UploadVideoForm() {
   const [title, setTitle] = useState("");
   const [notes, setNotes] = useState("");
-  const [recordedAt, setRecordedAt] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [progress, setProgress] = useState(0);
@@ -52,13 +51,11 @@ export function UploadVideoForm() {
         file,
         title,
         notes,
-        recordedAt,
         signal: uploadAbort.signal,
         onProgress: setProgress,
       });
       setTitle("");
       setNotes("");
-      setRecordedAt("");
       setFile(null);
       const fileInput = document.getElementById("video-upload-input") as HTMLInputElement | null;
       if (fileInput) fileInput.value = "";
@@ -93,14 +90,6 @@ export function UploadVideoForm() {
               value={title}
               onChange={(event) => setTitle(event.target.value)}
               placeholder="Sunrise drill"
-            />
-          </FormField>
-
-          <FormField label="Recorded date">
-            <Input
-              type="date"
-              value={recordedAt}
-              onChange={(event) => setRecordedAt(event.target.value)}
             />
           </FormField>
 

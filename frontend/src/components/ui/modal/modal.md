@@ -25,9 +25,10 @@ The `Modal` component is a floating overlay used for focused tasks like editing 
     }
 
 ## Props
-| Prop | Type | Default | Description |
-| :--- | :--- | :--- | :--- |
-| `isOpen` | `boolean` | Required | Controls the visibility of the modal. |
-| `onClose` | `() => void` | Required | Callback fired when the backdrop or close button is clicked. |
-| `title` | `string` | Required | The header text of the modal. |
-| `testId` | `string` | `'modal'` | Data-testid attribute for testing drivers. |
+
+| Prop      | Type         | Default   | Description                                                  |
+| :-------- | :----------- | :-------- | :----------------------------------------------------------- |
+| `isOpen`  | `boolean`    | Required  | Controls the visibility of the modal.                        |
+| `onClose` | `() => void` | Required  | Callback fired when the backdrop or close button is clicked. |
+| `title`   | `string`     | Required  | The header text of the modal.                                |
+| `testId`  | `string`     | `'modal'` | Data-testid attribute for testing drivers.                   |

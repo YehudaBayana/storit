@@ -4,10 +4,9 @@ import { Card, Stack, Heading, Text, Form, FormField, Input, Button, Flex } from
 
 interface LoginProps {
   onSwitchToRegister: () => void;
-  dataHook?: string;
 }
 
-export const Login: React.FC<LoginProps> = ({ onSwitchToRegister, dataHook }) => {
+export const Login: React.FC<LoginProps> = ({ onSwitchToRegister }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { mutate: login } = useLogin();

@@ -31,7 +31,6 @@ type Video struct {
 	OwnerID       uuid.UUID  `json:"owner_id"`
 	Title         string     `json:"title"`
 	Notes         string     `json:"notes"`
-	RecordedAt    *time.Time `json:"recorded_at,omitempty"`
 	Status        Status     `json:"status"`
 	FailureReason string     `json:"failure_reason,omitempty"`
 	OriginalName  string     `json:"original_name"`
@@ -57,7 +56,6 @@ type NewVideo struct {
 	UploadExpiresAt *time.Time
 	Title           string
 	Notes           string
-	RecordedAt      *time.Time
 	OriginalName    string
 	OriginalKey     string
 	MimeType        string
@@ -68,7 +66,6 @@ type NewVideo struct {
 type VideoUpdate struct {
 	Title      *string
 	Notes      *string
-	RecordedAt *time.Time
 }
 
 // ProcessingResult is what the background processor learned about a video.
@@ -88,7 +85,6 @@ type InitUpload struct {
 	MimeType   string
 	Title      string
 	Notes      string
-	RecordedAt *time.Time
 }
 
 // UploadSession tells the browser how to slice the file.
@@ -114,7 +110,6 @@ type initUploadRequest struct {
 	ContentType string  `json:"content_type"`
 	Title       string  `json:"title"`
 	Notes       string  `json:"notes"`
-	RecordedAt  *string `json:"recorded_at"`
 }
 
 type presignPartsRequest struct {
@@ -133,7 +128,6 @@ type completeUploadRequest struct {
 type updateVideoRequest struct {
 	Title      *string `json:"title"`
 	Notes      *string `json:"notes"`
-	RecordedAt *string `json:"recorded_at"`
 }
 
 // Repository is the persistence contract the Service depends on.

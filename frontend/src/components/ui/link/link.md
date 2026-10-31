@@ -19,8 +19,9 @@ The `Link` component wraps Next.js's native `next/link` to provide standardized 
     }
 
 ## Props
-| Prop | Type | Default | Description |
-| :--- | :--- | :--- | :--- |
-| `variant` | `'default' | 'subtle' | 'brand'` | `'default'` | Text color and hover styling. |
-| `testId` | `string` | `'link'` | Data-testid attribute for testing drivers. |
-| *(Any)* | *(NextLinkProps)* | | Inherits all Next.js Link props (href, replace, etc.). |
+
+| Prop      | Type              | Default  | Description                                            |
+| :-------- | :---------------- | :------- | :----------------------------------------------------- |
+| `variant` | `'default'        | 'subtle' | 'brand'`                                               | `'default'` | Text color and hover styling. |
+| `testId`  | `string`          | `'link'` | Data-testid attribute for testing drivers.             |
+| _(Any)_   | _(NextLinkProps)_ |          | Inherits all Next.js Link props (href, replace, etc.). |

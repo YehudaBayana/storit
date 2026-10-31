@@ -26,9 +26,9 @@ A layout component designed to be used as a child of the `Grid` component. It ha
 
 ## Props
 
-| Prop | Type | Default | Description |
-| :--- | :--- | :--- | :--- |
-| `colSpan` | `1 \| 2 ... \| 12` | `undefined` | Number of columns the item spans |
-| `rowSpan` | `1 \| 2 ... \| 6` | `undefined` | Number of rows the item spans |
-| `testId` | `string` | `'grid-item'` | Data-testid for DOM targeting |
-| `...props` | `HTMLAttributes` | - | Standard HTML div attributes |
+| Prop       | Type               | Default       | Description                      |
+| :--------- | :----------------- | :------------ | :------------------------------- |
+| `colSpan`  | `1 \| 2 ... \| 12` | `undefined`   | Number of columns the item spans |
+| `rowSpan`  | `1 \| 2 ... \| 6`  | `undefined`   | Number of rows the item spans    |
+| `testId`   | `string`           | `'grid-item'` | Data-testid for DOM targeting    |
+| `...props` | `HTMLAttributes`   | -             | Standard HTML div attributes     |

@@ -20,10 +20,11 @@ The `Flex` component is built on top of the `Box` component. It abstracts standa
     }
 
 ## Props
-| Prop | Type | Default | Description |
-| :--- | :--- | :--- | :--- |
-| `direction` | `'row' | 'col' | 'row-reverse' | 'col-reverse'` | `'row'` | Flex direction. |
-| `align` | `'start' | 'center' | 'end' | 'stretch' | 'baseline'` | `'stretch'` | Align-items property. |
-| `justify` | `'start' | 'center' | 'end' | 'between' | 'around' | 'evenly'` | `'start'` | Justify-content property. |
-| `wrap` | `'wrap' | 'nowrap' | 'wrap-reverse'` | `'nowrap'` | Flex wrap behavior. |
-| `gap` | `'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl'` | `'none'` | Standardized spacing between items. |
+
+| Prop        | Type     | Default  | Description     |
+| :---------- | :------- | :------- | :-------------- |
+| `direction` | `'row'   | 'col'    | 'row-reverse'   | 'col-reverse'` | `'row'`             | Flex direction. |
+| `align`     | `'start' | 'center' | 'end'           | 'stretch'      | 'baseline'`         | `'stretch'`     | Align-items property. |
+| `justify`   | `'start' | 'center' | 'end'           | 'between'      | 'around'            | 'evenly'`       | `'start'`             | Justify-content property.           |
+| `wrap`      | `'wrap'  | 'nowrap' | 'wrap-reverse'` | `'nowrap'`     | Flex wrap behavior. |
+| `gap`       | `'none'  | 'xs'     | 'sm'            | 'md'           | 'lg'                | 'xl'`           | `'none'`              | Standardized spacing between items. |

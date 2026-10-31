@@ -6,11 +6,7 @@ import { Register } from "../../components/register/Register";
 import { useGetCurrentUser, useLogout } from "../../query/useAuth";
 import { Button, Flex, Heading, Stack, Text } from "@/components/ui";
 
-interface AuthViewProps {
-  dataHook?: string;
-}
-
-export default function AuthView({ dataHook = "auth-view" }: AuthViewProps) {
+export default function AuthView() {
   const [isLogin, setIsLogin] = useState<boolean>(true);
   const router = useRouter();
   const { data, isLoading } = useGetCurrentUser();
@@ -24,28 +20,26 @@ export default function AuthView({ dataHook = "auth-view" }: AuthViewProps) {
 
   if (isLoading) {
     return (
-      <Flex as="main" align="center" justify="center" h="screen" dataHook={dataHook}>
+      <Flex as="main" align="center" justify="center">
         <Text>Loading...</Text>
       </Flex>
     );
   }
 
   return (
-    <Flex as="main" align="center" justify="center" h="screen" dataHook={dataHook}>
+    <Flex as="main" align="center" justify="center">
       {/* Container View toggling between Login and Register */}
       {data?.user ? (
-        <Stack gap={4} align="center" dataHook={`${dataHook}-authenticated`}>
-          <Heading level={2} size="2xl" align="center">
-            You are logged in to {data.user.email}
-          </Heading>
-          <Button variant="danger" onClick={() => logout()} dataHook={`${dataHook}-logout`}>
+        <Stack gap={"md"}>
+          <Heading>You are logged in to {data.user.email}</Heading>
+          <Button variant="secondary" onClick={() => logout()}>
             log out
           </Button>
         </Stack>
       ) : isLogin ? (
-        <Login onSwitchToRegister={() => setIsLogin(false)} dataHook={`${dataHook}-login`} />
+        <Login onSwitchToRegister={() => setIsLogin(false)} />
       ) : (
-        <Register onSwitchToLogin={() => setIsLogin(true)} dataHook={`${dataHook}-register`} />
+        <Register onSwitchToLogin={() => setIsLogin(true)} />
       )}
     </Flex>
   );

@@ -19,8 +19,9 @@ The `Box` component is the foundational layout primitive. It renders a flexible 
     }
 
 ## Props
-| Prop | Type | Default | Description |
-| :--- | :--- | :--- | :--- |
-| `as` | `React.ElementType` | `'div'` | The HTML element or React component to render. |
-| `testId` | `string` | `'box'` | Data-testid attribute for testing drivers. |
-| `className` | `string` | `''` | Tailwind CSS utility classes. |
+
+| Prop        | Type                | Default | Description                                    |
+| :---------- | :------------------ | :------ | :--------------------------------------------- |
+| `as`        | `React.ElementType` | `'div'` | The HTML element or React component to render. |
+| `testId`    | `string`            | `'box'` | Data-testid attribute for testing drivers.     |
+| `className` | `string`            | `''`    | Tailwind CSS utility classes.                  |

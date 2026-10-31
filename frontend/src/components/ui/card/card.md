@@ -19,7 +19,8 @@ The `Card` component is a flexible container used to group related information, 
     }
 
 ## Props
-| Prop | Type | Default | Description |
-| :--- | :--- | :--- | :--- |
-| `variant` | `'default' | 'bordered' | 'interactive'` | `'default'` | Visual style, including hover states. |
-| `testId` | `string` | `'card'` | Data-testid attribute for testing drivers. |
+
+| Prop      | Type       | Default    | Description                                |
+| :-------- | :--------- | :--------- | :----------------------------------------- |
+| `variant` | `'default' | 'bordered' | 'interactive'`                             | `'default'` | Visual style, including hover states. |
+| `testId`  | `string`   | `'card'`   | Data-testid attribute for testing drivers. |

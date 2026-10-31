@@ -1,9 +1,9 @@
-import { screen, fireEvent } from '@testing-library/react';
+import { screen, fireEvent } from "@testing-library/react";
 
 export class AlertDriver {
   private testId: string;
 
-  constructor(testId: string = 'alert-component') {
+  constructor(testId: string = "alert-component") {
     this.testId = testId;
   }
 

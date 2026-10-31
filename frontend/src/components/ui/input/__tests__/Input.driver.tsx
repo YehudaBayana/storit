@@ -1,6 +1,6 @@
-import { render, screen, fireEvent } from '@testing-library/react';
-import React from 'react';
-import { Input, InputProps } from '../Input';
+import { render, screen, fireEvent } from "@testing-library/react";
+import React from "react";
+import { Input, InputProps } from "../Input";
 
 export class InputDriver {
   render(props: InputProps) {
@@ -9,7 +9,7 @@ export class InputDriver {
   }
 
   get element() {
-    return screen.getByTestId('input-component') as HTMLInputElement;
+    return screen.getByTestId("input-component") as HTMLInputElement;
   }
 
   type(text: string) {

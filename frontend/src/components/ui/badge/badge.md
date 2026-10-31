@@ -19,7 +19,8 @@ The `Badge` component is a small visual indicator used for tags, file statuses, 
     }
 
 ## Props
-| Prop | Type | Default | Description |
-| :--- | :--- | :--- | :--- |
-| `variant` | `'success' | 'warning' | 'error' | 'neutral' | 'brand'` | `'neutral'` | Semantic color variant. |
-| `size` | `'sm' | 'md'` | `'md'` | Padding and font size. |
+
+| Prop      | Type       | Default   | Description |
+| :-------- | :--------- | :-------- | :---------- |
+| `variant` | `'success' | 'warning' | 'error'     | 'neutral'              | 'brand'` | `'neutral'` | Semantic color variant. |
+| `size`    | `'sm'      | 'md'`     | `'md'`      | Padding and font size. |

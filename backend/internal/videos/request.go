@@ -8,7 +8,6 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
-	"time"
 
 	"backend/internal/auth"
 	"backend/internal/httputil"
@@ -25,20 +24,6 @@ func supportedVideoExtension(filename string) (string, bool) {
 	default:
 		return "", false
 	}
-}
-
-// parseRecordedAt accepts a plain date or an RFC3339 timestamp; an empty value means "not set".
-func parseRecordedAt(value string) (*time.Time, error) {
-	value = strings.TrimSpace(value)
-	if value == "" {
-		return nil, nil
-	}
-	for _, layout := range []string{time.DateOnly, time.RFC3339} {
-		if parsed, err := time.Parse(layout, value); err == nil {
-			return &parsed, nil
-		}
-	}
-	return nil, fmt.Errorf("%w: recorded_at must be YYYY-MM-DD or RFC3339", ErrInvalidInput)
 }
 
 // parsePagination falls back to defaults for missing or out-of-range values.
@@ -104,13 +89,7 @@ func toInitUpload(request initUploadRequest) (InitUpload, error) {
 		Title:     title,
 		Notes:     strings.TrimSpace(request.Notes),
 	}
-	if request.RecordedAt != nil {
-		recordedAt, err := parseRecordedAt(*request.RecordedAt)
-		if err != nil {
-			return InitUpload{}, err
-		}
-		input.RecordedAt = recordedAt
-	}
+
 	return input, nil
 }
 
@@ -131,12 +110,6 @@ func toVideoUpdate(request updateVideoRequest) (VideoUpdate, error) {
 		}
 		update.Title = &trimmedTitle
 	}
-	if request.RecordedAt != nil {
-		recordedAt, err := parseRecordedAt(*request.RecordedAt)
-		if err != nil {
-			return VideoUpdate{}, err
-		}
-		update.RecordedAt = recordedAt
-	}
+
 	return update, nil
 }

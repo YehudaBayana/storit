@@ -11,7 +11,6 @@ export interface UploadVideoInput {
   file: File;
   title: string;
   notes: string;
-  recordedAt?: string;
   signal?: AbortSignal;
   /** Fraction of bytes sent, between 0 and 1. */
   onProgress?: (fraction: number) => void;
@@ -65,7 +64,6 @@ export async function uploadVideo(input: UploadVideoInput): Promise<Video> {
     content_type: file.type,
     title: input.title,
     notes: input.notes,
-    recorded_at: input.recordedAt || undefined,
   });
   if (!session) throw new Error("You need to sign in to upload videos.");
   const videoId = session.video.id;

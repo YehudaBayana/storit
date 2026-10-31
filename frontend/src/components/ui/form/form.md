@@ -19,6 +19,6 @@ A wrapper for the native HTML `<form>` that intercepts standard submission to pr
 
 ## Props
 
-| Prop     | Type                                        | Default | Description                   |
-|----------|---------------------------------------------|---------|-------------------------------|
-| onSubmit | (e: React.FormEvent<HTMLFormElement>) => void | -       | Required submit handler       |
+| Prop     | Type                                          | Default | Description             |
+| -------- | --------------------------------------------- | ------- | ----------------------- |
+| onSubmit | (e: React.FormEvent<HTMLFormElement>) => void | -       | Required submit handler |

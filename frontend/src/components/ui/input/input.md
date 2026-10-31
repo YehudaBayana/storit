@@ -8,14 +8,14 @@ A fundamental text input field with built-in error states.
 
 ## Usage
 
-    <Input 
-      placeholder="Enter your email" 
-      hasError={false} 
-      onChange={(e) => console.log(e.target.value)} 
+    <Input
+      placeholder="Enter your email"
+      hasError={false}
+      onChange={(e) => console.log(e.target.value)}
     />
 
 ## Props
 
-| Prop     | Type    | Default | Description                               |
-|----------|---------|---------|-------------------------------------------|
-| hasError | boolean | false   | Triggers red border and ring for validation|
+| Prop     | Type    | Default | Description                                 |
+| -------- | ------- | ------- | ------------------------------------------- |
+| hasError | boolean | false   | Triggers red border and ring for validation |

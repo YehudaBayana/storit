@@ -19,6 +19,7 @@ The `Spinner` component is an animated loading indicator used to show asynchrono
     }
 
 ## Props
-| Prop | Type | Default | Description |
-| :--- | :--- | :--- | :--- |
-| `size` | `'sm' | 'md' | 'lg'` | `'md'` | Dimensions of the spinner ring. |
+
+| Prop   | Type  | Default | Description |
+| :----- | :---- | :------ | :---------- |
+| `size` | `'sm' | 'md'    | 'lg'`       | `'md'` | Dimensions of the spinner ring. |

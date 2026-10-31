@@ -22,8 +22,9 @@ The `Tabs` component allows users to navigate between different views within the
     }
 
 ## Props
-| Prop | Type | Default | Description |
-| :--- | :--- | :--- | :--- |
-| `items` | `TabItem[]` | Required | Array of tab objects (id, label, content). |
-| `defaultTabId` | `string` | `undefined` | The ID of the tab to open initially. |
-| `testId` | `string` | `'tabs'` | Data-testid attribute for testing drivers. |
+
+| Prop           | Type        | Default     | Description                                |
+| :------------- | :---------- | :---------- | :----------------------------------------- |
+| `items`        | `TabItem[]` | Required    | Array of tab objects (id, label, content). |
+| `defaultTabId` | `string`    | `undefined` | The ID of the tab to open initially.       |
+| `testId`       | `string`    | `'tabs'`    | Data-testid attribute for testing drivers. |

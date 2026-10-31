@@ -9,7 +9,7 @@ A minimalist component used to display a placeholder when no data is available o
 ## Usage Example
 
     import { FiInbox } from 'react-icons/fi';
-    
+
     export default function ProjectsList() {
       return (
         <EmptyState
@@ -27,9 +27,9 @@ A minimalist component used to display a placeholder when no data is available o
 
 ## Props
 
-| Prop        | Type        | Required | Description                                      |
-|-------------|-------------|----------|--------------------------------------------------|
-| title       | string      | Yes      | Main heading text for the empty state            |
-| description | string      | No       | Secondary explanatory text beneath the title     |
-| icon        | ReactNode   | No       | Visual element (usually a `react-icons` component)|
-| action      | ReactNode   | No       | Call to action element, such as a primary button |
+| Prop        | Type      | Required | Description                                        |
+| ----------- | --------- | -------- | -------------------------------------------------- |
+| title       | string    | Yes      | Main heading text for the empty state              |
+| description | string    | No       | Secondary explanatory text beneath the title       |
+| icon        | ReactNode | No       | Visual element (usually a `react-icons` component) |
+| action      | ReactNode | No       | Call to action element, such as a primary button   |

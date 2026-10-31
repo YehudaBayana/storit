@@ -14,7 +14,7 @@ A structural component that pairs a form control (like Input) with a label and e
 
 ## Props
 
-| Prop  | Type            | Default | Description                               |
-|-------|-----------------|---------|-------------------------------------------|
-| label | string          | -       | The text displayed above the input        |
-| error | string          | -       | Validation message displayed below input  |
+| Prop  | Type   | Default | Description                              |
+| ----- | ------ | ------- | ---------------------------------------- |
+| label | string | -       | The text displayed above the input       |
+| error | string | -       | Validation message displayed below input |

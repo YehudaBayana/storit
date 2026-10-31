@@ -30,6 +30,6 @@ export const TextArea = React.forwardRef<HTMLTextAreaElement, TextAreaProps>(
         )}
       </div>
     );
-  }
+  },
 );
 TextArea.displayName = "TextArea";

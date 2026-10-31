@@ -15,7 +15,7 @@ A layout container that aligns its children using flexbox.
 
 ## Props
 
-| Prop      | Type                         | Default | Description                   |
-|-----------|------------------------------|---------|-------------------------------|
-| direction | 'row' \| 'col'               | 'col'   | Flexbox direction             |
-| gap       | 'none' \| 'sm' \| 'md' \| 'lg'| 'md'    | Spacing between child elements|
+| Prop      | Type                           | Default | Description                    |
+| --------- | ------------------------------ | ------- | ------------------------------ |
+| direction | 'row' \| 'col'                 | 'col'   | Flexbox direction              |
+| gap       | 'none' \| 'sm' \| 'md' \| 'lg' | 'md'    | Spacing between child elements |

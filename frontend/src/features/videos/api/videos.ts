@@ -8,7 +8,6 @@ export interface Video {
   owner_id: string;
   title: string;
   notes: string;
-  recorded_at?: string | null;
   status: "uploading" | "processing" | "ready" | "failed";
   failure_reason?: string | null;
   original_name: string;
@@ -58,7 +57,6 @@ export interface InitUploadInput {
   content_type: string;
   title: string;
   notes: string;
-  recorded_at?: string;
 }
 
 function csrfJsonHeaders() {
@@ -101,10 +99,7 @@ export function getPlaybackUrl(videoId: string) {
   });
 }
 
-export function updateVideo(
-  videoId: string,
-  patch: Partial<Pick<Video, "title" | "notes" | "recorded_at">>,
-) {
+export function updateVideo(videoId: string, patch: Partial<Pick<Video, "title" | "notes">>) {
   return apiClient<Video>(`/api/videos/${videoId}`, {
     method: "PATCH",
     credentials: "include",

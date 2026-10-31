@@ -12,22 +12,22 @@ describe("TextArea Component", () => {
 
   it("renders correctly and accepts input", () => {
     render(<TextArea placeholder="Enter text..." />);
-    
+
     expect(driver.exists()).toBe(true);
-    
+
     driver.change("Hello World");
     expect(driver.value).toBe("Hello World");
   });
 
   it("displays an error message when provided", () => {
     render(<TextArea error="This field is required" />);
-    
+
     expect(driver.errorText).toBe("This field is required");
   });
 
   it("is disabled when disabled prop is true", () => {
     render(<TextArea disabled />);
-    
+
     expect(driver.isDisabled()).toBe(true);
   });
 });

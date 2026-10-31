@@ -22,8 +22,7 @@ export default function VideoLibraryView({}: { dataHook?: string }) {
         <Stack gap={"lg"}>
           <Flex justify="between" align="start" gap={"lg"}>
             <Stack gap={"sm"}>
-              <Text>PRIVATE ARCHIVE</Text>
-              <Heading>Your dance videos</Heading>
+              <Heading>upload video</Heading>
             </Stack>
           </Flex>
 

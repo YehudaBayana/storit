@@ -13,7 +13,7 @@ import (
 
 // Nullable columns are COALESCEd so every row scans into plain Go values.
 const videoColumns = `
-	id, owner_id, title, notes, recorded_at, status,
+	id, owner_id, title, notes, status,
 	COALESCE(failure_reason, ''), original_name, original_key, COALESCE(upload_id, ''),
 	COALESCE(playback_key, ''), COALESCE(thumbnail_key, ''), COALESCE(mime_type, ''),
 	size_bytes, COALESCE(duration_ms, 0), COALESCE(width, 0), COALESCE(height, 0),
@@ -29,10 +29,10 @@ func NewRepository(db *pgxpool.Pool) *DatabaseRepository {
 
 func (repository *DatabaseRepository) Create(ctx context.Context, newVideo NewVideo) (Video, error) {
 	row := repository.db.QueryRow(ctx, `
-		INSERT INTO video (id, owner_id, title, notes, recorded_at, status, original_name, original_key, mime_type, size_bytes, upload_id, upload_expires_at)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, NULLIF($11, ''), $12)
+		INSERT INTO video (id, owner_id, title, notes, status, original_name, original_key, mime_type, size_bytes, upload_id, upload_expires_at)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NULLIF($10, ''), $11)
 		RETURNING `+videoColumns,
-		newVideo.ID, newVideo.OwnerID, newVideo.Title, newVideo.Notes, newVideo.RecordedAt, newVideo.Status,
+		newVideo.ID, newVideo.OwnerID, newVideo.Title, newVideo.Notes, newVideo.Status,
 		newVideo.OriginalName, newVideo.OriginalKey, newVideo.MimeType, newVideo.SizeBytes,
 		newVideo.UploadID, newVideo.UploadExpiresAt)
 
@@ -77,7 +77,7 @@ func (repository *DatabaseRepository) ListByOwner(ctx context.Context, ownerID u
 		SELECT `+videoColumns+`
 		FROM video
 		WHERE owner_id = $1
-		ORDER BY recorded_at DESC NULLS LAST, created_at DESC
+		ORDER BY created_at DESC
 		LIMIT $2 OFFSET $3`,
 		ownerID, limit, offset)
 	if err != nil {
@@ -91,11 +91,10 @@ func (repository *DatabaseRepository) Update(ctx context.Context, ownerID, video
 		UPDATE video
 		SET title = COALESCE($3, title),
 		    notes = COALESCE($4, notes),
-		    recorded_at = COALESCE($5, recorded_at),
 		    updated_at = now()
 		WHERE id = $1 AND owner_id = $2
 		RETURNING `+videoColumns,
-		videoID, ownerID, update.Title, update.Notes, update.RecordedAt)
+		videoID, ownerID, update.Title, update.Notes)
 
 	video, err := scanVideo(row)
 	if err != nil {
@@ -205,7 +204,7 @@ func (repository *DatabaseRepository) ListExpiredUploads(ctx context.Context, ex
 func scanVideo(row pgx.Row) (Video, error) {
 	var video Video
 	err := row.Scan(
-		&video.ID, &video.OwnerID, &video.Title, &video.Notes, &video.RecordedAt, &video.Status,
+		&video.ID, &video.OwnerID, &video.Title, &video.Notes, &video.Status,
 		&video.FailureReason, &video.OriginalName, &video.OriginalKey, &video.UploadID,
 		&video.PlaybackKey, &video.ThumbnailKey, &video.MimeType,
 		&video.SizeBytes, &video.DurationMs, &video.Width, &video.Height,

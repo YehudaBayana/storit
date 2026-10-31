@@ -1,44 +1,26 @@
 import React from "react";
 
-export interface VideoProps extends React.HTMLAttributes<HTMLVideoElement> {
+export interface VideoProps extends React.VideoHTMLAttributes<HTMLVideoElement> {
   src: string;
-  poster?: string;
-  controls?: boolean;
-  autoPlay?: boolean;
-  loop?: boolean;
-  muted?: boolean;
   className?: string;
   "data-testid"?: string;
+  controls?: boolean;
 }
 
 export const Video = React.forwardRef<HTMLVideoElement, VideoProps>(
   (
-    {
-      src,
-      poster,
-      controls = true,
-      autoPlay = false,
-      loop = false,
-      muted = false,
-      className = "",
-      "data-testid": testId = "video-component",
-      ...props
-    },
-    ref, // <-- 1. Add the ref parameter here
+    { src, className = "", controls = true, "data-testid": testId = "video-component", ...props },
+    ref,
   ) => {
     return (
       <div className={`overflow-hidden rounded-lg bg-brand-dark ${className}`}>
         <video
+          {...props}
           ref={ref} // <-- 2. Attach the ref to the video element
           data-testid={testId}
           src={src}
-          poster={poster}
-          controls={controls}
-          autoPlay={autoPlay}
-          loop={loop}
-          muted={muted}
+          controls={controls ? true : undefined}
           className="w-full h-auto object-cover block"
-          {...props}
         />
       </div>
     );
