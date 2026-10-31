@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { apiUrl } from "@/config/constants";
-import { Box, Button, Flex, StatusDot, Text } from "@/components/ui";
+import { Box, Button, Flex, Text } from "@/components/ui";
 
 interface ServicesStatus {
   database: string;
@@ -22,18 +22,14 @@ interface VersionData {
   commitDate: string;
 }
 
-interface ServerStatusProps {
-  dataHook?: string;
-}
-
-export default function ServerStatus({ dataHook = "server-status" }: ServerStatusProps) {
+export default function ServerStatus() {
   const [status, setStatus] = useState<"checking" | "online" | "offline">("checking");
   const [data, setData] = useState<HealthData | null>(null);
   const [versionData, setVersionData] = useState<VersionData | null>(null);
   const [latency, setLatency] = useState<number | null>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const panelRef = useRef<HTMLElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
 
   const checkHealth = async () => {
     setIsRefreshing(true);
@@ -120,9 +116,6 @@ export default function ServerStatus({ dataHook = "server-status" }: ServerStatu
     setIsOpen(!isOpen);
   };
 
-  const statusVariant =
-    status === "online" ? "success" : status === "offline" ? "danger" : "warning";
-
   const statusLabel =
     status === "online"
       ? "Backend Connected"
@@ -130,85 +123,39 @@ export default function ServerStatus({ dataHook = "server-status" }: ServerStatu
         ? "Backend Disconnected"
         : "Connecting...";
 
-  const latencyColor =
-    latency !== null ? (latency < 50 ? "success" : latency < 150 ? "warning" : "danger") : "muted";
-
   return (
-    <Box
-      position="fixed"
-      z="50"
-      ref={panelRef}
-      dataHook={dataHook}
-      style={{ top: "1rem", left: "32rem" }}
-    >
+    <Box ref={panelRef}>
       <Button
         variant="secondary"
         size="sm"
-        pill
         onClick={togglePanel}
         aria-label="Toggle server health status"
         aria-expanded={isOpen}
-        dataHook={`${dataHook}-toggle`}
-        leftIcon={<StatusDot variant={statusVariant} pulse />}
       >
-        <Text
-          as="span"
-          variant="inherit"
-          weight="medium"
-          color="inherit"
-          dataHook={`${dataHook}-connection`}
-        >
-          {statusLabel}
-        </Text>
-        {status === "online" && latency !== null && (
-          <Text as="span" variant="small" color="muted" weight="semibold">
-            ({latency}ms)
-          </Text>
-        )}
+        <Text>{statusLabel}</Text>
+        {status === "online" && latency !== null && <Text>({latency}ms)</Text>}
       </Button>
 
       {isOpen && (
-        <Box
-          dataHook={`${dataHook}-panel`}
-          position="absolute"
-          z="50"
-          p={3}
-          rounded="xl"
-          border="all"
-          borderTone="subtle"
-          bg="bg-[var(--bg-status-panel)]"
-          style={{ top: "calc(100% + 12px)", left: 0, width: "290px" }}
-        >
-          <Flex direction="col" gap={2} py={3}>
+        <Box>
+          <Flex direction="col" gap={"sm"}>
             <Flex justify="between">
-              <Text variant="small" color="muted">
-                Status:
-              </Text>
-              <Text variant="small" weight="bold" mono uppercase color={statusVariant}>
-                {status}
-              </Text>
+              <Text>Status:</Text>
+              <Text>{status}</Text>
             </Flex>
 
             {status === "online" && latency !== null && (
               <Flex justify="between">
-                <Text variant="small" color="muted">
-                  Latency:
-                </Text>
-                <Text variant="small" weight="bold" mono color={latencyColor}>
-                  {latency}ms
-                </Text>
+                <Text>Latency:</Text>
+                <Text>{latency}ms</Text>
               </Flex>
             )}
 
             {data && (
               <>
                 <Flex justify="between">
-                  <Text variant="small" color="muted">
-                    Uptime:
-                  </Text>
-                  <Text variant="small" weight="medium" mono>
-                    {data.uptime}
-                  </Text>
+                  <Text>Uptime:</Text>
+                  <Text>{data.uptime}</Text>
                 </Flex>
               </>
             )}
@@ -216,40 +163,18 @@ export default function ServerStatus({ dataHook = "server-status" }: ServerStatu
             {versionData && (
               <>
                 <Flex justify="between">
-                  <Text variant="small" color="muted">
-                    Commit:
-                  </Text>
-                  <Text variant="small" weight="medium" mono dataHook={`${dataHook}-commit-hash`}>
-                    {versionData.commitHash}
-                  </Text>
+                  <Text variant="default">Commit:</Text>
+                  <Text variant="default">{versionData.commitHash}</Text>
                 </Flex>
                 <Flex justify="between">
-                  <Text variant="small" color="muted">
-                    Commit Date:
-                  </Text>
-                  <Text
-                    variant="small"
-                    weight="medium"
-                    mono
-                    truncate
-                    title={versionData.commitDate}
-                    style={{ maxWidth: "170px" }}
-                    dataHook={`${dataHook}-commit-date`}
-                  >
-                    {versionData.commitDate}
-                  </Text>
+                  <Text variant="default">Commit Date:</Text>
+                  <Text>{versionData.commitDate}</Text>
                 </Flex>
               </>
             )}
           </Flex>
 
-          <Button
-            variant="secondary"
-            size="sm"
-            fullWidth
-            onClick={checkHealth}
-            loading={isRefreshing}
-          >
+          <Button variant="secondary" size="sm" onClick={checkHealth}>
             {isRefreshing ? "Checking..." : "Refresh Status"}
           </Button>
         </Box>

@@ -1,36 +1,34 @@
+import React from "react";
+import { render } from "@testing-library/react";
+import Sidebar, { SidebarSection } from "../Sidebar";
 import { SidebarDriver } from "./Sidebar.driver";
-import { screen } from "@testing-library/react";
+import { IoFolderOutline, IoStarOutline } from "react-icons/io5";
 
-jest.mock("next/navigation", () => ({ usePathname: () => "/" }));
-jest.mock("next/link", () => ({
-  __esModule: true,
-  default: ({ href, children, ...props }: { href: string; children: React.ReactNode }) => (
-    <a href={href} {...props}>
-      {children}
-    </a>
-  ),
-}));
-jest.mock("@/features/auth/query/useAuth", () => ({
-  useGetCurrentUser: () => ({ data: null }),
-  useLogout: () => ({ mutate: jest.fn() }),
-}));
+describe("Sidebar Component", () => {
+  const sections: SidebarSection[] = [
+    {
+      title: "Files",
+      items: [
+        { id: "all-files", label: "All Files", href: "/files", icon: IoFolderOutline },
+        { id: "starred", label: "Starred", href: "/starred", icon: IoStarOutline, badge: "3" },
+      ],
+    },
+  ];
 
-describe("Sidebar", () => {
-  let driver: SidebarDriver;
+  it("should render sections and highlight the active item", () => {
+    render(
+      <Sidebar
+        testId="app-sidebar"
+        sections={sections}
+        activeId="all-files"
+        logo={<span className="font-bold text-lg">Cloudy</span>}
+      />,
+    );
 
-  beforeEach(() => {
-    driver = new SidebarDriver();
-  });
+    const driver = new SidebarDriver("app-sidebar");
 
-  it("renders a configurable root and navigation links", () => {
-    driver.render("main-sidebar");
-    expect(driver.exists("main-sidebar")).toBe(true);
-    expect(driver.hasNavigationItem(0, "main-sidebar")).toBe(true);
-    expect(driver.hasNavigationItem(1, "main-sidebar")).toBe(true);
-  });
-
-  it("links to the video library", () => {
-    driver.render();
-    expect(screen.getByRole("link", { name: /Videos/ })).toHaveAttribute("href", "/videos");
+    expect(driver.exists()).toBe(true);
+    expect(driver.isItemActive("all-files")).toBe(true);
+    expect(driver.isItemActive("starred")).toBe(false);
   });
 });

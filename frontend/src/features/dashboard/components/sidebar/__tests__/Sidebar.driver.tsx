@@ -1,35 +1,28 @@
-import { fireEvent, render, RenderResult } from "@testing-library/react";
-import Sidebar from "../Sidebar";
-import { getByDataHook, queryByDataHook } from "@/__tests__/testUtils";
+import { screen, fireEvent } from "@testing-library/react";
 
 export class SidebarDriver {
-  private renderResult: RenderResult | null = null;
-  private readonly defaultDataHook = "dashboard-sidebar";
+  private testId: string;
 
-  render(dataHook = this.defaultDataHook): this {
-    this.renderResult = render(<Sidebar dataHook={dataHook} />);
+  constructor(testId: string = "sidebar") {
+    this.testId = testId;
+  }
+
+  private getElement(): HTMLElement {
+    return screen.getByTestId(this.testId);
+  }
+
+  public clickItem(itemId: string): this {
+    const item = screen.getByTestId(`${this.testId}-item-${itemId}`);
+    fireEvent.click(item);
     return this;
   }
 
-  private getContainer(): HTMLElement {
-    if (!this.renderResult)
-      throw new Error("SidebarDriver: render() must be called before querying");
-    return this.renderResult.container;
+  public isItemActive(itemId: string): boolean {
+    const item = screen.getByTestId(`${this.testId}-item-${itemId}`);
+    return item.className.includes("bg-brand-50");
   }
 
-  exists(dataHook = this.defaultDataHook): boolean {
-    return queryByDataHook(this.getContainer(), dataHook) !== null;
-  }
-
-  hasNavigationItem(index: number, dataHook = this.defaultDataHook): boolean {
-    return queryByDataHook(this.getContainer(), `${dataHook}-nav-${index}`) !== null;
-  }
-
-  clickCreatePlaylist(dataHook = this.defaultDataHook): void {
-    fireEvent.click(getByDataHook(this.getContainer(), `${dataHook}-create-playlist`));
-  }
-
-  isCreateModalOpen(dataHook = this.defaultDataHook): boolean {
-    return queryByDataHook(document.body, `${dataHook}-create-modal`) !== null;
+  public exists(): boolean {
+    return screen.queryByTestId(this.testId) !== null;
   }
 }

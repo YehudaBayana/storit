@@ -1,87 +1,99 @@
-"use client";
+import React from "react";
+import { Box, Flex, Text, Link } from "@/components/ui";
+import { IconType } from "react-icons";
 
-import { Box, Button, Flex, Heading, Link, Text } from "@/components/ui";
-import { usePathname } from "next/navigation";
-import { useGetCurrentUser, useLogout } from "@/features/auth/query/useAuth";
-
-interface SidebarProps {
-  dataHook?: string;
+export interface SidebarItem {
+  id: string;
+  label: string;
+  href: string;
+  icon: IconType;
+  badge?: string;
 }
 
-export default function Sidebar({ dataHook = "dashboard-sidebar" }: SidebarProps) {
-  const pathname = usePathname();
-  const { mutate: logout } = useLogout();
-  const { data: currentUser } = useGetCurrentUser(); // Ensure user data is fetched to determine if logged in
+export interface SidebarSection {
+  title?: string;
+  items: SidebarItem[];
+}
 
-  const navItems = [
-    { href: "/", label: "Home", icon: "🏠" },
-    { href: "/videos", label: "Videos", icon: "🎥" },
-  ];
+export interface SidebarProps {
+  logo?: React.ReactNode;
+  sections: SidebarSection[];
+  activeId: string;
+  footer?: React.ReactNode;
+  testId?: string;
+  className?: string;
+}
 
+const Sidebar: React.FC<SidebarProps> = ({
+  logo,
+  sections,
+  activeId,
+  footer,
+  testId = "sidebar",
+  className = "",
+}) => {
   return (
-    <Flex
-      direction="col"
-      h="full"
-      w="full"
-      border="right"
-      bg="bg-[var(--bg-secondary)]"
-      dataHook={dataHook}
+    <Box
+      testId={testId}
+      as="aside"
+      className={`w-64 bg-white border-r border-gray-100 flex flex-col h-screen p-6 justify-between ${className}`}
     >
-      {/* Brand Header */}
-      <Flex align="center" gap={3} p={6} border="bottom">
-        <Flex
-          align="center"
-          justify="center"
-          w="9"
-          h="9"
-          rounded="xl"
-          bg="bg-gradient-to-br from-emerald-500 to-teal-500"
-        >
-          🎵
-        </Flex>
-        <Flex direction="col">
-          <Heading level={1} size="md" weight="extrabold">
-            DANCE JOURNAL
-          </Heading>
-          <Text variant="caption" color="primary">
-            PRIVATE ARCHIVE
-          </Text>
+      {/* Top Section: Logo & Navigation */}
+      <Flex direction="col" gap="lg" className="overflow-y-auto">
+        {logo && <Box className="px-2">{logo}</Box>}
+
+        <Flex direction="col" gap="xl">
+          {sections.map((section, idx) => (
+            <Flex key={idx} direction="col" gap="sm">
+              {section.title && (
+                <Text
+                  size="xs"
+                  variant="muted"
+                  className="px-3 font-semibold uppercase tracking-wider"
+                >
+                  {section.title}
+                </Text>
+              )}
+              <Flex direction="col" gap="xs">
+                {section.items.map((item) => {
+                  const Icon = item.icon;
+                  const isActive = item.id === activeId;
+
+                  return (
+                    <Link
+                      key={item.id}
+                      href={item.href}
+                      testId={`${testId}-item-${item.id}`}
+                      className={`flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition-colors no-underline ${
+                        isActive
+                          ? "bg-brand-50 text-brand-600 font-semibold"
+                          : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                      }`}
+                    >
+                      <Flex align="center" gap="sm">
+                        <Icon
+                          className={`w-5 h-5 ${isActive ? "text-brand-500" : "text-gray-400"}`}
+                        />
+                        <span>{item.label}</span>
+                      </Flex>
+                      {item.badge && (
+                        <span className="px-2 py-0.5 text-xs font-semibold rounded-full bg-gray-100 text-gray-600">
+                          {item.badge}
+                        </span>
+                      )}
+                    </Link>
+                  );
+                })}
+              </Flex>
+            </Flex>
+          ))}
         </Flex>
       </Flex>
 
-      {/* Navigation */}
-      <Flex direction="col" gap={1} px={3} py={4} border="bottom">
-        {navItems.map((item, index) => (
-          <Link
-            key={item.href}
-            href={item.href}
-            variant="nav"
-            active={pathname === item.href}
-            leftIcon={item.icon}
-            dataHook={`${dataHook}-nav-${index}`}
-          >
-            {item.label}
-          </Link>
-        ))}
-      </Flex>
-
-      {/* Bottom Profile/Watermark */}
-      <Box p={4} border="top" bg="bg-[var(--bg-surface)]">
-        <Flex direction="col" minW="0" grow>
-          <Text variant="body-sm" weight="semibold" truncate>
-            {currentUser?.user.email}
-          </Text>
-          {currentUser?.user ? (
-            <Button variant="secondary" fullWidth onClick={() => logout()}>
-              Logout
-            </Button>
-          ) : (
-            <Link href="/auth" variant="primary" dataHook={`${dataHook}-login`}>
-              <Button>Login</Button>
-            </Link>
-          )}
-        </Flex>
-      </Box>
-    </Flex>
+      {/* Bottom Footer Widget (e.g. Storage/User Info) */}
+      {footer && <Box className="pt-4 border-t border-gray-100">{footer}</Box>}
+    </Box>
   );
-}
+};
+
+export default Sidebar;

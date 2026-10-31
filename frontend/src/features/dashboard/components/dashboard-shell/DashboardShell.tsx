@@ -1,24 +1,41 @@
 "use client";
 
-import React, { useState } from "react";
-import { Badge, Box, Button, Drawer, Flex, IconButton, StatusDot, Text } from "@/components/ui";
+import React from "react";
+import { Badge, Box, Flex, Text } from "@/components/ui";
 import Sidebar from "@/features/dashboard/components/Sidebar";
 import { usePathname } from "next/navigation";
-import { useTheme } from "@/shared/context/ThemeContext";
+import { IoFolderOutline, IoStarOutline } from "react-icons/io5";
 
 interface DashboardShellProps {
   children: React.ReactNode;
   dataHook?: string;
 }
 
-export default function DashboardShell({
-  children,
-  dataHook = "dashboard-shell",
-}: DashboardShellProps) {
-  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+export default function DashboardShell({ children }: DashboardShellProps) {
   const pathname = usePathname();
-  const { themeDefinition, toggleTheme } = useTheme();
+  const sidebarItems = [
+    {
+      id: "home",
+      label: "Home",
+      href: "/",
+      icon: IoFolderOutline,
+    },
+    {
+      id: "starred",
+      label: "Starred",
+      href: "/starred",
+      icon: IoStarOutline,
+      badge: "3",
+    },
+  ];
 
+  const sections = [
+    {
+      title: "Files",
+      items: sidebarItems,
+    },
+  ];
+  const activeId = sidebarItems.find((item) => item.href === pathname)?.id || "home";
   // Helper to resolve title in the top bar
   const getHeaderTitle = () => {
     if (pathname === "/") return "Home";
@@ -27,89 +44,49 @@ export default function DashboardShell({
     if (pathname === "/playlists") return "Playlists";
     if (pathname?.startsWith("/playlists/")) return "Playlist";
     if (pathname === "/auth/liked") return "Favorites";
-    return "Dance Journal";
+    return "cloud storage";
   };
 
   return (
-    <Flex
-      dataHook={dataHook}
-      w="screen"
-      h="screen"
-      overflow="hidden"
-      position="relative"
-      bg="bg-[var(--bg-primary)]"
-    >
+    <Flex>
       {/* Mobile Navigation Drawer (includes its own backdrop) */}
-      <Drawer
+      {/* <Drawer
         isOpen={isMobileSidebarOpen}
         onClose={() => setIsMobileSidebarOpen(false)}
         placement="left"
         size="sm"
         dataHook={`${dataHook}-mobile-drawer`}
-      >
-        <Sidebar />
-      </Drawer>
-
-      {/* Desktop Sidebar */}
-      <Box hideOn="mobile" h="full" w="64">
-        <Sidebar />
-      </Box>
+      > */}
+      <Sidebar sections={sections} activeId={activeId} />
 
       {/* Main Content Area */}
-      <Flex direction="col" grow minW="0" h="full" position="relative">
+      <Flex direction="col">
         {/* Top Header Navigation */}
-        <Flex
-          as="header"
-          align="center"
-          justify="between"
-          w="full"
-          h="16"
-          px={6}
-          border="bottom"
-          bg="bg-[var(--bg-secondary)]"
-          position="relative"
-          z="30"
-        >
+        <Flex as="header" align="center" justify="between">
           {/* Left: Mobile Toggle & View Title */}
-          <Flex align="center" gap={3}>
-            <Box hideOn="desktop">
-              <IconButton
+          <Flex align="center" gap={"md"}>
+            <Box>
+              {/* <IconButton
                 size="sm"
                 variant="ghost"
                 onClick={() => setIsMobileSidebarOpen(true)}
                 aria-label="Open menu"
                 dataHook={`${dataHook}-open-menu`}
                 icon="☰"
-              />
+              /> */}
             </Box>
-            <Text variant="body" weight="bold">
-              {getHeaderTitle()}
-            </Text>
+            <Text>{getHeaderTitle()}</Text>
           </Flex>
 
           {/* Right: Theme Toggle + Server indicator badge */}
-          <Flex align="center" gap={3}>
-            {/* Theme Toggle Button */}
-            <Button
-              variant="secondary"
-              size="sm"
-              pill
-              onClick={toggleTheme}
-              leftIcon={themeDefinition.icon}
-              aria-label={`Switch theme (current: ${themeDefinition.label})`}
-              title="Switch to next theme"
-              dataHook={`${dataHook}-theme-toggle`}
-            >
-              {themeDefinition.label}
-            </Button>
-
+          <Flex align="center" gap={"md"}>
             {/* Server indicator badge */}
             <Badge
-              variant="surface"
+              // variant="surface"
               size="sm"
-              pill
-              icon={<StatusDot variant="success" pulse />}
-              dataHook={`${dataHook}-live-badge`}
+              // pill
+              // icon={<StatusDot variant="success" pulse />}
+              // dataHook={`${dataHook}-live-badge`}
             >
               Live Connection
             </Badge>
@@ -117,9 +94,7 @@ export default function DashboardShell({
         </Flex>
 
         {/* Dynamic Scrollable Content Pane */}
-        <Box grow overflowY="auto" pb={32} minW="0" dataHook={`${dataHook}-content`}>
-          {children}
-        </Box>
+        <Box>{children}</Box>
       </Flex>
     </Flex>
   );
