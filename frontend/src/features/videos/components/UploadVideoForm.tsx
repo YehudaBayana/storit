@@ -1,13 +1,13 @@
-'use client';
+"use client";
 
-import { ChangeEvent, FormEvent, useRef, useState } from 'react';
-import { Grid, Stack, Alert, Button, Flex, Input, Progress, Text, Textarea } from '@mantine/core';
-import { isAbortError } from '@/features/videos/api/uploadParts';
-import { useUploadVideo } from '@/features/videos/query/useVideos';
+import { ChangeEvent, FormEvent, useRef, useState } from "react";
+import { Grid, Stack, Alert, Button, Flex, Input, Progress, Text, Textarea } from "@mantine/core";
+import { isAbortError } from "@/features/videos/api/uploadParts";
+import { useUploadVideo } from "@/features/videos/query/useVideos";
 
 export function UploadVideoForm() {
-  const [title, setTitle] = useState('');
-  const [notes, setNotes] = useState('');
+  const [title, setTitle] = useState("");
+  const [notes, setNotes] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [progress, setProgress] = useState(0);
@@ -18,14 +18,14 @@ export function UploadVideoForm() {
     const selectedFile = event.target.files?.[0] ?? null;
     setFile(selectedFile);
     if (selectedFile) {
-      setTitle((current) => current || selectedFile.name.replace(/\.[^/.]+$/, ''));
+      setTitle((current) => current || selectedFile.name.replace(/\.[^/.]+$/, ""));
     }
   };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!file) {
-      setError('Select a video file to upload.');
+      setError("Select a video file to upload.");
       return;
     }
 
@@ -41,16 +41,18 @@ export function UploadVideoForm() {
         signal: uploadAbort.signal,
         onProgress: setProgress,
       });
-      setTitle('');
-      setNotes('');
+      setTitle("");
+      setNotes("");
       setFile(null);
-      const fileInput = document.getElementById('video-upload-input') as HTMLInputElement | null;
-      if (fileInput) fileInput.value = '';
+      const fileInput = document.getElementById("video-upload-input") as HTMLInputElement | null;
+      if (fileInput) {
+        fileInput.value = "";
+      }
     } catch (submitError) {
       if (isAbortError(submitError)) {
-        setError('Upload cancelled.');
+        setError("Upload cancelled.");
       } else {
-        setError(submitError instanceof Error ? submitError.message : 'Upload failed.');
+        setError(submitError instanceof Error ? submitError.message : "Upload failed.");
       }
     } finally {
       uploadAbortRef.current = null;
@@ -59,8 +61,8 @@ export function UploadVideoForm() {
 
   return (
     <form onSubmit={handleSubmit}>
-      <Stack gap={'lg'}>
-        <Grid columns={2} gap={'lg'}>
+      <Stack gap="lg">
+        <Grid columns={2} gap="lg">
           <Grid.Col span={2}>
             <Input.Wrapper label="Video file">
               <Input
@@ -97,7 +99,7 @@ export function UploadVideoForm() {
         {error && <Alert title={error} variant="error" />}
 
         {uploadVideoMutation.isPending && (
-          <Stack gap={'sm'}>
+          <Stack gap="sm">
             <Progress value={Math.round(progress * 100)} />
             <Text>
               Uploading {Math.round(progress * 100)}%. Keep this tab open until it finishes.
@@ -105,9 +107,9 @@ export function UploadVideoForm() {
           </Stack>
         )}
 
-        <Flex justify="between" align="center" gap={'lg'}>
-          <Text>{file ? `Selected: ${file.name}` : 'No file selected'}</Text>
-          <Flex align="center" gap={'lg'}>
+        <Flex justify="between" align="center" gap="lg">
+          <Text>{file ? `Selected: ${file.name}` : "No file selected"}</Text>
+          <Flex align="center" gap="lg">
             {uploadVideoMutation.isPending && (
               <Button
                 type="button"

@@ -55,11 +55,24 @@ docker run -d \
 
 # Use \q to exit. This works without publishing the database port because docker compose exec runs the database client inside the container.
 
+# 1. Install tree (one-time)
+
+brew install tree
+
+# 2. Go to your project root
+
+cd /path/to/your/repo
+
+# 3. Copy the entire tree to your clipboard
+
+tree | pbcopy
+
 # Get folders tree from current path:
 
 `tree -I 'node_modules|.git|venv|build|dist' | pbcopy`
 
 # get files with its content
 
+`pipx install files-to-prompt`
 `files-to-prompt . | pbcopy`
 `files-to-prompt . --ignore 'node_modules' --ignore 'build' | pbcopy`

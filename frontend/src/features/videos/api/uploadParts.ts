@@ -15,7 +15,7 @@ export interface PartUploadDeps {
     url: string,
     blob: Blob,
     onProgress: (loadedBytes: number) => void,
-    signal: AbortSignal
+    signal: AbortSignal,
   ) => Promise<string>;
 }
 
@@ -34,23 +34,23 @@ const DEFAULT_MAX_ATTEMPTS = 4;
 const DEFAULT_RETRY_DELAY_MS = 1000;
 
 export function isAbortError(error: unknown): boolean {
-  return error instanceof DOMException && error.name === 'AbortError';
+  return error instanceof DOMException && error.name === "AbortError";
 }
 
 function delay(milliseconds: number, signal: AbortSignal): Promise<void> {
   return new Promise((resolve, reject) => {
     if (signal.aborted) {
-      reject(new DOMException('Upload cancelled', 'AbortError'));
+      reject(new DOMException("Upload cancelled", "AbortError"));
       return;
     }
     const timer = setTimeout(resolve, milliseconds);
     signal.addEventListener(
-      'abort',
+      "abort",
       () => {
         clearTimeout(timer);
-        reject(new DOMException('Upload cancelled', 'AbortError'));
+        reject(new DOMException("Upload cancelled", "AbortError"));
       },
-      { once: true }
+      { once: true },
     );
   });
 }
@@ -62,7 +62,7 @@ function delay(milliseconds: number, signal: AbortSignal): Promise<void> {
 export async function uploadParts(
   file: Blob,
   deps: PartUploadDeps,
-  options: UploadPartsOptions
+  options: UploadPartsOptions,
 ): Promise<UploadedPart[]> {
   const {
     partSize,
@@ -76,8 +76,10 @@ export async function uploadParts(
   // A failure in one worker stops the others instead of letting them upload on.
   const workerAbort = new AbortController();
   const stopOnOuterAbort = () => workerAbort.abort();
-  options.signal?.addEventListener('abort', stopOnOuterAbort, { once: true });
-  if (options.signal?.aborted) workerAbort.abort();
+  options.signal?.addEventListener("abort", stopOnOuterAbort, { once: true });
+  if (options.signal?.aborted) {
+    workerAbort.abort();
+  }
 
   const loadedByPart = new Map<number, number>();
   const reportProgress = (partNumber: number, loadedBytes: number) => {
@@ -96,7 +98,7 @@ export async function uploadParts(
 
     for (let attempt = 0; attempt < maxAttempts; attempt++) {
       if (workerAbort.signal.aborted) {
-        throw new DOMException('Upload cancelled', 'AbortError');
+        throw new DOMException("Upload cancelled", "AbortError");
       }
       try {
         const { url } = await deps.getPartUrl(partNumber);
@@ -104,12 +106,14 @@ export async function uploadParts(
           url,
           blob,
           (loaded) => reportProgress(partNumber, loaded),
-          workerAbort.signal
+          workerAbort.signal,
         );
         reportProgress(partNumber, blob.size);
         return { part_number: partNumber, etag };
       } catch (error) {
-        if (isAbortError(error)) throw error;
+        if (isAbortError(error)) {
+          throw error;
+        }
         lastError = error;
         reportProgress(partNumber, 0);
         if (attempt < maxAttempts - 1) {
@@ -133,11 +137,11 @@ export async function uploadParts(
         worker().catch((error) => {
           workerAbort.abort();
           throw error;
-        })
-      )
+        }),
+      ),
     );
   } finally {
-    options.signal?.removeEventListener('abort', stopOnOuterAbort);
+    options.signal?.removeEventListener("abort", stopOnOuterAbort);
   }
 
   return uploaded.sort((a, b) => a.part_number - b.part_number);

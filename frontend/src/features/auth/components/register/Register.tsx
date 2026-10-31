@@ -1,14 +1,14 @@
-import React, { useState } from 'react';
-import { Card, Stack, Title, Text, Input, Button, Flex, PasswordInput } from '@mantine/core';
-import { useRegister } from '../../query/useAuth';
+import React, { useState } from "react";
+import { Card, Stack, Title, Text, Input, Button, Flex, PasswordInput } from "@mantine/core";
+import { useRegister } from "../../query/useAuth";
 
 interface RegisterProps {
   onSwitchToLogin: () => void;
 }
 
 export const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const { mutate: register } = useRegister();
 
   const handleSubmit = () => {
@@ -17,8 +17,8 @@ export const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
 
   return (
     <Card variant="interactive">
-      <Stack gap={'lg'}>
-        <Stack gap={'sm'}>
+      <Stack gap="lg">
+        <Stack gap="sm">
           <Title order={2}>Create Account</Title>
           <Text>Get started with your new account</Text>
         </Stack>
@@ -46,7 +46,7 @@ export const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
           </Button>
         </form>
 
-        <Flex align="center" justify="center" gap={'xs'}>
+        <Flex align="center" justify="center" gap="xs">
           <Text>Already have an account?</Text>
           <Button variant="outline" size="sm" onClick={onSwitchToLogin}>
             Sign in

@@ -29,9 +29,6 @@ export function useLogout() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: logout,
-    onError: (error: any) => {
-      console.error("Logout failed:", error);
-    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: authKeys.me() });
     },

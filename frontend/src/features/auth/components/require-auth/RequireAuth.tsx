@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { useEffect } from 'react';
-import { usePathname, useRouter } from 'next/navigation';
-import { Box, Button, Flex, Text } from '@mantine/core';
-import { useGetCurrentUser } from '@/features/auth/query/useAuth';
+import { useEffect } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { Box, Button, Flex, Text } from "@mantine/core";
+import { useGetCurrentUser } from "@/features/auth/query/useAuth";
 
 interface RequireAuthProps {
   children: React.ReactNode;
@@ -32,7 +32,7 @@ export default function RequireAuth({ children }: RequireAuthProps) {
 
   if (isError) {
     return (
-      <Flex align="center" justify="center" gap={'lg'}>
+      <Flex align="center" justify="center" gap="lg">
         <Text>Unable to verify your session. Please try again.</Text>
         <Button variant="outline" onClick={() => void refetch()}>
           Retry

@@ -1,11 +1,11 @@
-import { uploadParts } from '@/features/videos/api/uploadParts';
+import { uploadParts } from "@/features/videos/api/uploadParts";
 import {
   completeVideoUpload,
   deleteVideo,
   getUploadPartUrls,
   initVideoUpload,
   type Video,
-} from '@/features/videos/api/videos';
+} from "@/features/videos/api/videos";
 
 export interface UploadVideoInput {
   file: File;
@@ -21,32 +21,32 @@ function putPartWithXhr(
   url: string,
   blob: Blob,
   onProgress: (loadedBytes: number) => void,
-  signal: AbortSignal
+  signal: AbortSignal,
 ): Promise<string> {
   return new Promise((resolve, reject) => {
     const request = new XMLHttpRequest();
-    request.open('PUT', url);
+    request.open("PUT", url);
     request.upload.onprogress = (event) => onProgress(event.loaded);
     request.onload = () => {
       if (request.status < 200 || request.status >= 300) {
         reject(new Error(`Part upload failed with status ${request.status}`));
         return;
       }
-      const etag = request.getResponseHeader('ETag');
+      const etag = request.getResponseHeader("ETag");
       if (!etag) {
-        reject(new Error('Storage did not return an ETag; check the bucket CORS rules.'));
+        reject(new Error("Storage did not return an ETag; check the bucket CORS rules."));
         return;
       }
       resolve(etag);
     };
-    request.onerror = () => reject(new Error('Network error while uploading a part'));
+    request.onerror = () => reject(new Error("Network error while uploading a part"));
     signal.addEventListener(
-      'abort',
+      "abort",
       () => {
         request.abort();
-        reject(new DOMException('Upload cancelled', 'AbortError'));
+        reject(new DOMException("Upload cancelled", "AbortError"));
       },
-      { once: true }
+      { once: true },
     );
     request.send(blob);
   });
@@ -65,7 +65,9 @@ export async function uploadVideo(input: UploadVideoInput): Promise<Video> {
     title: input.title,
     notes: input.notes,
   });
-  if (!session) throw new Error('You need to sign in to upload videos.');
+  if (!session) {
+    throw new Error("You need to sign in to upload videos.");
+  }
   const videoId = session.video.id;
 
   let parts;
@@ -75,7 +77,9 @@ export async function uploadVideo(input: UploadVideoInput): Promise<Video> {
       {
         getPartUrl: async (partNumber) => {
           const urls = await getUploadPartUrls(videoId, [partNumber]);
-          if (!urls?.[0]) throw new Error('Could not get an upload URL.');
+          if (!urls?.[0]) {
+            throw new Error("Could not get an upload URL.");
+          }
           return urls[0];
         },
         putPart: putPartWithXhr,
@@ -85,7 +89,7 @@ export async function uploadVideo(input: UploadVideoInput): Promise<Video> {
         partCount: session.part_count,
         signal,
         onProgress: (loadedBytes) => input.onProgress?.(loadedBytes / file.size),
-      }
+      },
     );
   } catch (error) {
     // Best effort: the server also discards abandoned uploads after a day.
@@ -95,6 +99,8 @@ export async function uploadVideo(input: UploadVideoInput): Promise<Video> {
 
   // A failure here is not cleaned up: the server may already have completed the upload.
   const video = await completeVideoUpload(videoId, parts);
-  if (!video) throw new Error('You need to sign in to upload videos.');
+  if (!video) {
+    throw new Error("You need to sign in to upload videos.");
+  }
   return video;
 }

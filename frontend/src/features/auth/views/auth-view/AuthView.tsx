@@ -1,10 +1,10 @@
-'use client';
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { Button, Flex, Title, Stack, Text } from '@mantine/core';
-import { Login } from '../../components/login/Login';
-import { Register } from '../../components/register/Register';
-import { useGetCurrentUser, useLogout } from '../../query/useAuth';
+"use client";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { Button, Flex, Title, Stack, Text } from "@mantine/core";
+import { Login } from "../../components/login/Login";
+import { Register } from "../../components/register/Register";
+import { useGetCurrentUser, useLogout } from "../../query/useAuth";
 
 export default function AuthView() {
   const [isLogin, setIsLogin] = useState<boolean>(true);
@@ -14,7 +14,7 @@ export default function AuthView() {
 
   useEffect(() => {
     if (data?.user.id) {
-      router.push('/');
+      router.push("/");
     }
   }, [data?.user.id, router]);
 
@@ -30,7 +30,7 @@ export default function AuthView() {
     <Flex align="center" justify="center">
       {/* Container View toggling between Login and Register */}
       {data?.user ? (
-        <Stack gap={'md'}>
+        <Stack gap="md">
           <Title>You are logged in to {data.user.email}</Title>
           <Button variant="secondary" onClick={() => logout()}>
             log out

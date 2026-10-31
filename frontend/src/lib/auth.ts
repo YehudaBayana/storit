@@ -1,11 +1,11 @@
-import { cookies } from 'next/headers';
-import { apiClient } from '@/api/apiClient';
-import { getCurrentResponse } from '@/types/global.types';
+import { cookies } from "next/headers";
+import { apiClient } from "@/api/apiClient";
+import { getCurrentResponse } from "@/types/global.types";
 
 export async function getSession(): Promise<getCurrentResponse> {
   // 1. Get the cookies that the user's browser sent to Next.js
   const cookieStore = await cookies();
-  const sessionCookie = cookieStore.get('session')?.value;
+  const sessionCookie = cookieStore.get("session")?.value;
 
   // If no session cookie exists, user is not logged in
   if (!sessionCookie) {
@@ -16,7 +16,7 @@ export async function getSession(): Promise<getCurrentResponse> {
   const cookieString = cookieStore
     .getAll()
     .map((cookie) => `${cookie.name}=${cookie.value}`)
-    .join('; ');
+    .join("; ");
 
   try {
     const data = await apiClient<getCurrentResponse>(`/api/auth/me`, {
@@ -24,7 +24,7 @@ export async function getSession(): Promise<getCurrentResponse> {
         // Forward the cookies to the backend so it knows who is asking
         Cookie: cookieString,
       },
-      cache: 'no-store',
+      cache: "no-store",
     });
 
     // 3. If the backend says the user is not logged in, return null
@@ -34,8 +34,7 @@ export async function getSession(): Promise<getCurrentResponse> {
 
     // 4. Return the user data matching your getCurrentResponse type
     return data;
-  } catch (error) {
-    console.error('Auth check failed:', error);
+  } catch {
     return null;
   }
 }

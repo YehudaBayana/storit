@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import { Modal, ActionIcon, Group, Text, Box } from "@mantine/core";
 import { MdClose, MdMinimize, MdOpenInFull, MdDragIndicator } from "react-icons/md";
 import { Video } from "../api/videos";
@@ -24,7 +24,7 @@ export function FloatingVideoPlayer({
   // Store the coordinates from the bottom-right corner
   const [pos, setPos] = useState({ x: 20, y: 20 });
   const videoId = video?.id;
-  const { data: playback, refetch: refetchPlayback } = usePlaybackUrl(
+  const { data: playback } = usePlaybackUrl(
     videoId ?? "",
     Boolean(videoId) && video?.status === "ready",
   );
@@ -34,7 +34,9 @@ export function FloatingVideoPlayer({
     null,
   );
 
-  if (!video) return null;
+  if (!video) {
+    return null;
+  }
 
   const handlePointerDown = (e: React.PointerEvent) => {
     // Capture the initial click position and the current element coordinates
@@ -49,7 +51,9 @@ export function FloatingVideoPlayer({
   };
 
   const handlePointerMove = (e: PointerEvent) => {
-    if (!dragRef.current) return;
+    if (!dragRef.current) {
+      return;
+    }
     // Calculate how far the mouse has moved
     const dx = dragRef.current.startX - e.clientX;
     const dy = dragRef.current.startY - e.clientY;
@@ -101,23 +105,30 @@ export function FloatingVideoPlayer({
           </Group>
         </Group>
 
-        <video src={playback?.url} controls autoPlay className="w-full aspect-video object-contain bg-black block" />
+        <video
+          src={playback?.url}
+          controls
+          autoPlay
+          className="w-full aspect-video object-contain bg-black block"
+        >
+          <track kind="captions" />
+        </video>
       </Box>
     );
   }
 
   return (
     <Modal
-      opened={true}
+      opened
       onClose={onClose}
       size="xl"
       title={video.title}
       centered
-      // The below styles prevent the modal body from scrolling by strictly matching the internal padding 
+      // The below styles prevent the modal body from scrolling by strictly matching the internal padding
       // and letting the aspect ratio/height constraints take over perfectly
-      styles={{ 
-        body: { padding: 0 }, 
-        header: { paddingBottom: 16 } 
+      styles={{
+        body: { padding: 0 },
+        header: { paddingBottom: 16 },
       }}
     >
       <Box className="relative w-full flex justify-center bg-black overflow-hidden rounded-b-md">
@@ -131,15 +142,17 @@ export function FloatingVideoPlayer({
         >
           <MdMinimize />
         </ActionIcon>
-        
+
         {/* display: block removes the inline baseline gap, max-height ensures no vertical overflow beyond the viewport bounds */}
         <video
           src={playback?.url}
           controls
           autoPlay
-          style={{ maxHeight: 'calc(100vh - 120px)' }}
+          style={{ maxHeight: "calc(100vh - 120px)" }}
           className="w-full object-contain block bg-black aspect-video"
-        />
+        >
+          <track kind="captions" />
+        </video>
       </Box>
     </Modal>
   );

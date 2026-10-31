@@ -1,5 +1,5 @@
 // src/lib/api-client.ts
-import { clientApiUrl, serverApiUrl } from '@/config/constants';
+import { clientApiUrl, serverApiUrl } from "@/config/constants";
 
 export interface RequestOptions extends RequestInit {
   params?: Record<string, string | number | boolean | undefined>;
@@ -9,15 +9,14 @@ export async function apiClient<T>(endpoint: string, options: RequestOptions = {
   const { params, headers, ...customConfig } = options;
 
   // 1. Build URL with query parameters automatically
-  const isServer = typeof window === 'undefined';
-  const baseUrl = isServer
-    ? serverApiUrl
-    : (clientApiUrl || window.location.origin);
+  const isServer = typeof window === "undefined";
+  const baseUrl = isServer ? serverApiUrl : clientApiUrl || window.location.origin;
 
-  const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
-  const url = endpoint.startsWith('http://') || endpoint.startsWith('https://')
-    ? new URL(endpoint)
-    : new URL(`${baseUrl}${cleanEndpoint}`);
+  const cleanEndpoint = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
+  const url =
+    endpoint.startsWith("http://") || endpoint.startsWith("https://")
+      ? new URL(endpoint)
+      : new URL(`${baseUrl}${cleanEndpoint}`);
 
   if (params) {
     Object.entries(params).forEach(([key, value]) => {
@@ -29,9 +28,9 @@ export async function apiClient<T>(endpoint: string, options: RequestOptions = {
 
   // 2. Default configuration with custom override support
   const config: RequestInit = {
-    method: customConfig.body ? 'POST' : 'GET',
+    method: customConfig.body ? "POST" : "GET",
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
       ...headers, // Override defaults if specific headers are needed
     },
     ...customConfig,

@@ -1,6 +1,6 @@
 "use client";
 
-import { Card, Image, Text, Badge, Group } from "@mantine/core";
+import { Card, Image, Text, Badge, Group, AspectRatio } from "@mantine/core";
 import { useVideos } from "../query/useVideos";
 import { getVideoThumbnailUrl, Video } from "../api/videos";
 import { VideosList } from "./VideosList";
@@ -31,12 +31,14 @@ export function VideoCard({ video, onClick }: Props) {
       className="cursor-pointer hover:shadow-md transition-shadow"
     >
       <Card.Section className="relative">
-        <Image
-          src={thumbnailUrl}
-          height={160}
-          alt={video.title}
-          fallbackSrc="https://placehold.co/600x400?text=No+Thumbnail"
-        />
+        <AspectRatio ratio={1080 / 720} maw={300} mx="auto">
+          <Image
+            src={thumbnailUrl}
+            height={160}
+            alt={video.title}
+            fallbackSrc="https://placehold.co/600x400?text=No+Thumbnail"
+          />
+        </AspectRatio>
         <Badge className="absolute bottom-2 right-2 opacity-90" color="dark" radius="sm">
           {video.duration_ms}
         </Badge>
