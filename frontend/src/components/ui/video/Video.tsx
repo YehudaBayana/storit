@@ -16,7 +16,7 @@ export const Video = React.forwardRef<HTMLVideoElement, VideoProps>(
       <div className={`overflow-hidden rounded-lg bg-brand-dark ${className}`}>
         <video
           {...props}
-          ref={ref} // <-- 2. Attach the ref to the video element
+          ref={ref}
           data-testid={testId}
           src={src}
           controls={controls ? true : undefined}

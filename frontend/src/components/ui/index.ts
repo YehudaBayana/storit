@@ -51,8 +51,8 @@ export type { StackProps } from "./stack/Stack";
 
 export { Form } from "./form/Form";
 export type { FormProps } from "./form/Form";
-export { FormField } from "./formField/FormField";
-export type { FormFieldProps } from "./formField/FormField";
+export { FormField } from "./FormField/FormField";
+export type { FormFieldProps } from "./FormField/FormField";
 export { Input } from "./input/Input";
 export type { InputProps } from "./input/Input";
 
