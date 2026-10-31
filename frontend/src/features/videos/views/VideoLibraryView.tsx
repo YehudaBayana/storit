@@ -5,6 +5,7 @@ import { VideosList } from "../components/VideosList";
 import { FloatingVideoPlayer } from "../components/FloatingVideoPlayer";
 import { Video } from "../api/videos";
 import { useVideos } from "../query/useVideos";
+import { Box, Title } from "@mantine/core";
 
 export function VideoLibraryView({ initialVideos }: { initialVideos: Video[] }) {
   // State orchestrates which video is active and whether it should display in a modal or as PiP
@@ -27,8 +28,8 @@ export function VideoLibraryView({ initialVideos }: { initialVideos: Video[] }) 
   };
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-6">Video Library</h1>
+    <Box>
+      <Title className="text-2xl font-bold mb-6">Video Library</Title>
 
       <VideosList videos={safeVideos} onVideoSelect={handleVideoSelect} />
 
@@ -39,6 +40,6 @@ export function VideoLibraryView({ initialVideos }: { initialVideos: Video[] }) 
         onMinimize={() => setIsMinimized(true)}
         onMaximize={() => setIsMinimized(false)}
       />
-    </div>
+    </Box>
   );
 }

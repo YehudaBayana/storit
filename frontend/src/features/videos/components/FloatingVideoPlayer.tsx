@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { Modal, ActionIcon, Group, Text, Box } from "@mantine/core";
+import { Modal, ActionIcon, Group, Text, Box, AspectRatio } from "@mantine/core";
 import { MdClose, MdMinimize, MdOpenInFull, MdDragIndicator } from "react-icons/md";
 import { Video } from "../api/videos";
 import { usePlaybackUrl } from "../query/useVideos";
@@ -104,15 +104,16 @@ export function FloatingVideoPlayer({
             </ActionIcon>
           </Group>
         </Group>
-
-        <video
-          src={playback?.url}
-          controls
-          autoPlay
-          className="w-full aspect-video object-contain bg-black block"
-        >
-          <track kind="captions" />
-        </video>
+        <AspectRatio ratio={1080 / 720} maw="100%" mx="auto">
+          <video
+            src={playback?.url}
+            controls
+            autoPlay
+            className="w-full aspect-video object-contain bg-black block"
+          >
+            <track kind="captions" />
+          </video>
+        </AspectRatio>
       </Box>
     );
   }
@@ -143,16 +144,17 @@ export function FloatingVideoPlayer({
           <MdMinimize />
         </ActionIcon>
 
-        {/* display: block removes the inline baseline gap, max-height ensures no vertical overflow beyond the viewport bounds */}
-        <video
-          src={playback?.url}
-          controls
-          autoPlay
-          style={{ maxHeight: "calc(100vh - 120px)" }}
-          className="w-full object-contain block bg-black aspect-video"
-        >
-          <track kind="captions" />
-        </video>
+        <AspectRatio ratio={1080 / 720} maw="100%" mx="auto">
+          <video
+            src={playback?.url}
+            controls
+            autoPlay
+            style={{ maxHeight: "calc(100vh - 120px)" }}
+            className="w-full object-contain block bg-black aspect-video"
+          >
+            <track kind="captions" />
+          </video>
+        </AspectRatio>
       </Box>
     </Modal>
   );

@@ -1,22 +1,11 @@
 "use client";
 
 import { Card, Image, Text, Badge, Group, AspectRatio } from "@mantine/core";
-import { useVideos } from "../query/useVideos";
 import { getVideoThumbnailUrl, Video } from "../api/videos";
-import { VideosList } from "./VideosList";
 
 interface Props {
   video: Video;
   onClick: (video: Video) => void;
-}
-
-export function VideosContainer({ initialVideos }: { initialVideos: Video[] }) {
-  // TanStack starts with the server data, then handles polling in the background
-  const { data: videos = [] } = useVideos(50, 0, initialVideos);
-  // If data is still null or undefined, default to an empty array
-  const safeVideos = videos ?? [];
-
-  return <VideosList videos={safeVideos} onVideoSelect={() => {}} />;
 }
 
 export function VideoCard({ video, onClick }: Props) {
