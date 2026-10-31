@@ -10,22 +10,26 @@ export interface VideoProps extends React.HTMLAttributes<HTMLVideoElement> {
   className?: string;
   "data-testid"?: string;
 }
-// convert to forwardRef
+
 export const Video = React.forwardRef<HTMLVideoElement, VideoProps>(
-  ({
-    src,
-    poster,
-    controls = true,
-    autoPlay = false,
-    loop = false,
-    muted = false,
-    className = "",
-    "data-testid": testId = "video-component",
-    ...props
-  }) => {
+  (
+    {
+      src,
+      poster,
+      controls = true,
+      autoPlay = false,
+      loop = false,
+      muted = false,
+      className = "",
+      "data-testid": testId = "video-component",
+      ...props
+    },
+    ref, // <-- 1. Add the ref parameter here
+  ) => {
     return (
       <div className={`overflow-hidden rounded-lg bg-brand-dark ${className}`}>
         <video
+          ref={ref} // <-- 2. Attach the ref to the video element
           data-testid={testId}
           src={src}
           poster={poster}

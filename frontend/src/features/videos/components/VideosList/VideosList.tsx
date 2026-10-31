@@ -13,15 +13,13 @@ export function VideosList({ videos }: VideosListProps) {
   return (
     <Box>
       {/* Page Title using atomic Heading component */}
-      <Heading size="lg" weight="bold">
-        Video Library
-      </Heading>
+      <Heading size="lg">Video Library</Heading>
 
       {/* Grid layout for video cards using atomic Grid component */}
-      <Heading size="md" weight="semibold" className="mt-4 mb-2">
+      <Heading size="md" className="mt-4 mb-2">
         uploaded videos
       </Heading>
-      <Grid cols={5} colsTablet={3} colsMobile={2}>
+      <Grid cols={5}>
         {videos
           .filter((video) => video.status === "ready")
           .map((video: Video) => (
@@ -34,10 +32,10 @@ export function VideosList({ videos }: VideosListProps) {
             </Link>
           ))}
       </Grid>
-      <Heading size="md" weight="semibold" className="mt-4 mb-2">
+      <Heading size="md" className="mt-4 mb-2">
         processing videos
       </Heading>
-      <Grid cols={5} colsTablet={3} colsMobile={2}>
+      <Grid cols={5}>
         {videos
           .filter((video) => video.status === "processing")
           .map((video: Video) => (
@@ -50,10 +48,10 @@ export function VideosList({ videos }: VideosListProps) {
             </Link>
           ))}
       </Grid>
-      <Heading size="md" weight="semibold" className="mt-4 mb-2">
+      <Heading size="md" className="mt-4 mb-2">
         failed videos
       </Heading>
-      <Grid cols={5} colsTablet={3} colsMobile={2}>
+      <Grid cols={5}>
         {videos
           .filter((video) => video.status === "failed")
           .map((video: Video) => (

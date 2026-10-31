@@ -7,10 +7,9 @@ import { Box, Button, Flex, Text } from "@/components/ui";
 
 interface RequireAuthProps {
   children: React.ReactNode;
-  dataHook?: string;
 }
 
-export default function RequireAuth({ children, dataHook = "require-auth" }: RequireAuthProps) {
+export default function RequireAuth({ children }: RequireAuthProps) {
   const router = useRouter();
   const pathname = usePathname();
   const { data, isError, isPending, isLoading, refetch } = useGetCurrentUser();
@@ -25,14 +24,7 @@ export default function RequireAuth({ children, dataHook = "require-auth" }: Req
 
   if (isPending || unauthorized) {
     return (
-      <Flex
-        as="main"
-        align="center"
-        justify="center"
-        h="screen"
-        dataHook={dataHook}
-        aria-live="polite"
-      >
+      <Flex as="main" align="center" justify="center" aria-live="polite">
         <Text>Loading...</Text>
       </Flex>
     );
@@ -40,19 +32,9 @@ export default function RequireAuth({ children, dataHook = "require-auth" }: Req
 
   if (isError) {
     return (
-      <Flex
-        as="main"
-        direction="col"
-        align="center"
-        justify="center"
-        gap={4}
-        h="screen"
-        dataHook={dataHook}
-      >
-        <Text role="alert" dataHook={`${dataHook}-error`}>
-          Unable to verify your session. Please try again.
-        </Text>
-        <Button variant="outline" onClick={() => void refetch()} dataHook={`${dataHook}-retry`}>
+      <Flex as="main" direction="col" align="center" justify="center" gap={"lg"}>
+        <Text>Unable to verify your session. Please try again.</Text>
+        <Button variant="outline" onClick={() => void refetch()}>
           Retry
         </Button>
       </Flex>
@@ -63,5 +45,5 @@ export default function RequireAuth({ children, dataHook = "require-auth" }: Req
     return null;
   }
 
-  return <Box dataHook={dataHook}>{children}</Box>;
+  return <Box>{children}</Box>;
 }

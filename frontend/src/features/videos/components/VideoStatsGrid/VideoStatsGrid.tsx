@@ -13,37 +13,25 @@ export function VideoStatsGrid({ videos }: VideoStatsGridProps) {
   const readyCount = videos.filter((video) => video.status === "ready").length;
 
   return (
-    <Grid cols={3} colsMobile={1} gap={4}>
-      <Card variant="secondary" rounded="2xl" padding="md">
-        <Stack gap={2}>
-          <Text variant="body-sm" color="muted">
-            Sessions
-          </Text>
-          <Heading level={3} size="3xl">
-            {totalCount}
-          </Heading>
+    <Grid cols={3} gap={"lg"}>
+      <Card variant="bordered">
+        <Stack gap={"sm"}>
+          <Text>Sessions</Text>
+          <Heading>{totalCount}</Heading>
         </Stack>
       </Card>
 
-      <Card variant="secondary" rounded="2xl" padding="md">
-        <Stack gap={2}>
-          <Text variant="body-sm" color="muted">
-            Processing
-          </Text>
-          <Heading level={3} size="3xl">
-            {processingCount}
-          </Heading>
+      <Card variant="bordered">
+        <Stack gap={"sm"}>
+          <Text>Processing</Text>
+          <Heading>{processingCount}</Heading>
         </Stack>
       </Card>
 
-      <Card variant="secondary" rounded="2xl" padding="md">
-        <Stack gap={2}>
-          <Text variant="body-sm" color="muted">
-            Ready
-          </Text>
-          <Heading level={3} size="3xl">
-            {readyCount}
-          </Heading>
+      <Card variant="bordered">
+        <Stack gap={"sm"}>
+          <Text>Ready</Text>
+          <Heading>{readyCount}</Heading>
         </Stack>
       </Card>
     </Grid>
