@@ -1,4 +1,4 @@
-import { apiClient } from "@/api/apiClient";
+import { apiClient, RequestOptions } from "@/api/apiClient";
 import { apiUrl } from "@/config/constants";
 import { getCookie } from "@/features/auth/utils";
 import type { PartUrl, UploadedPart } from "@/features/videos/api/uploadParts";
@@ -23,10 +23,11 @@ export interface Video {
   updated_at: string;
 }
 
-export function listVideos(limit = 50, offset = 0) {
+export function listVideos(limit = 50, offset = 0, options?: RequestOptions) {
   return apiClient<Video[]>("/api/videos", {
     params: { limit, offset },
     credentials: "include",
+    ...options,
   });
 }
 

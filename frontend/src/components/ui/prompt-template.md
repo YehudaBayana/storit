@@ -17,7 +17,4 @@ I want to create all files and insert their content directly from my terminal wi
 You must output a SINGLE copiable bash code block containing `mkdir -p` commands and `cat << 'EOF' > filepath` commands to generate all the files and their content.
 _Important:_ When generating the `.md` files via `cat`, DO NOT use triple backticks (` ``` `) for code blocks inside the markdown content, as this prematurely closes the bash block and breaks browser formatting. Instead, use standard 4-space indentation for code blocks inside the markdown.
 
-Please generate the following components:
-[INSERT COMPONENT NAMES HERE, e.g., Tooltip, Accordion, Checkbox]
-
 Please start directly with the terminal commands, if your potential response will be too long that it exceeds your resonse limit, them provide some of what i've asked, and then i will respond to you with "continue" and you will respond to me with the next content, this will insure the best results and will not force you to compress your response to not cap the limit you have built in.

@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import { useParams } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
-import { getVideo, type Video as VideoModel } from "@/features/videos/api/videos";
-import { usePlaybackUrl } from "@/features/videos/query/useVideos";
-import { Card, Flex, Stack, Heading, Text, Badge, Link, Alert, Video, Box } from "@/components/ui";
+import { useEffect, useRef, useState } from 'react';
+import { useParams } from 'next/navigation';
+import { Alert, Badge, Box, Card, Flex, NavLink, Stack, Text, Title } from '@mantine/core';
+import { getVideo, type Video as VideoModel } from '@/features/videos/api/videos';
+import { usePlaybackUrl } from '@/features/videos/query/useVideos';
 
 const MAX_PLAYBACK_RECOVERIES = 3;
 
@@ -18,8 +18,8 @@ export default function VideoWatchView() {
   const resumeRef = useRef<{ time: number; paused: boolean } | null>(null);
   const recoveriesRef = useRef(0);
   const { data: playback, refetch: refetchPlayback } = usePlaybackUrl(
-    videoId ?? "",
-    Boolean(videoId) && video?.status === "ready",
+    videoId ?? '',
+    Boolean(videoId) && video?.status === 'ready'
   );
 
   // An expired signed URL makes the player fail on the next range request: fetch a new one and resume.
@@ -56,7 +56,7 @@ export default function VideoWatchView() {
       })
       .catch((requestError) => {
         if (!isMounted) return;
-        setError(requestError instanceof Error ? requestError.message : "Unable to load video.");
+        setError(requestError instanceof Error ? requestError.message : 'Unable to load video.');
       })
       .finally(() => {
         if (isMounted) setIsLoading(false);
@@ -70,9 +70,9 @@ export default function VideoWatchView() {
   if (!videoId) {
     return (
       <Box>
-        <Stack gap={"md"}>
+        <Stack gap={'md'}>
           <Alert title="Error">Missing video id.</Alert>
-          <Link href="/videos">← Back to library</Link>
+          <NavLink href="/videos">← Back to library</NavLink>
         </Stack>
       </Box>
     );
@@ -89,9 +89,9 @@ export default function VideoWatchView() {
   if (error || !video) {
     return (
       <Box>
-        <Stack gap={"md"}>
-          <Alert title="Error">{error ?? "Video not found."}</Alert>
-          <Link href="/videos">← Back to library</Link>
+        <Stack gap={'md'}>
+          <Alert title="Error">{error ?? 'Video not found.'}</Alert>
+          <NavLink href="/videos">← Back to library</NavLink>
         </Stack>
       </Box>
     );
@@ -99,15 +99,15 @@ export default function VideoWatchView() {
 
   return (
     <Box>
-      <Stack gap={"lg"}>
-        <Flex justify="between" align="center" gap={"md"}>
-          <Link href="/videos">← Back to library</Link>
+      <Stack gap={'lg'}>
+        <Flex justify="between" align="center" gap={'md'}>
+          <NavLink href="/videos">← Back to library</NavLink>
           <Badge size="sm">{video.status}</Badge>
         </Flex>
 
         <Card>
           {playback ? (
-            <Video
+            <video
               key={video.id}
               ref={videoElementRef}
               controls
@@ -118,19 +118,19 @@ export default function VideoWatchView() {
           ) : (
             <Flex align="center" justify="center">
               <Text>
-                {video.status === "ready" && "Loading video…"}
-                {video.status === "uploading" && "This video is still uploading."}
-                {video.status === "processing" && "This video is being prepared for playback."}
-                {video.status === "failed" &&
-                  `Processing failed${video.failure_reason ? `: ${video.failure_reason}` : "."}`}
+                {video.status === 'ready' && 'Loading video…'}
+                {video.status === 'uploading' && 'This video is still uploading.'}
+                {video.status === 'processing' && 'This video is being prepared for playback.'}
+                {video.status === 'failed' &&
+                  `Processing failed${video.failure_reason ? `: ${video.failure_reason}` : '.'}`}
               </Text>
             </Flex>
           )}
         </Card>
 
         <Card>
-          <Stack gap={"md"}>
-            <Heading>{video.title || video.original_name}</Heading>
+          <Stack gap={'md'}>
+            <Title>{video.title || video.original_name}</Title>
 
             {video.notes ? (
               <Text>{video.notes}</Text>

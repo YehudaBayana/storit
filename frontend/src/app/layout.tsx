@@ -1,34 +1,29 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
-import QueryProvider from "@/providers/QueryProvider";
-import DashboardShell from "@/features/dashboard/components/dashboard-shell/DashboardShell";
+import '@mantine/core/styles.css';
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
+import React from 'react';
+import { ColorSchemeScript, mantineHtmlProps, MantineProvider } from '@mantine/core';
+import QueryProvider from '@/providers/QueryProvider';
+import { theme } from '../../theme';
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
-export const metadata: Metadata = {
-  title: "cloud storage",
-  description: "place to store and manage your photos and videos",
+export const metadata = {
+  title: 'Mantine Next.js template',
+  description: 'I am using Mantine with Next.js!',
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
+    <html lang="en" {...mantineHtmlProps}>
+      <head>
+        <ColorSchemeScript />
+        <link rel="shortcut icon" href="/favicon.svg" />
+        <meta
+          name="viewport"
+          content="minimum-scale=1, initial-scale=1, width=device-width, user-scalable=no"
+        />
+      </head>
       <body>
         <QueryProvider>
-          <DashboardShell>{children}</DashboardShell>
+          <MantineProvider theme={theme}>{children}</MantineProvider>
         </QueryProvider>
       </body>
     </html>

@@ -54,3 +54,12 @@ docker run -d \
 `SELECT * FROM your_table LIMIT 20;`
 
 # Use \q to exit. This works without publishing the database port because docker compose exec runs the database client inside the container.
+
+# Get folders tree from current path:
+
+`tree -I 'node_modules|.git|venv|build|dist' | pbcopy`
+
+# get files with its content
+
+`files-to-prompt . | pbcopy`
+`files-to-prompt . --ignore 'node_modules' --ignore 'build' | pbcopy`

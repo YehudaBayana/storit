@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { getCurrentUser, login, logout, register } from "../api/auth";
-import { getCurrentResponse } from "@/types/global.types";
 import { authKeys } from "@/shared/api/keys";
+import { getCurrentResponse } from "@/types/global.types";
+import { getCurrentUser, login, logout, register } from "../api/auth";
 
 export function useLogin() {
   const queryClient = useQueryClient();
@@ -29,7 +29,7 @@ export function useLogout() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: logout,
-    onError: (error) => {
+    onError: (error: any) => {
       console.error("Logout failed:", error);
     },
     onSuccess: () => {

@@ -4,3 +4,5 @@ backend/server
 .DS_Store
 .neon
 node_modules/
+.pnp.cjs
+install-state.gz

@@ -1,14 +1,14 @@
-import React, { useState } from "react";
-import { useLogin } from "../../query/useAuth";
-import { Card, Stack, Heading, Text, Form, FormField, Input, Button, Flex } from "@/components/ui";
+import React, { useState } from 'react';
+import { Card, Stack, Title, Text, Input, Button, Flex, PasswordInput } from '@mantine/core';
+import { useLogin } from '../../query/useAuth';
 
 interface LoginProps {
   onSwitchToRegister: () => void;
 }
 
 export const Login: React.FC<LoginProps> = ({ onSwitchToRegister }) => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const { mutate: login } = useLogin();
 
   const handleSubmit = () => {
@@ -17,41 +17,37 @@ export const Login: React.FC<LoginProps> = ({ onSwitchToRegister }) => {
 
   return (
     <Card variant="bordered">
-      <Stack gap={"lg"}>
-        <Stack gap={"md"}>
-          <Heading>Welcome Back</Heading>
+      <Stack gap={'lg'}>
+        <Stack gap={'md'}>
+          <Title>Welcome Back</Title>
           <Text>Please enter your details to sign in</Text>
         </Stack>
 
-        <Form onSubmit={handleSubmit}>
-          <FormField label="Email">
-            <Input
-              id="login-email-input"
-              type="email"
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
-              required
-              placeholder="you@example.com"
-            />
-          </FormField>
+        <form onSubmit={handleSubmit}>
+          <Input
+            id="login-email-input"
+            type="email"
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+            required
+            placeholder="you@example.com"
+          />
 
-          <FormField label="Password">
-            <Input
-              id="login-password-input"
-              type="password"
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-              required
-              placeholder="••••••••"
-            />
-          </FormField>
+          <PasswordInput
+            id="login-password-input"
+            type="password"
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
+            required
+            placeholder="••••••••"
+          />
 
           <Button type="submit" variant="primary">
             Sign In
           </Button>
-        </Form>
+        </form>
 
-        <Flex align="center" justify="center" gap={"xs"}>
+        <Flex align="center" justify="center" gap={'xs'}>
           <Text>Do not have an account?</Text>
           <Button variant="secondary" size="sm" onClick={onSwitchToRegister}>
             Sign up

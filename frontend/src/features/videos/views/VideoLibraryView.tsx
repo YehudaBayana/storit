@@ -1,51 +1,44 @@
 "use client";
 
-import { useVideos } from "@/features/videos/query/useVideos";
-import { Alert, Box, Card, EmptyState, Flex, Heading, Stack, Text } from "@/components/ui";
-import { UploadVideoForm } from "@/features/videos/components/UploadVideoForm/UploadVideoForm";
-import { VideoStatsGrid } from "@/features/videos/components/VideoStatsGrid/VideoStatsGrid";
-import { VideosList } from "@/features/videos/components/VideosList/VideosList";
-import { useGetCurrentUser } from "@/features/auth/query/useAuth";
+import { useState } from "react";
+import { VideosList } from "../components/VideosList";
+import { FloatingVideoPlayer } from "../components/FloatingVideoPlayer";
+import { Video } from "../api/videos";
+import { useVideos } from "../query/useVideos";
 
-export default function VideoLibraryView({}: { dataHook?: string }) {
-  const { data: videos = [], isLoading, isError, error: listError } = useVideos();
-  const { data: currentUser, isLoading: isCurrentUserLoading } = useGetCurrentUser();
-  if (isCurrentUserLoading) {
-    return <Text>Loading user...</Text>;
-  }
-  if (!currentUser) {
-    return <Text>User not logged in.</Text>;
-  }
+export function VideoLibraryView({ initialVideos }: { initialVideos: Video[] }) {
+  // State orchestrates which video is active and whether it should display in a modal or as PiP
+  const [activeVideo, setActiveVideo] = useState<Video | null>(null);
+  const [isMinimized, setIsMinimized] = useState(false);
+
+  // TanStack starts with the server data, then handles polling in the background
+  const { data: videos = [] } = useVideos(50, 0, initialVideos);
+  // If data is still null or undefined, default to an empty array
+  const safeVideos = videos ?? [];
+
+  const handleVideoSelect = (video: Video) => {
+    setActiveVideo(video);
+    setIsMinimized(false);
+  };
+
+  const handleClose = () => {
+    setActiveVideo(null);
+    setIsMinimized(false);
+  };
+
   return (
-    <Box>
-      <Card variant="interactive">
-        <Stack gap={"lg"}>
-          <Flex justify="between" align="start" gap={"lg"}>
-            <Stack gap={"sm"}>
-              <Heading>upload video</Heading>
-            </Stack>
-          </Flex>
+    <div className="p-6">
+      <h1 className="text-2xl font-bold mb-6">Video Library</h1>
 
-          <UploadVideoForm />
+      <VideosList videos={safeVideos} onVideoSelect={handleVideoSelect} />
 
-          <VideoStatsGrid videos={videos} />
-
-          <Card variant="interactive">
-            {isLoading ? (
-              <Text>Loading videos...</Text>
-            ) : isError ? (
-              <Alert
-                title={listError instanceof Error ? listError.message : "Unable to load videos."}
-                variant="error"
-              />
-            ) : videos.length === 0 ? (
-              <EmptyState title="you do not have any videos" />
-            ) : (
-              <VideosList videos={videos} />
-            )}
-          </Card>
-        </Stack>
-      </Card>
-    </Box>
+      <FloatingVideoPlayer
+        video={activeVideo}
+        isMinimized={isMinimized}
+        onClose={handleClose}
+        onMinimize={() => setIsMinimized(true)}
+        onMaximize={() => setIsMinimized(false)}
+      />
+    </div>
   );
 }

@@ -1,26 +1,37 @@
-# Storit Frontend
+# Mantine Next.js template
 
-This is the Next.js frontend for the Storit music streaming platform.
+This is a template for [Next.js](https://nextjs.org/) app router + [Mantine](https://mantine.dev/).
+If you want to use pages router instead, see [next-pages-template](https://github.com/mantinedev/next-pages-template).
 
 ## Features
 
-- **Modern UI:** Built with Next.js App Router and Vanilla CSS for a premium, fast experience.
-- **Glassmorphism:** Elegant design with subtle transparency and blurs.
-- **Responsive:** Fully optimized for mobile and desktop viewing.
+This template comes with the following features:
 
-## Getting Started
+- [PostCSS](https://postcss.org/) with [mantine-postcss-preset](https://mantine.dev/styles/postcss-preset)
+- [TypeScript](https://www.typescriptlang.org/)
+- [Storybook](https://storybook.js.org/)
+- [Jest](https://jestjs.io/) setup with [React Testing Library](https://testing-library.com/docs/react-testing-library/intro)
+- Oxlint setup for TypeScript and React sources
 
-First, run the development server:
+## npm scripts
 
-```bash
-yarn dev
-```
+### Build and dev scripts
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- `dev` – start dev server
+- `build` – bundle application for production
+- `analyze` – analyzes application bundle with [@next/bundle-analyzer](https://www.npmjs.com/package/@next/bundle-analyzer)
 
-## Tech Stack
+### Testing scripts
 
-- **Framework:** Next.js 15
-- **Language:** TypeScript
-- **Styling:** Vanilla CSS (CSS Variables + Global Classes)
-- **Icons:** Unicode Emoji (can be replaced with Lucide-react later)
+- `typecheck` – checks TypeScript types
+- `lint` – runs oxlint and stylelint
+- `format:test` – checks files with oxfmt
+- `jest` – runs jest tests
+- `jest:watch` – starts jest watch
+- `test` – runs `jest`, `format:test`, `lint` and `typecheck` scripts
+
+### Other scripts
+
+- `storybook` – starts storybook dev server
+- `storybook:build` – build production storybook bundle to `storybook-static`
+- `format:write` – formats all files with oxfmt

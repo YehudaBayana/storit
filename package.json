@@ -9,5 +9,6 @@
     "start-db-dash": "docker start pgadmin4 || docker run -d --name pgadmin4 -p 9090:80 -e PGADMIN_DEFAULT_EMAIL=admin@admin.com -e PGADMIN_DEFAULT_PASSWORD=admin dpage/pgadmin4",
     "stop-db-dash": "docker stop pgadmin4",
     "test-server": "docker compose up -d postgres && (cd backend && set -a && source ../.env && set +a && DB_URL=\"${DB_URL/@postgres:/@127.0.0.1:}\" DB_HOST=127.0.0.1 go test -tags=integration -v ./...)"
-  }
+  },
+  "packageManager": "yarn@4.18.1+sha512.b2e1e7524f654f2749d32b4ebcb4622473cb5bcbc485df2007e12a154e50162a4d795526768bc5f5b8f81717bfd79deb2472813d86fb5ae2eb551fa9c872b08f"
 }
