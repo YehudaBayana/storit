@@ -2,7 +2,7 @@
 
 **Stack & rules:**
 
-- React + TypeScript. Use **Mantine components only** for UI — never raw HTML tags (`div`, `span`, `button`, `input`, etc.). Use the Mantine equivalent (`Stack`, `Group`, `Box`, `Text`, `Button`, `TextInput`, …).
+- nextJS + React + TypeScript + tanstack + zustand. Use **Mantine components only** for UI — never raw HTML tags (`div`, `span`, `button`, `input`, etc.). Use the Mantine equivalent (`Stack`, `Group`, `Box`, `Text`, `Button`, `TextInput`, …).
 - Custom styling only via **TailwindCSS** classes passed through `className` on Mantine components.
 - Icons only from **react-icons** (e.g. `react-icons/fi`, `react-icons/md`).
 - Use full paths relative to the project root. Add `mkdir -p` for every new directory.

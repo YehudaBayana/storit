@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
+import { ResizableAppShell } from "@/components/appShell/AppShell";
 // Import your auth verification helper (e.g., from Supabase, NextAuth, Firebase, etc.)
 
 export default async function ProtectedLayout({ children }: { children: React.ReactNode }) {
@@ -10,5 +11,5 @@ export default async function ProtectedLayout({ children }: { children: React.Re
     redirect("/auth");
   }
 
-  return <>{children}</>;
+  return <ResizableAppShell>{children}</ResizableAppShell>;
 }

@@ -1,45 +1,30 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { Modal, ActionIcon, Group, Text, Box, AspectRatio } from "@mantine/core";
+import { ActionIcon, Group, Text, Box, AspectRatio, Portal, Overlay } from "@mantine/core";
 import { MdClose, MdMinimize, MdOpenInFull, MdDragIndicator } from "react-icons/md";
-import { Video } from "../api/videos";
 import { usePlaybackUrl } from "../query/useVideos";
+import { useVideoPlayerStore } from "@/store/useVideoPlayerStore";
 
-interface Props {
-  video: Video | null;
-  isMinimized: boolean;
-  onClose: () => void;
-  onMinimize: () => void;
-  onMaximize: () => void;
-}
-
-export function FloatingVideoPlayer({
-  video,
-  isMinimized,
-  onClose,
-  onMinimize,
-  onMaximize,
-}: Props) {
-  // Store the coordinates from the bottom-right corner
+export function FloatingVideoPlayer() {
+  const { activeVideo, isMinimized, closeVideo, minimizeVideo, maximizeVideo } =
+    useVideoPlayerStore();
   const [pos, setPos] = useState({ x: 20, y: 20 });
-  const videoId = video?.id;
+  const videoId = activeVideo?.id;
   const { data: playback } = usePlaybackUrl(
     videoId ?? "",
-    Boolean(videoId) && video?.status === "ready",
+    Boolean(videoId) && activeVideo?.status === "ready",
   );
 
-  // Keep track of where the user clicked to start dragging without causing re-renders
   const dragRef = useRef<{ startX: number; startY: number; initX: number; initY: number } | null>(
     null,
   );
 
-  if (!video) {
+  if (!activeVideo) {
     return null;
   }
 
   const handlePointerDown = (e: React.PointerEvent) => {
-    // Capture the initial click position and the current element coordinates
     dragRef.current = {
       startX: e.clientX,
       startY: e.clientY,
@@ -54,11 +39,9 @@ export function FloatingVideoPlayer({
     if (!dragRef.current) {
       return;
     }
-    // Calculate how far the mouse has moved
     const dx = dragRef.current.startX - e.clientX;
     const dy = dragRef.current.startY - e.clientY;
 
-    // Apply that distance to our coordinates (clamping values could be added here if needed)
     setPos({
       x: dragRef.current.initX + dx,
       y: dragRef.current.initY + dy,
@@ -71,91 +54,109 @@ export function FloatingVideoPlayer({
     document.removeEventListener("pointerup", handlePointerUp);
   };
 
-  if (isMinimized) {
-    return (
+  return (
+    <Portal>
+      {/* Backdrop for maximized state */}
+      {!isMinimized && (
+        <Overlay
+          color="#000"
+          backgroundOpacity={0.85}
+          zIndex={9998}
+          fixed
+          onClick={minimizeVideo}
+        />
+      )}
+
+      {/* Single shared container to preserve <video> tree structure and playback state */}
       <Box
         style={{
           position: "fixed",
-          bottom: `${pos.y}px`,
-          right: `${pos.x}px`,
-          width: "320px",
-          zIndex: 1000,
+          zIndex: 9999,
+          ...(isMinimized
+            ? {
+                bottom: `${pos.y}px`,
+                right: `${pos.x}px`,
+                width: "320px",
+              }
+            : {
+                top: "50%",
+                left: "50%",
+                transform: "translate(-50%, -50%)",
+                width: "100%",
+                maxWidth: "1000px",
+              }),
         }}
-        className="bg-black rounded-lg shadow-xl overflow-hidden border border-gray-700"
+        className={
+          isMinimized
+            ? "bg-black rounded-lg shadow-xl border border-gray-700 flex flex-col overflow-hidden"
+            : "bg-black rounded-lg shadow-2xl flex flex-col overflow-hidden"
+        }
       >
-        {/* Drag Handle Area */}
-        <Group
-          justify="space-between"
-          className="bg-gray-900 p-2 cursor-move touch-none"
-          onPointerDown={handlePointerDown}
-        >
-          <Group gap="xs">
-            <MdDragIndicator className="text-gray-400" />
-            <Text size="xs" className="text-white truncate max-w-[150px]">
-              {video.title}
-            </Text>
-          </Group>
-          <Group gap="xs">
-            <ActionIcon variant="subtle" color="gray" onClick={onMaximize} size="sm">
-              <MdOpenInFull />
-            </ActionIcon>
-            <ActionIcon variant="subtle" color="red" onClick={onClose} size="sm">
-              <MdClose />
-            </ActionIcon>
-          </Group>
-        </Group>
-        <AspectRatio ratio={1080 / 720} maw="100%" mx="auto">
-          <video
-            src={playback?.url}
-            controls
-            autoPlay
-            className="w-full aspect-video object-contain bg-black block"
+        {isMinimized ? (
+          <Group
+            justify="space-between"
+            className="bg-gray-900 p-2 cursor-move touch-none"
+            onPointerDown={handlePointerDown}
           >
-            <track kind="captions" />
-          </video>
-        </AspectRatio>
-      </Box>
-    );
-  }
+            <Group gap="xs">
+              <MdDragIndicator className="text-gray-400" />
+              <Text size="xs" className="text-white truncate max-w-[150px]">
+                {activeVideo.title}
+              </Text>
+            </Group>
+            <Group gap="xs">
+              <ActionIcon variant="subtle" color="gray" onClick={maximizeVideo} size="sm">
+                <MdOpenInFull />
+              </ActionIcon>
+              <ActionIcon variant="subtle" color="red" onClick={closeVideo} size="sm">
+                <MdClose />
+              </ActionIcon>
+            </Group>
+          </Group>
+        ) : (
+          <Box className="absolute top-4 right-4 z-10">
+            <Group gap="sm">
+              <ActionIcon
+                variant="filled"
+                color="dark"
+                onClick={minimizeVideo}
+                className="opacity-70 hover:opacity-100 transition-opacity shadow-sm"
+                size="lg"
+                title="Minimize to corner"
+              >
+                <MdMinimize />
+              </ActionIcon>
+              <ActionIcon
+                variant="filled"
+                color="dark"
+                onClick={closeVideo}
+                className="opacity-70 hover:opacity-100 transition-opacity shadow-sm"
+                size="lg"
+                title="Close video"
+              >
+                <MdClose />
+              </ActionIcon>
+            </Group>
+          </Box>
+        )}
 
-  return (
-    <Modal
-      opened
-      onClose={onClose}
-      size="xl"
-      title={video.title}
-      centered
-      // The below styles prevent the modal body from scrolling by strictly matching the internal padding
-      // and letting the aspect ratio/height constraints take over perfectly
-      styles={{
-        body: { padding: 0 },
-        header: { paddingBottom: 16 },
-      }}
-    >
-      <Box className="relative w-full flex justify-center bg-black overflow-hidden rounded-b-md">
-        <ActionIcon
-          variant="filled"
-          color="dark"
-          onClick={onMinimize}
-          className="absolute top-4 right-4 z-10 opacity-70 hover:opacity-100 transition-opacity shadow-sm"
-          size="lg"
-          title="Minimize to corner"
+        {/* The video element itself - remains intact avoiding remounts */}
+        <Box
+          className={`relative w-full flex justify-center bg-black overflow-hidden flex-1 ${isMinimized ? "" : "rounded-b-md"}`}
         >
-          <MdMinimize />
-        </ActionIcon>
-
-        <AspectRatio ratio={1080 / 720} maw="100%" mx="auto">
-          <video
-            src={playback?.url}
-            controls
-            autoPlay
-            style={{ maxHeight: "calc(100vh - 120px)" }}
-            className="w-full object-contain block bg-black aspect-video"
-          >
-            <track kind="captions" />
-          </video>
-        </AspectRatio>
+          <AspectRatio mx="auto" h="85%" w="85%">
+            <video
+              src={playback?.url}
+              controls
+              autoPlay
+              // style={isMinimized ? undefined : { maxHeight: "calc(100vh - 120px)" }}
+              className={`w-full block bg-black aspect-video ${isMinimized ? "h-full" : "h-full"}`}
+            >
+              <track kind="captions" />
+            </video>
+          </AspectRatio>
+        </Box>
       </Box>
-    </Modal>
+    </Portal>
   );
 }
