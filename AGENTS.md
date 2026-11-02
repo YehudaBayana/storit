@@ -11,8 +11,9 @@ Area-specific rules live next to the code: `backend/AGENTS.md` and `frontend/AGE
 ## Verification after changes
 
 After every change made in the codebase, you must run:
+
 1. From the root directory: `yarn test-server`
-2. From the `frontend/` directory: `yarn check-all` (which runs `yarn build`, `yarn lint`, `yarn format:check`, and `yarn test`)
+2. From the `frontend/` directory: `yarn verify` (which runs `yarn build`, `yarn lint`, `yarn format:check`, and `yarn test`)
 
 ## References
 
