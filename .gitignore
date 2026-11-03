@@ -7,3 +7,4 @@ node_modules/
 .pnp.cjs
 install-state.gz
 setup-env.sh
+.gemini-harness.log
