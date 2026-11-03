@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useRef } from "react";
-import { ActionIcon, Group, Text, Box, AspectRatio, Portal, Overlay } from "@mantine/core";
+import { useState, useRef, SyntheticEvent, useEffect } from "react";
+import { ActionIcon, Group, Text, Box, Modal, FloatingWindow } from "@mantine/core";
 import { MdClose, MdMinimize, MdOpenInFull, MdDragIndicator } from "react-icons/md";
 import { usePlaybackUrl } from "../query/useVideos";
 import { useVideoPlayerStore } from "@/store/useVideoPlayerStore";
@@ -10,15 +10,41 @@ export function FloatingVideoPlayer() {
   const { activeVideo, isMinimized, closeVideo, minimizeVideo, maximizeVideo } =
     useVideoPlayerStore();
   const [pos, setPos] = useState({ x: 20, y: 20 });
-  const videoId = activeVideo?.id;
-  const { data: playback } = usePlaybackUrl(
-    videoId ?? "",
-    Boolean(videoId) && activeVideo?.status === "ready",
-  );
+  const [aspectRatio, setAspectRatio] = useState<number>(16 / 9);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const currentTimeRef = useRef<number>(0);
 
-  const dragRef = useRef<{ startX: number; startY: number; initX: number; initY: number } | null>(
-    null,
-  );
+  const videoId = activeVideo?.id;
+  const { data: playback } = usePlaybackUrl(videoId ?? "", Boolean(videoId && activeVideo));
+
+  const dragRef = useRef<{
+    startX: number;
+    startY: number;
+    initialX: number;
+    initialY: number;
+  } | null>(null);
+
+  // Keep track of current playback time before unmounting/switching state
+  const handleTimeUpdate = (e: SyntheticEvent<HTMLVideoElement>) => {
+    currentTimeRef.current = e.currentTarget.currentTime;
+  };
+
+  // Restore playback time once the video ref is loaded/mounted
+  const handleLoadedMetadata = (e: SyntheticEvent<HTMLVideoElement>) => {
+    const video = e.currentTarget;
+    if (video.videoWidth && video.videoHeight) {
+      setAspectRatio(video.videoWidth / video.videoHeight);
+    }
+    if (currentTimeRef.current > 0) {
+      video.currentTime = currentTimeRef.current;
+    }
+  };
+
+  useEffect(() => {
+    if (videoRef.current && currentTimeRef.current > 0) {
+      videoRef.current.currentTime = currentTimeRef.current;
+    }
+  }, [isMinimized]);
 
   if (!activeVideo) {
     return null;
@@ -28,135 +54,199 @@ export function FloatingVideoPlayer() {
     dragRef.current = {
       startX: e.clientX,
       startY: e.clientY,
-      initX: pos.x,
-      initY: pos.y,
+      initialX: pos.x,
+      initialY: pos.y,
     };
-    document.addEventListener("pointermove", handlePointerMove);
-    document.addEventListener("pointerup", handlePointerUp);
+    (e.target as HTMLElement).setPointerCapture(e.pointerId);
   };
 
-  const handlePointerMove = (e: PointerEvent) => {
-    if (!dragRef.current) {
-      return;
-    }
-    const dx = dragRef.current.startX - e.clientX;
-    const dy = dragRef.current.startY - e.clientY;
-
+  const handlePointerMove = (e: React.PointerEvent) => {
+    if (!dragRef.current) return;
+    const dx = e.clientX - dragRef.current.startX;
+    const dy = e.clientY - dragRef.current.startY;
     setPos({
-      x: dragRef.current.initX + dx,
-      y: dragRef.current.initY + dy,
+      x: Math.max(0, dragRef.current.initialX - dx),
+      y: Math.max(0, dragRef.current.initialY - dy),
     });
   };
 
-  const handlePointerUp = () => {
+  const handlePointerUp = (e: React.PointerEvent) => {
+    if (!dragRef.current) return;
     dragRef.current = null;
-    document.removeEventListener("pointermove", handlePointerMove);
-    document.removeEventListener("pointerup", handlePointerUp);
+    try {
+      (e.target as HTMLElement).releasePointerCapture(e.pointerId);
+    } catch {
+      // Ignore if capture already lost
+    }
   };
 
-  return (
-    <Portal>
-      {/* Backdrop for maximized state */}
-      {!isMinimized && (
-        <Overlay
-          color="#000"
-          backgroundOpacity={0.85}
-          zIndex={9998}
-          fixed
-          onClick={minimizeVideo}
-        />
-      )}
-
-      {/* Single shared container to preserve <video> tree structure and playback state */}
-      <Box
+  if (isMinimized) {
+    return (
+      <FloatingWindow
         style={{
           position: "fixed",
-          zIndex: 9999,
-          ...(isMinimized
-            ? {
-                bottom: `${pos.y}px`,
-                right: `${pos.x}px`,
-                width: "320px",
-              }
-            : {
-                top: "50%",
-                left: "50%",
-                transform: "translate(-50%, -50%)",
-                width: "100%",
-                maxWidth: "1000px",
-              }),
+          bottom: `${pos.y}px`,
+          right: `${pos.x}px`,
+          zIndex: 1000,
+          boxShadow: "var(--mantine-shadow-xl)",
+          width: "320px",
+          maxWidth: "90vw",
         }}
-        className={
-          isMinimized
-            ? "bg-black rounded-lg shadow-xl border border-gray-700 flex flex-col overflow-hidden"
-            : "bg-black rounded-lg shadow-2xl flex flex-col overflow-hidden"
-        }
+        className="bg-dark-9 rounded-lg shadow-2xl flex flex-col overflow-hidden border border-dark-4 transition-all"
       >
-        {isMinimized ? (
-          <Group
-            justify="space-between"
-            className="bg-gray-900 p-2 cursor-move touch-none"
-            onPointerDown={handlePointerDown}
-          >
-            <Group gap="xs">
-              <MdDragIndicator className="text-gray-400" />
-              <Text size="xs" className="text-white truncate max-w-[150px]">
-                {activeVideo.title}
-              </Text>
-            </Group>
-            <Group gap="xs">
-              <ActionIcon variant="subtle" color="gray" onClick={maximizeVideo} size="sm">
-                <MdOpenInFull />
-              </ActionIcon>
-              <ActionIcon variant="subtle" color="red" onClick={closeVideo} size="sm">
-                <MdClose />
-              </ActionIcon>
-            </Group>
-          </Group>
-        ) : (
-          <Box className="absolute top-4 right-4 z-10">
-            <Group gap="sm">
-              <ActionIcon
-                variant="filled"
-                color="dark"
-                onClick={minimizeVideo}
-                className="opacity-70 hover:opacity-100 transition-opacity shadow-sm"
-                size="lg"
-                title="Minimize to corner"
-              >
-                <MdMinimize />
-              </ActionIcon>
-              <ActionIcon
-                variant="filled"
-                color="dark"
-                onClick={closeVideo}
-                className="opacity-70 hover:opacity-100 transition-opacity shadow-sm"
-                size="lg"
-                title="Close video"
-              >
-                <MdClose />
-              </ActionIcon>
-            </Group>
-          </Box>
-        )}
-
-        {/* The video element itself - remains intact avoiding remounts */}
-        <Box
-          className={`relative w-full flex justify-center bg-black overflow-hidden flex-1 ${isMinimized ? "" : "rounded-b-md"}`}
+        <Group
+          onPointerDown={handlePointerDown}
+          onPointerMove={handlePointerMove}
+          onPointerUp={handlePointerUp}
+          className="bg-dark-8 px-3 py-2 cursor-grab active:cursor-grabbing select-none border-b border-dark-4 flex justify-between items-center"
+          justify="space-between"
+          gap="xs"
         >
-          <AspectRatio mx="auto" h="85%" w="85%">
+          <Group gap="xs" style={{ overflow: "hidden", flex: 1 }}>
+            <MdDragIndicator className="text-gray-500 cursor-grab flex-shrink-0" size={18} />
+            <Text size="sm" fw={500} truncate className="text-gray-200">
+              {activeVideo.title}
+            </Text>
+          </Group>
+
+          <Group gap={4} className="flex-shrink-0" onClick={(e) => e.stopPropagation()}>
+            <ActionIcon
+              variant="subtle"
+              color="gray"
+              size="sm"
+              onClick={maximizeVideo}
+              title="Expand"
+            >
+              <MdOpenInFull size={16} />
+            </ActionIcon>
+            <ActionIcon variant="subtle" color="red" size="sm" onClick={closeVideo} title="Close">
+              <MdClose size={16} />
+            </ActionIcon>
+          </Group>
+        </Group>
+
+        <Box className="relative flex items-center justify-center bg-black overflow-hidden w-full">
+          <div
+            className="relative flex items-center justify-center w-full"
+            style={{
+              aspectRatio: "16/9",
+            }}
+          >
             <video
+              ref={videoRef}
               src={playback?.url}
               controls
               autoPlay
-              // style={isMinimized ? undefined : { maxHeight: "calc(100vh - 120px)" }}
-              className={`w-full block bg-black aspect-video ${isMinimized ? "h-full" : "h-full"}`}
+              onTimeUpdate={handleTimeUpdate}
+              onLoadedMetadata={handleLoadedMetadata}
+              className="bg-black block w-full h-full object-contain"
             >
               <track kind="captions" />
             </video>
-          </AspectRatio>
+          </div>
+        </Box>
+      </FloatingWindow>
+    );
+  }
+
+  return (
+    <Modal
+      opened={!isMinimized}
+      onClose={closeVideo}
+      withCloseButton={false}
+      centered
+      size="100%"
+      zIndex={1000}
+      styles={{
+        root: {
+          padding: 0,
+        },
+        inner: {
+          padding: 0,
+        },
+        content: {
+          backgroundColor: "transparent",
+          boxShadow: "none",
+          maxWidth: "100vw",
+          maxHeight: "100vh",
+          width: "100vw",
+          height: "100vh",
+          margin: 0,
+          borderRadius: 0,
+          display: "flex",
+          flexDirection: "column",
+        },
+        body: {
+          padding: 0,
+          flex: 1,
+          display: "flex",
+          flexDirection: "column",
+          overflow: "hidden",
+        },
+      }}
+    >
+      <Box
+        className="bg-dark-9 flex flex-col overflow-hidden w-full h-full"
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          flex: 1,
+        }}
+      >
+        <Group
+          className="bg-dark-8 px-4 py-3 select-none border-b border-dark-4 flex justify-between items-center"
+          justify="space-between"
+          gap="xs"
+        >
+          <Group gap="xs" style={{ overflow: "hidden", flex: 1 }}>
+            <Text size="md" fw={500} truncate className="text-gray-200">
+              {activeVideo.title}
+            </Text>
+          </Group>
+
+          <Group gap={8} className="flex-shrink-0">
+            <ActionIcon
+              variant="subtle"
+              color="gray"
+              size="md"
+              onClick={minimizeVideo}
+              title="Minimize"
+            >
+              <MdMinimize size={20} />
+            </ActionIcon>
+            <ActionIcon variant="subtle" color="red" size="md" onClick={closeVideo} title="Close">
+              <MdClose size={20} />
+            </ActionIcon>
+          </Group>
+        </Group>
+
+        <Box className="relative flex items-center justify-center overflow-hidden bg-red-500">
+          <video
+            ref={videoRef}
+            src={playback?.url}
+            controls
+            autoPlay
+            onTimeUpdate={handleTimeUpdate}
+            onLoadedMetadata={handleLoadedMetadata}
+            className="bg-black block max-w-full max-h-full object-fit m-auto"
+            style={{
+              width: "30vw",
+              height: "100vh",
+              margin: "0 auto",
+            }}
+          >
+            <track
+              className="bg-black block max-w-full max-h-full object-fit m-auto"
+              kind="captions"
+              style={{
+                width: "30vw",
+                height: "100vh",
+                margin: "0auto",
+              }}
+            />
+          </video>
         </Box>
       </Box>
-    </Portal>
+    </Modal>
   );
 }

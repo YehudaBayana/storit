@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, SyntheticEvent } from "react";
 import { useParams } from "next/navigation";
 import { Alert, Badge, Box, Card, Flex, NavLink, Stack, Text, Title } from "@mantine/core";
 import { getVideo, type Video as VideoModel } from "@/features/videos/api/videos";
@@ -14,6 +14,7 @@ export default function VideoWatchView() {
   const [video, setVideo] = useState<VideoModel | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [aspectRatio, setAspectRatio] = useState<number>(16 / 9);
   const videoElementRef = useRef<HTMLVideoElement>(null);
   const resumeRef = useRef<{ time: number; paused: boolean } | null>(null);
   const recoveriesRef = useRef(0);
@@ -33,9 +34,13 @@ export default function VideoWatchView() {
     void refetchPlayback();
   };
 
-  const handleLoadedMetadata = () => {
+  const handleLoadedMetadata = (e: SyntheticEvent<HTMLVideoElement>) => {
     recoveriesRef.current = 0;
     const element = videoElementRef.current;
+    const videoTarget = e.currentTarget;
+    if (videoTarget.videoWidth && videoTarget.videoHeight) {
+      setAspectRatio(videoTarget.videoWidth / videoTarget.videoHeight);
+    }
     const resume = resumeRef.current;
     if (!element || !resume) {
       return;
@@ -117,20 +122,28 @@ export default function VideoWatchView() {
           <Badge size="sm">{video.status}</Badge>
         </Flex>
 
-        <Card>
+        <Card className="flex items-center justify-center bg-black p-0 overflow-hidden">
           {playback ? (
-            <video
-              key={video.id}
-              ref={videoElementRef}
-              controls
-              src={playback.url}
-              onError={handlePlaybackError}
-              onLoadedMetadata={handleLoadedMetadata}
+            <div
+              className="relative flex items-center justify-center w-full max-h-[80vh]"
+              style={{
+                aspectRatio: `${aspectRatio}`,
+              }}
             >
-              <track kind="captions" />
-            </video>
+              <video
+                key={video.id}
+                ref={videoElementRef}
+                controls
+                src={playback.url}
+                onError={handlePlaybackError}
+                onLoadedMetadata={handleLoadedMetadata}
+                className="w-full h-full object-contain bg-black"
+              >
+                <track kind="captions" />
+              </video>
+            </div>
           ) : (
-            <Flex align="center" justify="center">
+            <Flex align="center" justify="center" h={400}>
               <Text>
                 {video.status === "ready" && "Loading video…"}
                 {video.status === "uploading" && "This video is still uploading."}

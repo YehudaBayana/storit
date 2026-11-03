@@ -23,5 +23,14 @@
     "yarn lint": true,
     "printf": true,
     "true": true
+  },
+  "files.associations": {
+    "*.css": "tailwindcss"
+  },
+  "editor.quickSuggestions": {
+    "strings": "on"
+  },
+  "tailwindCSS.includeLanguages": {
+    "plaintext": "html"
   }
 }
