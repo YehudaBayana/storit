@@ -13,14 +13,16 @@ import {
 import { ColorSchemeToggle } from "../ColorSchemeToggle/ColorSchemeToggle";
 import { useDisclosure } from "@mantine/hooks";
 import Link from "next/link";
-import { FiHome, FiVideo, FiLogOut } from "react-icons/fi";
+import { FiHome, FiVideo, FiFolder, FiLogOut, FiTrash2 } from "react-icons/fi";
 import { FloatingVideoPlayer } from "@/features/videos/components/FloatingVideoPlayer";
 import { useGetCurrentUser, useLogout } from "@/features/auth/query/useAuth";
 import { useRouter } from "next/navigation";
+import { useFolders } from "@/features/folders/query/useFolders";
 
 const NAV_ITEMS = [
   { label: "Home", href: "/", icon: FiHome },
   { label: "Videos", href: "/videos", icon: FiVideo },
+  { label: "Folders", href: "/folders", icon: FiFolder },
 ];
 
 export function ResizableAppShell({ children }: { children: React.ReactNode }) {
@@ -32,6 +34,7 @@ export function ResizableAppShell({ children }: { children: React.ReactNode }) {
 
   const { data: currentUser } = useGetCurrentUser();
   const { mutate: logout, isPending: isLoggingOut } = useLogout();
+  const { data: foldersData } = useFolders();
   const router = useRouter();
 
   const handleLogout = () => {
@@ -62,7 +65,7 @@ export function ResizableAppShell({ children }: { children: React.ReactNode }) {
         </Group>
       </AppShell.Header>
       <AppShell.Navbar p="md">
-        <Stack gap="xs" style={{ flex: 1 }}>
+        <Stack gap="xs" style={{ flex: 1, overflowY: "auto" }}>
           {NAV_ITEMS.map((item) => (
             <NavLink
               key={item.href}
@@ -75,6 +78,44 @@ export function ResizableAppShell({ children }: { children: React.ReactNode }) {
               }}
             />
           ))}
+
+          <Divider my="xs" />
+
+          <NavLink
+            component={Link}
+            href="/folders"
+            label="My Library"
+            leftSection={<FiFolder size="1.2rem" />}
+            onClick={() => {
+              if (opened) toggle();
+            }}
+          />
+
+          {(foldersData ?? []).map((folder) => (
+            <NavLink
+              key={folder.id}
+              component={Link}
+              href={`/folders?id=${folder.id}`}
+              label={folder.name}
+              leftSection={<FiFolder size="1.2rem" />}
+              style={{ paddingLeft: "1.5rem" }}
+              onClick={() => {
+                if (opened) toggle();
+              }}
+            />
+          ))}
+
+          <Divider my="xs" />
+
+          <NavLink
+            component={Link}
+            href="/folders?trash=true"
+            label="Trash"
+            leftSection={<FiTrash2 size="1.2rem" />}
+            onClick={() => {
+              if (opened) toggle();
+            }}
+          />
         </Stack>
 
         <Stack gap="sm" mt="auto">
@@ -95,13 +136,10 @@ export function ResizableAppShell({ children }: { children: React.ReactNode }) {
           >
             Logout
           </Button>
-          <Text size="xs" c="dimmed">
-            Drag the right edge of the navbar, or focus it and use arrow keys, to resize it.
-          </Text>
         </Stack>
       </AppShell.Navbar>
       <AppShell.Main>{children}</AppShell.Main>
-      
+
       {/* Global floating video player rendered inside AppShell */}
       <FloatingVideoPlayer />
     </AppShell>

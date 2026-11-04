@@ -17,7 +17,7 @@ export function formatFileSize(bytes: number): string {
   }
   const units = ["B", "KB", "MB", "GB", "TB"];
   const i = Math.floor(Math.log(bytes) / Math.log(1024));
-  return `${(bytes / (1024 ** i)).toFixed(1)} ${units[i]}`;
+  return `${(bytes / 1024 ** i).toFixed(1)} ${units[i]}`;
 }
 
 export function formatDate(dateString: string): string {

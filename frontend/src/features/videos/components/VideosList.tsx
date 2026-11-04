@@ -8,14 +8,29 @@ interface Props {
   videos: Video[];
   viewMode: "icons" | "list";
   onVideoSelect: (video: Video) => void;
+  onVideoDoubleClick?: (video: Video) => void;
+  selectedVideoId?: string | null;
 }
 
-export function VideosList({ videos, viewMode, onVideoSelect }: Props) {
+export function VideosList({
+  videos,
+  viewMode,
+  onVideoSelect,
+  onVideoDoubleClick,
+  selectedVideoId,
+}: Props) {
   if (viewMode === "list") {
     return (
       <Stack gap="sm">
-        {videos.map((v) => (
-          <VideoItemCard key={v.id} video={v} viewMode="list" onClick={onVideoSelect} />
+        {videos.map((video) => (
+          <VideoItemCard
+            key={video.id}
+            video={video}
+            viewMode="list"
+            onClick={onVideoSelect}
+            onDoubleClick={onVideoDoubleClick}
+            isSelected={video.id === selectedVideoId}
+          />
         ))}
       </Stack>
     );
@@ -23,8 +38,15 @@ export function VideosList({ videos, viewMode, onVideoSelect }: Props) {
 
   return (
     <SimpleGrid cols={{ base: 2, sm: 4, lg: 7, xl: 11 }} spacing="sm">
-      {videos.map((v) => (
-        <VideoItemCard key={v.id} video={v} viewMode="icons" onClick={onVideoSelect} />
+      {videos.map((video) => (
+        <VideoItemCard
+          key={video.id}
+          video={video}
+          viewMode="icons"
+          onClick={onVideoSelect}
+          onDoubleClick={onVideoDoubleClick}
+          isSelected={video.id === selectedVideoId}
+        />
       ))}
     </SimpleGrid>
   );

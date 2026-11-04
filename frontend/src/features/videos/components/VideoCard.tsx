@@ -6,9 +6,10 @@ import { getVideoThumbnailUrl, Video } from "../api/videos";
 interface Props {
   video: Video;
   onClick: (video: Video) => void;
+  onDoubleClick?: (video: Video) => void;
 }
 
-export function VideoCard({ video, onClick }: Props) {
+export function VideoCard({ video, onClick, onDoubleClick }: Props) {
   const thumbnailUrl = getVideoThumbnailUrl(video.id);
   return (
     <Card
@@ -17,6 +18,7 @@ export function VideoCard({ video, onClick }: Props) {
       radius="md"
       withBorder
       onClick={() => onClick(video)}
+      onDoubleClick={() => onDoubleClick?.(video)}
       className="cursor-pointer hover:shadow-md transition-shadow"
     >
       <Card.Section className="relative">

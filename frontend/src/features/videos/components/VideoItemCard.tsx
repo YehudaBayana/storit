@@ -23,9 +23,17 @@ interface Props {
   video: Video;
   viewMode: "icons" | "list";
   onClick: (video: Video) => void;
+  onDoubleClick?: (video: Video) => void;
+  isSelected?: boolean;
 }
 
-export function VideoItemCard({ video, viewMode, onClick }: Props) {
+export function VideoItemCard({
+  video,
+  viewMode,
+  onClick,
+  onDoubleClick,
+  isSelected = false,
+}: Props) {
   const [deleteModalOpened, setDeleteModalOpened] = useState(false);
   const queryClient = useQueryClient();
   const showToast = useToastStore((state) => state.success);
@@ -69,6 +77,11 @@ export function VideoItemCard({ video, viewMode, onClick }: Props) {
           radius="md"
           withBorder
           onClick={() => onClick(video)}
+          onDoubleClick={() => onDoubleClick?.(video)}
+          aria-selected={isSelected}
+          style={
+            isSelected ? { outline: "2px solid var(--mantine-primary-color-filled)" } : undefined
+          }
           className="cursor-pointer hover:shadow-sm transition-shadow flex flex-row items-center gap-4 relative"
         >
           <div className="relative w-28 h-16 flex-shrink-0">
@@ -161,6 +174,11 @@ export function VideoItemCard({ video, viewMode, onClick }: Props) {
         radius="md"
         withBorder
         onClick={() => onClick(video)}
+        onDoubleClick={() => onDoubleClick?.(video)}
+        aria-selected={isSelected}
+        style={
+          isSelected ? { outline: "2px solid var(--mantine-primary-color-filled)" } : undefined
+        }
         className="cursor-pointer hover:shadow-md transition-shadow relative group"
       >
         <Card.Section className="relative">

@@ -1,0 +1,15 @@
+DROP TABLE IF EXISTS trash_batches;
+DROP INDEX IF EXISTS idx_video_deleted_batch;
+ALTER TABLE video DROP COLUMN IF EXISTS version;
+ALTER TABLE video DROP COLUMN IF EXISTS original_folder_id;
+ALTER TABLE video DROP COLUMN IF EXISTS deleted_batch_id;
+DROP INDEX IF EXISTS idx_folders_deleted_batch;
+DROP INDEX IF EXISTS idx_folders_trashed_updated;
+DROP INDEX IF EXISTS idx_folders_owner_parent_trashed;
+DROP INDEX IF EXISTS idx_folders_unique_name;
+ALTER TABLE folders DROP COLUMN IF EXISTS original_name;
+ALTER TABLE folders DROP COLUMN IF EXISTS original_parent_id;
+ALTER TABLE folders DROP COLUMN IF EXISTS deleted_batch_id;
+ALTER TABLE folders DROP COLUMN IF EXISTS depth;
+ALTER TABLE folders DROP COLUMN IF EXISTS is_root;
+ALTER TABLE folders DROP COLUMN IF EXISTS name_normalized;

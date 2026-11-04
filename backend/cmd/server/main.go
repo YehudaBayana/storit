@@ -13,6 +13,7 @@ import (
 	"backend/internal/auth"
 	"backend/internal/config"
 	"backend/internal/database"
+	"backend/internal/folders"
 	"backend/internal/health"
 	"backend/internal/liked"
 	"backend/internal/logging"
@@ -55,6 +56,9 @@ func newHTTPHandler(db *pgxpool.Pool, cfg config.Config) (http.Handler, *videos.
 	likedRepo := liked.NewRepository(db, videoService)
 	likedH := liked.NewHandler(likedRepo)
 
+	foldersRepo := folders.NewRepository(db)
+	foldersH := folders.NewHandler(foldersRepo)
+
 	// Create a new ServeMux (Go 1.22+ supports HTTP methods in path patterns)
 	mux := http.NewServeMux()
 
@@ -87,6 +91,17 @@ func newHTTPHandler(db *pgxpool.Pool, cfg config.Config) (http.Handler, *videos.
 
 	mux.Handle("GET /api/liked", protected(likedH.Handle))
 	mux.Handle("POST /api/liked", protected(likedH.HandlePost))
+
+	mux.Handle("GET /api/folders", protected(foldersH.HandleList))
+	mux.Handle("GET /api/folders/root", protected(foldersH.HandleRoot))
+	mux.Handle("POST /api/folders", protected(foldersH.HandleCreate))
+	mux.Handle("GET /api/folders/{id}/contents", protected(foldersH.HandleContents))
+	mux.Handle("PATCH /api/folders/{id}", protected(foldersH.HandleUpdate))
+	mux.Handle("POST /api/folders/move", protected(foldersH.HandleMove))
+	mux.Handle("POST /api/library/move", protected(foldersH.HandleMove))
+	mux.Handle("DELETE /api/folders/items/{id}", protected(foldersH.HandleTrash))
+	mux.Handle("GET /api/folders/trash", protected(foldersH.HandleListTrash))
+	mux.Handle("GET /api/library/trash", protected(foldersH.HandleListTrash))
 
 	return logging.Middleware(middleware.CORSMiddleware(mux)), videoProcessor, nil
 }
