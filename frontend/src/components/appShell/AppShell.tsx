@@ -13,17 +13,10 @@ import {
 import { ColorSchemeToggle } from "../ColorSchemeToggle/ColorSchemeToggle";
 import { useDisclosure } from "@mantine/hooks";
 import Link from "next/link";
-import { FiHome, FiVideo, FiFolder, FiLogOut, FiTrash2 } from "react-icons/fi";
+import { FiFolder, FiLogOut, FiTrash2 } from "react-icons/fi";
 import { FloatingVideoPlayer } from "@/features/videos/components/FloatingVideoPlayer";
 import { useGetCurrentUser, useLogout } from "@/features/auth/query/useAuth";
 import { useRouter } from "next/navigation";
-import { useFolders } from "@/features/folders/query/useFolders";
-
-const NAV_ITEMS = [
-  { label: "Home", href: "/", icon: FiHome },
-  { label: "Videos", href: "/videos", icon: FiVideo },
-  { label: "Folders", href: "/folders", icon: FiFolder },
-];
 
 export function ResizableAppShell({ children }: { children: React.ReactNode }) {
   const [opened, { toggle }] = useDisclosure();
@@ -34,7 +27,6 @@ export function ResizableAppShell({ children }: { children: React.ReactNode }) {
 
   const { data: currentUser } = useGetCurrentUser();
   const { mutate: logout, isPending: isLoggingOut } = useLogout();
-  const { data: foldersData } = useFolders();
   const router = useRouter();
 
   const handleLogout = () => {
@@ -66,44 +58,15 @@ export function ResizableAppShell({ children }: { children: React.ReactNode }) {
       </AppShell.Header>
       <AppShell.Navbar p="md">
         <Stack gap="xs" style={{ flex: 1, overflowY: "auto" }}>
-          {NAV_ITEMS.map((item) => (
-            <NavLink
-              key={item.href}
-              component={Link}
-              href={item.href}
-              label={item.label}
-              leftSection={<item.icon size="1.2rem" />}
-              onClick={() => {
-                if (opened) toggle();
-              }}
-            />
-          ))}
-
-          <Divider my="xs" />
-
           <NavLink
             component={Link}
             href="/folders"
-            label="My Library"
+            label="Folders"
             leftSection={<FiFolder size="1.2rem" />}
             onClick={() => {
               if (opened) toggle();
             }}
           />
-
-          {(foldersData ?? []).map((folder) => (
-            <NavLink
-              key={folder.id}
-              component={Link}
-              href={`/folders?id=${folder.id}`}
-              label={folder.name}
-              leftSection={<FiFolder size="1.2rem" />}
-              style={{ paddingLeft: "1.5rem" }}
-              onClick={() => {
-                if (opened) toggle();
-              }}
-            />
-          ))}
 
           <Divider my="xs" />
 
