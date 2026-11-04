@@ -154,6 +154,7 @@ export function FolderView() {
                 item_id: item.id,
                 item_type: item.type,
                 target_folder_id: currentFolderID,
+                version: item.version,
               });
             }
           });
@@ -235,10 +236,10 @@ export function FolderView() {
     }
   };
 
-  const handleRename = (id: string) => {
+  const handleRename = (item: LibraryItem) => {
     if (!renameValue.trim()) return;
     updateFolderMut.mutate(
-      { id, patch: { name: renameValue } },
+      { id: item.id, patch: { name: renameValue, version: item.version } },
       {
         onSuccess: () => {
           setRenameFolderID(null);
@@ -436,7 +437,7 @@ export function FolderView() {
               renameValue={renameValue}
               menuContent={renderItemMenu(item)}
               onRenameValueChange={setRenameValue}
-              onRenameSubmit={() => handleRename(item.id)}
+              onRenameSubmit={() => handleRename(item)}
               onRenameCancel={() => setRenameFolderID(null)}
               onSelect={(event) => selectItem(item.id, event)}
               onOpen={() => openItem(item)}

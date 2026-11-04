@@ -177,13 +177,25 @@ func (r *Repository) UpdateFolder(ctx context.Context, ownerID, folderID uuid.UU
 	nameNormalized := NormalizeName(name)
 
 	var f Folder
-	err := r.db.QueryRow(ctx, `
-		UPDATE folders
-		SET name = $3, name_normalized = $4, version = version + 1, updated_at = now()
-		WHERE id = $1 AND owner_id = $2 AND version = $5 AND trashed_at IS NULL AND is_root = false
-		RETURNING `+folderColumns, folderID, ownerID, name, nameNormalized, version).Scan(
-		&f.ID, &f.OwnerID, &f.ParentID, &f.Name, &f.NameNormalized, &f.IsRoot, &f.Depth, &f.Version, &f.TrashedAt, &f.DeletedBatchID, &f.OriginalParentID, &f.OriginalName, &f.CreatedAt, &f.UpdatedAt,
-	)
+	var err error
+	if version != 0 {
+		err = r.db.QueryRow(ctx, `
+			UPDATE folders
+			SET name = $3, name_normalized = $4, version = version + 1, updated_at = now()
+			WHERE id = $1 AND owner_id = $2 AND version = $5 AND trashed_at IS NULL AND is_root = false
+			RETURNING `+folderColumns, folderID, ownerID, name, nameNormalized, version).Scan(
+			&f.ID, &f.OwnerID, &f.ParentID, &f.Name, &f.NameNormalized, &f.IsRoot, &f.Depth, &f.Version, &f.TrashedAt, &f.DeletedBatchID, &f.OriginalParentID, &f.OriginalName, &f.CreatedAt, &f.UpdatedAt,
+		)
+	} else {
+		err = r.db.QueryRow(ctx, `
+			UPDATE folders
+			SET name = $3, name_normalized = $4, version = version + 1, updated_at = now()
+			WHERE id = $1 AND owner_id = $2 AND trashed_at IS NULL AND is_root = false
+			RETURNING `+folderColumns, folderID, ownerID, name, nameNormalized).Scan(
+			&f.ID, &f.OwnerID, &f.ParentID, &f.Name, &f.NameNormalized, &f.IsRoot, &f.Depth, &f.Version, &f.TrashedAt, &f.DeletedBatchID, &f.OriginalParentID, &f.OriginalName, &f.CreatedAt, &f.UpdatedAt,
+		)
+	}
+
 	if errors.Is(err, pgx.ErrNoRows) {
 		return Folder{}, ErrConflict
 	}

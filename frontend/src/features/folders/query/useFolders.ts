@@ -58,7 +58,7 @@ export function useUpdateFolder() {
       patch,
     }: {
       id: string;
-      patch: { name?: string; parent_id?: string | null };
+      patch: { name?: string; parent_id?: string | null; version?: number };
     }) => updateFolder(id, patch),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: folderKeys.all });

@@ -63,6 +63,7 @@ func (h *Handler) HandleList(w http.ResponseWriter, r *http.Request) {
 				OwnerID:   userID,
 				ParentID:  item.FolderID,
 				Name:      item.Name,
+				Version:   item.Version,
 				CreatedAt: item.CreatedAt,
 				UpdatedAt: item.UpdatedAt,
 			})

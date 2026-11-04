@@ -7,6 +7,7 @@ export interface Folder {
   parent_id?: string | null;
   name: string;
   is_trash: boolean;
+  version: number;
   created_at: string;
   updated_at: string;
 }
@@ -18,6 +19,7 @@ export interface LibraryItem {
   type: "folder" | "video";
   name: string;
   parent_id?: string | null;
+  version: number;
   created_at: string;
   updated_at: string;
   video?: {
@@ -30,12 +32,13 @@ export interface LibraryItem {
   };
 }
 
-interface LibraryItemResponse extends Omit<LibraryItem, "type"> {
+type LibraryItemResponse = Omit<LibraryItem, "type" | "version"> & {
   type?: "folder" | "video";
   item_type?: "folder" | "media";
   media_type?: string;
   status?: VideoStatus;
-}
+  version?: number;
+};
 
 export function listFolders(options?: RequestOptions) {
   return apiClient<Folder[]>("/api/folders", {
@@ -56,7 +59,10 @@ export function createFolder(input: { name: string; parent_id?: string | null })
   });
 }
 
-export function updateFolder(id: string, patch: { name?: string; parent_id?: string | null }) {
+export function updateFolder(
+  id: string,
+  patch: { name?: string; parent_id?: string | null; version?: number },
+) {
   return apiClient<Folder>(`/api/folders/${id}`, {
     method: "PATCH",
     credentials: "include",
@@ -85,6 +91,7 @@ export function getFolderContents(id: string, options?: RequestOptions) {
   }).then((items) =>
     items.map((item) => ({
       ...item,
+      version: item.version ?? 1,
       type: item.type ?? (item.item_type === "folder" ? "folder" : "video"),
       video:
         item.video ??
@@ -104,6 +111,7 @@ export function moveLibraryItem(input: {
   item_id: string;
   item_type: "folder" | "video";
   target_folder_id?: string | null;
+  version?: number;
 }) {
   return apiClient<void>("/api/library/move", {
     method: "POST",
