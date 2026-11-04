@@ -13,6 +13,8 @@ export const Login: React.FC<LoginProps> = ({ onSwitchToRegister }) => {
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    console.log("Logging in with email:", email);
+    console.log("Logging in with password:", password);
     login({ email, password });
   };
 
