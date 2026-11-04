@@ -1,10 +1,5 @@
 import React from "react";
-import { Modal, Stack, TextInput, Select, Text, Alert, Progress, Group, Button } from "@mantine/core";
-
-interface FolderOption {
-  value: string;
-  label: string;
-}
+import { Modal, Stack, TextInput, Text, Alert, Progress, Group, Button } from "@mantine/core";
 
 interface UploadVideoModalProps {
   opened: boolean;
@@ -13,9 +8,9 @@ interface UploadVideoModalProps {
   onTitleChange: (val: string) => void;
   notes: string;
   onNotesChange: (val: string) => void;
-  targetFolderID: string | null;
-  onTargetFolderIDChange: (val: string | null) => void;
-  folderOptions: FolderOption[];
+  targetFolderID?: string | null;
+  onTargetFolderIDChange?: (val: string | null) => void;
+  folderOptions?: { value: string; label: string }[];
   onFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   error: string | null;
   isUploading: boolean;
@@ -32,9 +27,6 @@ export function UploadVideoModal({
   onTitleChange,
   notes,
   onNotesChange,
-  targetFolderID,
-  onTargetFolderIDChange,
-  folderOptions,
   onFileChange,
   error,
   isUploading,
@@ -58,12 +50,6 @@ export function UploadVideoModal({
             placeholder="Optional notes"
             value={notes}
             onChange={(e) => onNotesChange(e.target.value)}
-          />
-          <Select
-            label="Target Folder"
-            data={folderOptions}
-            value={targetFolderID ?? ""}
-            onChange={(val) => onTargetFolderIDChange(val || null)}
           />
           <div>
             <Text size="sm" fw={500} mb={4}>

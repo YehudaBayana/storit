@@ -136,11 +136,6 @@ export function FolderView() {
     setSelectedIDs(new Set([id]));
   };
 
-  const folderOptions = [
-    { value: "", label: "My Library (Root)" },
-    ...(foldersData ?? []).map((f) => ({ value: f.id, label: f.name })),
-  ];
-
   const navigateToFolder = (folderId: string | null) => {
     if (folderId === currentFolderID && !viewTrash) {
       return;
@@ -253,9 +248,6 @@ export function FolderView() {
         onTitleChange={uploadHook.setUploadTitle}
         notes={uploadHook.uploadNotes}
         onNotesChange={uploadHook.setUploadNotes}
-        targetFolderID={uploadHook.targetFolderID}
-        onTargetFolderIDChange={uploadHook.setTargetFolderID}
-        folderOptions={folderOptions}
         onFileChange={uploadHook.handleFileChange}
         error={uploadHook.uploadError}
         isUploading={uploadHook.isUploading}
