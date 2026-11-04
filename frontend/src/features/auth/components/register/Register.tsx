@@ -9,7 +9,7 @@ interface RegisterProps {
 export const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { mutate: register } = useRegister();
+  const { mutate: register, isPending } = useRegister();
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -50,7 +50,7 @@ export const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
             required
             placeholder="••••••••"
           />
-          <Button type="submit" variant="primary">
+          <Button type="submit" variant="primary" loading={isPending}>
             Create Account
           </Button>
         </form>
