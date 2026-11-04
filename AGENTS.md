@@ -15,6 +15,10 @@ After every change made in the codebase, you must run:
 1. From the root directory: `yarn test-server`
 2. From the `frontend/` directory: `yarn verify` (which runs `yarn build`, `yarn lint`, `yarn format:check`, and `yarn test`)
 
+## Code Organization & File Granularity
+
+- Keep files concise and single-purpose. Separate business/state logic into custom hooks and UI into small, focused subcomponents. Avoid monolithic files with inline logic.
+
 ## References
 
 - Logging, error reporting, Sentry, Grafana Loki, Alloy, Dozzle: `docs/LOGGING.md`. Read it for any new feature that logs or handles errors.

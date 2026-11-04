@@ -18,6 +18,10 @@ Read this before changing anything under `frontend/`. All UI in Storit is built 
 
 - Descriptive, self-explanatory variable and component names only. No single-letter variable names.
 
-4. **Verification after changes**:
+4. **Code Structure & Modular Design**:
+
+- Keep files small and modular. Extract state management, event listeners, and data fetching into custom hooks. Split complex view rendering into focused, reusable subcomponents.
+
+5. **Verification after changes**:
 
 - After making changes in `frontend/`, run `yarn verify` (which runs `yarn build`, `yarn lint`, `yarn format:check`, and `yarn test`).

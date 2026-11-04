@@ -1,21 +1,6 @@
 "use client";
-import React, { useState, useEffect, useMemo, useRef } from "react";
-import {
-  Group,
-  Text,
-  Button,
-  Stack,
-  Menu,
-  TextInput,
-  Modal,
-  Box,
-  Select,
-  Progress,
-  Alert,
-  Divider,
-} from "@mantine/core";
-import { FiChevronRight, FiTrash2, FiEdit2, FiCornerUpRight } from "react-icons/fi";
-import { useQueryClient } from "@tanstack/react-query";
+import React, { useState, useEffect, useMemo } from "react";
+import { Text, Stack, Box, Group } from "@mantine/core";
 import { useRouter, useSearchParams, useParams } from "next/navigation";
 import {
   useFolders,
@@ -24,24 +9,21 @@ import {
   useUpdateFolder,
   useDeleteFolder,
   useMoveLibraryItem,
-  useTrashItems,
   useRestoreLibraryItem,
   useEmptyTrash,
-  folderKeys,
+  useTrashItems,
 } from "../query/useFolders";
 import { LibraryItem } from "../api/folders";
 import { LibraryItemTile } from "./LibraryItemTile";
-import { useUploadVideo } from "@/features/videos/query/useVideos";
-import { isAbortError } from "@/features/videos/api/uploadParts";
 import { useVideoPlayerStore } from "@/store/useVideoPlayerStore";
-
-interface BreadcrumbItem {
-  id: string | null;
-  name: string;
-}
+import { FolderBreadcrumbsHeader, BreadcrumbItem } from "./FolderBreadcrumbsHeader";
+import { CreateFolderModal } from "./CreateFolderModal";
+import { UploadVideoModal } from "./UploadVideoModal";
+import { FolderItemMenu } from "./FolderItemMenu";
+import { useFolderKeyboardShortcuts } from "../hooks/useFolderKeyboardShortcuts";
+import { useFolderUpload } from "../hooks/useFolderUpload";
 
 export function FolderView() {
-  const queryClient = useQueryClient();
   const router = useRouter();
   const playVideo = useVideoPlayerStore((state) => state.playVideo);
   const searchParams = useSearchParams();
@@ -50,26 +32,16 @@ export function FolderView() {
   const folderIdFromParam = params?.id ? decodeURIComponent(params.id) : null;
   const currentFolderID = folderIdFromParam || searchParams.get("id");
   const viewTrash = searchParams.get("trash") === "true";
+
   const [breadcrumbs, setBreadcrumbs] = useState<BreadcrumbItem[]>([
     { id: null, name: "My Library" },
   ]);
   const [newFolderName, setNewFolderName] = useState("");
   const [createModalOpen, setCreateModalOpen] = useState(false);
-  const [uploadModalOpen, setUploadModalOpen] = useState(false);
   const [renameFolderID, setRenameFolderID] = useState<string | null>(null);
   const [renameValue, setRenameValue] = useState("");
   const [selectedIDs, setSelectedIDs] = useState<Set<string>>(new Set());
   const [cutIDs, setCutIDs] = useState<Set<string>>(new Set());
-
-  // Upload states using multipart hook
-  const [uploadFile, setUploadFile] = useState<File | null>(null);
-  const [uploadTitle, setUploadTitle] = useState("");
-  const [uploadNotes, setUploadNotes] = useState("");
-  const [targetFolderIDForUpload, setTargetFolderIDForUpload] = useState<string | null>(null);
-  const [uploadProgress, setUploadProgress] = useState(0);
-  const [uploadError, setUploadError] = useState<string | null>(null);
-  const uploadAbortRef = useRef<AbortController | null>(null);
-  const uploadVideoMutation = useUploadVideo();
 
   // Track previous folder/trash state to reset selection during render if changed
   const [prevFolderState, setPrevFolderState] = useState({ currentFolderID, viewTrash });
@@ -110,6 +82,19 @@ export function FolderView() {
         ]
       : [{ id: null, name: "My Library" }];
 
+  const uploadHook = useFolderUpload(currentFolderID);
+
+  useFolderKeyboardShortcuts({
+    items,
+    selectedIDs,
+    cutIDs,
+    currentFolderID,
+    setSelectedIDs,
+    setCutIDs,
+    onCancelRename: () => setRenameFolderID(null),
+    onMoveItem: (params) => moveItemMut.mutate(params),
+  });
+
   // Handle browser popstate / back / forward
   useEffect(() => {
     const handlePopState = (event: PopStateEvent) => {
@@ -131,42 +116,6 @@ export function FolderView() {
     return () => window.removeEventListener("popstate", handlePopState);
   }, [foldersData, currentFolderID]);
 
-  // Keyboard shortcuts
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === "a") {
-        if (["INPUT", "TEXTAREA"].includes((e.target as HTMLElement).tagName)) return;
-        e.preventDefault();
-        setSelectedIDs(new Set(items.map((i) => i.id)));
-      } else if (e.key === "Escape") {
-        setRenameFolderID(null);
-        setSelectedIDs(new Set());
-        setCutIDs(new Set());
-      } else if ((e.metaKey || e.ctrlKey) && e.key === "x") {
-        if (selectedIDs.size > 0) {
-          setCutIDs(new Set(selectedIDs));
-        }
-      } else if ((e.metaKey || e.ctrlKey) && e.key === "v") {
-        if (cutIDs.size > 0) {
-          cutIDs.forEach((id) => {
-            const item = items.find((i) => i.id === id);
-            if (item) {
-              moveItemMut.mutate({
-                item_id: item.id,
-                item_type: item.type,
-                target_folder_id: currentFolderID,
-                version: item.version,
-              });
-            }
-          });
-          setCutIDs(new Set());
-        }
-      }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [items, selectedIDs, cutIDs, currentFolderID, moveItemMut]);
-
   const handleCreate = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newFolderName.trim()) return;
@@ -179,62 +128,6 @@ export function FolderView() {
         },
       },
     );
-  };
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = e.target.files?.[0] ?? null;
-    setUploadFile(selectedFile);
-    if (selectedFile) {
-      setUploadTitle((current) => current || selectedFile.name.replace(/\.[^/.]+$/, ""));
-    }
-  };
-
-  const handleUploadSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!uploadFile) {
-      setUploadError("Select a video file to upload.");
-      return;
-    }
-
-    setUploadError(null);
-    setUploadProgress(0);
-    const uploadAbort = new AbortController();
-    uploadAbortRef.current = uploadAbort;
-
-    const destFolder = targetFolderIDForUpload !== null ? targetFolderIDForUpload : currentFolderID;
-
-    try {
-      const uploadedVideo = await uploadVideoMutation.mutateAsync({
-        file: uploadFile,
-        title: uploadTitle || uploadFile.name,
-        notes: uploadNotes,
-        signal: uploadAbort.signal,
-        onProgress: setUploadProgress,
-      });
-
-      if (destFolder && uploadedVideo) {
-        await moveItemMut.mutateAsync({
-          item_id: uploadedVideo.id,
-          item_type: "video",
-          target_folder_id: destFolder,
-        });
-      }
-
-      setUploadFile(null);
-      setUploadTitle("");
-      setUploadNotes("");
-      setUploadModalOpen(false);
-      queryClient.invalidateQueries({ queryKey: folderKeys.all });
-      queryClient.invalidateQueries({ queryKey: ["videos"] });
-    } catch (submitError) {
-      if (isAbortError(submitError)) {
-        setUploadError("Upload cancelled.");
-      } else {
-        setUploadError(submitError instanceof Error ? submitError.message : "Upload failed.");
-      }
-    } finally {
-      uploadAbortRef.current = null;
-    }
   };
 
   const handleRename = (item: LibraryItem) => {
@@ -323,102 +216,19 @@ export function FolderView() {
     router.push(`/videos/${mediaId}`);
   };
 
-  const renderItemMenu = (item: LibraryItem) => {
-    if (viewTrash) {
-      return (
-        <Menu.Item
-          leftSection={<FiCornerUpRight size={14} />}
-          onClick={() => restoreItemMut.mutate({ item_id: item.id, item_type: item.type })}
-        >
-          Restore
-        </Menu.Item>
-      );
-    }
-    return (
-      <>
-        {item.type === "folder" && (
-          <Menu.Item
-            leftSection={<FiEdit2 size={14} />}
-            onClick={() => {
-              setRenameFolderID(item.id);
-              setRenameValue(item.name);
-            }}
-          >
-            Rename
-          </Menu.Item>
-        )}
-        <Menu.Item
-          leftSection={<FiTrash2 size={14} />}
-          color="red"
-          onClick={() => {
-            if (item.type === "folder") {
-              deleteFolderMut.mutate(item.id);
-            }
-          }}
-        >
-          Move to Trash
-        </Menu.Item>
-      </>
-    );
-  };
-
   const pathSegments = viewTrash ? [{ id: null, name: "Trash" }] : visibleBreadcrumbs;
 
   return (
     <Stack gap={0} h="100%" onClick={() => setSelectedIDs(new Set())}>
-      <Group justify="space-between" px="md" py="xs" onClick={(e) => e.stopPropagation()}>
-        <Group gap={2}>
-          {pathSegments.map((segment, index) => (
-            <Group key={segment.id ?? "root"} gap={2}>
-              {index > 0 && <FiChevronRight size={12} />}
-              <Button
-                variant="subtle"
-                color="gray"
-                size="compact-sm"
-                fw={index === pathSegments.length - 1 ? 600 : 400}
-                disabled={viewTrash}
-                onClick={() => navigateToFolder(segment.id, segment.name)}
-              >
-                {segment.name}
-              </Button>
-            </Group>
-          ))}
-        </Group>
-        {!viewTrash && (
-          <Group gap="xs">
-            <Button
-              variant="subtle"
-              color="gray"
-              size="compact-sm"
-              onClick={() => {
-                setTargetFolderIDForUpload(currentFolderID);
-                setUploadModalOpen(true);
-              }}
-            >
-              Upload
-            </Button>
-            <Button
-              variant="subtle"
-              color="gray"
-              size="compact-sm"
-              onClick={() => setCreateModalOpen(true)}
-            >
-              New Folder
-            </Button>
-          </Group>
-        )}
-        {viewTrash && items.length > 0 && (
-          <Button
-            color="red"
-            variant="subtle"
-            size="compact-sm"
-            onClick={() => emptyTrashMut.mutate()}
-          >
-            Empty Trash
-          </Button>
-        )}
-      </Group>
-      <Divider />
+      <FolderBreadcrumbsHeader
+        pathSegments={pathSegments}
+        viewTrash={viewTrash}
+        hasTrashItems={items.length > 0}
+        onNavigate={navigateToFolder}
+        onOpenUpload={() => uploadHook.openUploadModal()}
+        onOpenCreateFolder={() => setCreateModalOpen(true)}
+        onEmptyTrash={() => emptyTrashMut.mutate()}
+      />
 
       {cutIDs.size > 0 && (
         <Text size="xs" c="dimmed" px="md" pt="xs">
@@ -436,7 +246,24 @@ export function FolderView() {
               isCut={cutIDs.has(item.id)}
               isRenaming={renameFolderID === item.id}
               renameValue={renameValue}
-              menuContent={renderItemMenu(item)}
+              menuContent={
+                <FolderItemMenu
+                  item={item}
+                  viewTrash={viewTrash}
+                  onRestore={(itm) =>
+                    restoreItemMut.mutate({ item_id: itm.id, item_type: itm.type })
+                  }
+                  onStartRename={(itm) => {
+                    setRenameFolderID(itm.id);
+                    setRenameValue(itm.name);
+                  }}
+                  onDeleteFolder={(itm) => {
+                    if (itm.type === "folder") {
+                      deleteFolderMut.mutate(itm.id);
+                    }
+                  }}
+                />
+              }
               onRenameValueChange={setRenameValue}
               onRenameSubmit={() => handleRename(item)}
               onRenameCancel={() => setRenameFolderID(null)}
@@ -452,100 +279,32 @@ export function FolderView() {
         )}
       </Box>
 
-      <Modal
+      <CreateFolderModal
         opened={createModalOpen}
         onClose={() => setCreateModalOpen(false)}
-        title="Create New Folder"
-      >
-        <form onSubmit={handleCreate}>
-          <Stack gap="md">
-            <TextInput
-              label="Folder Name"
-              placeholder="My Folder"
-              value={newFolderName}
-              onChange={(e) => setNewFolderName(e.target.value)}
-              data-autofocus
-              required
-            />
-            <Group justify="flex-end">
-              <Button variant="default" onClick={() => setCreateModalOpen(false)}>
-                Cancel
-              </Button>
-              <Button type="submit">Create</Button>
-            </Group>
-          </Stack>
-        </form>
-      </Modal>
+        folderName={newFolderName}
+        onFolderNameChange={setNewFolderName}
+        onSubmit={handleCreate}
+      />
 
-      <Modal
-        opened={uploadModalOpen}
-        onClose={() => setUploadModalOpen(false)}
-        title="Upload Video to Folder"
-      >
-        <form onSubmit={handleUploadSubmit}>
-          <Stack gap="md">
-            <TextInput
-              label="Video Title"
-              placeholder="My Video"
-              value={uploadTitle}
-              onChange={(e) => setUploadTitle(e.target.value)}
-            />
-            <TextInput
-              label="Notes"
-              placeholder="Optional notes"
-              value={uploadNotes}
-              onChange={(e) => setUploadNotes(e.target.value)}
-            />
-            <Select
-              label="Target Folder"
-              data={folderOptions}
-              value={targetFolderIDForUpload ?? ""}
-              onChange={(val) => setTargetFolderIDForUpload(val || null)}
-            />
-            <div>
-              <Text size="sm" fw={500} mb={4}>
-                Video File
-              </Text>
-              <input
-                type="file"
-                accept="video/*,.mp4,.mov,.avi,.webm,.mkv,.m4v"
-                onChange={handleFileChange}
-                required
-              />
-            </div>
-
-            {uploadError && <Alert color="red" title={uploadError} />}
-
-            {uploadVideoMutation.isPending && (
-              <Stack gap="sm">
-                <Progress value={Math.round(uploadProgress * 100)} />
-                <Text size="sm">
-                  Uploading {Math.round(uploadProgress * 100)}%. Keep this tab open.
-                </Text>
-              </Stack>
-            )}
-
-            <Group justify="flex-end">
-              {uploadVideoMutation.isPending ? (
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => uploadAbortRef.current?.abort()}
-                >
-                  Cancel Upload
-                </Button>
-              ) : (
-                <Button variant="default" onClick={() => setUploadModalOpen(false)}>
-                  Cancel
-                </Button>
-              )}
-              <Button type="submit" disabled={!uploadFile || uploadVideoMutation.isPending}>
-                Upload
-              </Button>
-            </Group>
-          </Stack>
-        </form>
-      </Modal>
+      <UploadVideoModal
+        opened={uploadHook.uploadModalOpen}
+        onClose={() => uploadHook.setUploadModalOpen(false)}
+        title={uploadHook.uploadTitle}
+        onTitleChange={uploadHook.setUploadTitle}
+        notes={uploadHook.uploadNotes}
+        onNotesChange={uploadHook.setUploadNotes}
+        targetFolderID={uploadHook.targetFolderID}
+        onTargetFolderIDChange={uploadHook.setTargetFolderID}
+        folderOptions={folderOptions}
+        onFileChange={uploadHook.handleFileChange}
+        error={uploadHook.uploadError}
+        isUploading={uploadHook.isUploading}
+        progress={uploadHook.uploadProgress}
+        onCancelUpload={uploadHook.cancelUpload}
+        onSubmit={uploadHook.handleUploadSubmit}
+        fileSelected={Boolean(uploadHook.uploadFile)}
+      />
     </Stack>
   );
 }
