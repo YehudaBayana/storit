@@ -27,6 +27,10 @@ export const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
           <Input
             id="register-email-input"
             type="email"
+            autoComplete="email"
+            autoCapitalize="none"
+            autoCorrect="off"
+            spellCheck={false}
             value={email}
             onChange={(event) => setEmail(event.target.value)}
             required
@@ -36,6 +40,10 @@ export const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
           <PasswordInput
             id="register-password-input"
             type="password"
+            autoComplete="new-password"
+            autoCapitalize="none"
+            autoCorrect="off"
+            spellCheck={false}
             value={password}
             onChange={(event) => setPassword(event.target.value)}
             required
