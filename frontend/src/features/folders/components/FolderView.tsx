@@ -69,7 +69,6 @@ export function FolderView() {
   }, [viewTrash, trashData, contentsData]);
 
   const items: LibraryItem[] = useMemo(() => {
-    console.log("rawItems ", rawItems);
     return [...rawItems].sort(
       (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
     );
