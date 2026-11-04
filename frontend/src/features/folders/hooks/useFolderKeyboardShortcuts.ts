@@ -9,7 +9,12 @@ interface UseFolderKeyboardShortcutsProps {
   setSelectedIDs: (value: Set<string>) => void;
   onCancelRename: () => void;
   setCutIDs: (value: Set<string>) => void;
-  onMoveItem: (params: { item_id: string; item_type: "folder" | "video"; target_folder_id: string | null; version?: number }) => void;
+  onMoveItem: (params: {
+    item_id: string;
+    item_type: "folder" | "video";
+    target_folder_id: string | null;
+    version?: number;
+  }) => void;
 }
 
 export function useFolderKeyboardShortcuts({
@@ -55,5 +60,14 @@ export function useFolderKeyboardShortcuts({
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [items, selectedIDs, cutIDs, currentFolderID, onMoveItem, setCutIDs, onCancelRename, setSelectedIDs]);
+  }, [
+    items,
+    selectedIDs,
+    cutIDs,
+    currentFolderID,
+    onMoveItem,
+    setCutIDs,
+    onCancelRename,
+    setSelectedIDs,
+  ]);
 }

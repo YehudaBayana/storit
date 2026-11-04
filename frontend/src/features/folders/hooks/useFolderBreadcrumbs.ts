@@ -4,7 +4,7 @@ import { BreadcrumbItem } from "../components/FolderBreadcrumbsHeader";
 
 export function useFolderBreadcrumbs(
   currentFolderID: string | null,
-  folders: Folder[] | undefined
+  folders: Folder[] | undefined,
 ): BreadcrumbItem[] {
   return useMemo(() => {
     const rootBreadcrumb: BreadcrumbItem = { id: null, name: "My Library" };

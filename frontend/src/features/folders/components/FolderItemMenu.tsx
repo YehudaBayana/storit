@@ -20,10 +20,7 @@ export function FolderItemMenu({
 }: FolderItemMenuProps) {
   if (viewTrash) {
     return (
-      <Menu.Item
-        leftSection={<FiCornerUpRight size={14} />}
-        onClick={() => onRestore(item)}
-      >
+      <Menu.Item leftSection={<FiCornerUpRight size={14} />} onClick={() => onRestore(item)}>
         Restore
       </Menu.Item>
     );
@@ -32,10 +29,7 @@ export function FolderItemMenu({
   return (
     <>
       {item.type === "folder" && (
-        <Menu.Item
-          leftSection={<FiEdit2 size={14} />}
-          onClick={() => onStartRename(item)}
-        >
+        <Menu.Item leftSection={<FiEdit2 size={14} />} onClick={() => onStartRename(item)}>
           Rename
         </Menu.Item>
       )}

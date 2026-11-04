@@ -68,9 +68,7 @@ export function UploadVideoModal({
           {isUploading && (
             <Stack gap="sm">
               <Progress value={Math.round(progress * 100)} />
-              <Text size="sm">
-                Uploading {Math.round(progress * 100)}%. Keep this tab open.
-              </Text>
+              <Text size="sm">Uploading {Math.round(progress * 100)}%. Keep this tab open.</Text>
             </Stack>
           )}
 
