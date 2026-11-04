@@ -11,7 +11,8 @@ export const Login: React.FC<LoginProps> = ({ onSwitchToRegister }) => {
   const [password, setPassword] = useState("");
   const { mutate: login } = useLogin();
 
-  const handleSubmit = () => {
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
     login({ email, password });
   };
 
