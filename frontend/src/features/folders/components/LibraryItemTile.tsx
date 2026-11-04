@@ -56,16 +56,14 @@ export function LibraryItemTile({
 
   return (
     <Menu opened={menuOpened} onChange={setMenuOpened} position="bottom-start" shadow="sm">
-      <Menu.Target>
+      <Menu.ContextMenu>
         <Box
           w={112}
           p="xs"
           onClick={onSelect}
           onDoubleClick={onOpen}
           onContextMenu={(event: React.MouseEvent) => {
-            event.preventDefault();
             onSelect(event);
-            setMenuOpened(true);
           }}
           style={{
             cursor: "default",
@@ -103,7 +101,7 @@ export function LibraryItemTile({
             )}
           </Stack>
         </Box>
-      </Menu.Target>
+      </Menu.ContextMenu>
       <Menu.Dropdown>{menuContent}</Menu.Dropdown>
     </Menu>
   );
