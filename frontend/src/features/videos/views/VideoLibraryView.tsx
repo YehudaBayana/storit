@@ -93,13 +93,15 @@ export function VideoLibraryView({ initialVideos }: { initialVideos: Video[] }) 
             ),
             { id: folderId, name: folderName },
           ];
-    const pathname = window.location.pathname;
-    const url = folderId ? `${pathname}?id=${folderId}` : pathname;
 
     setCurrentFolderId(folderId);
     setBreadcrumbs(nextBreadcrumbs);
     setSelectedVideoId(null);
-    window.history.pushState({ folderId, breadcrumbs: nextBreadcrumbs }, "", url);
+    if (folderId) {
+      router.push(`/folders/${folderId}`);
+    } else {
+      router.push(`/folders`);
+    }
   };
 
   const handleVideoSelect = (video: Video) => {

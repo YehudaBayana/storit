@@ -16,7 +16,7 @@ import {
 } from "@mantine/core";
 import { FiChevronRight, FiTrash2, FiEdit2, FiCornerUpRight } from "react-icons/fi";
 import { useQueryClient } from "@tanstack/react-query";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams, useParams } from "next/navigation";
 import {
   useFolders,
   useFolderContents,
@@ -45,8 +45,10 @@ export function FolderView() {
   const router = useRouter();
   const playVideo = useVideoPlayerStore((state) => state.playVideo);
   const searchParams = useSearchParams();
+  const params = useParams<{ id?: string }>();
 
-  const currentFolderID = searchParams.get("id");
+  const folderIdFromParam = params?.id ? decodeURIComponent(params.id) : null;
+  const currentFolderID = folderIdFromParam || searchParams.get("id");
   const viewTrash = searchParams.get("trash") === "true";
   const [breadcrumbs, setBreadcrumbs] = useState<BreadcrumbItem[]>([
     { id: null, name: "My Library" },
@@ -115,9 +117,8 @@ export function FolderView() {
       const historyBreadcrumbs = event.state?.breadcrumbs as BreadcrumbItem[] | undefined;
       if (historyBreadcrumbs) {
         setBreadcrumbs(historyBreadcrumbs);
-      } else if (new URLSearchParams(window.location.search).get("id")) {
-        const folderId = new URLSearchParams(window.location.search).get("id");
-        const folder = foldersData?.find((item) => item.id === folderId);
+      } else if (currentFolderID) {
+        const folder = foldersData?.find((item) => item.id === currentFolderID);
         setBreadcrumbs([
           { id: null, name: "My Library" },
           ...(folder ? [{ id: folder.id, name: folder.name }] : []),
@@ -128,7 +129,7 @@ export function FolderView() {
     };
     window.addEventListener("popstate", handlePopState);
     return () => window.removeEventListener("popstate", handlePopState);
-  }, [foldersData]);
+  }, [foldersData, currentFolderID]);
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -280,7 +281,7 @@ export function FolderView() {
       return;
     }
 
-    const url = folderId ? `/folders?id=${folderId}` : `/folders`;
+    const url = folderId ? `/folders/${folderId}` : `/folders`;
     let nextBreadcrumbs: BreadcrumbItem[];
 
     if (folderId === null) {
@@ -295,7 +296,7 @@ export function FolderView() {
     }
     setBreadcrumbs(nextBreadcrumbs);
     setSelectedIDs(new Set());
-    window.history.pushState({ folderId, breadcrumbs: nextBreadcrumbs }, "", url);
+    router.push(url);
   };
 
   const openItem = (item: LibraryItem) => {
