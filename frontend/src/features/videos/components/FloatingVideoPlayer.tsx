@@ -1,22 +1,26 @@
 "use client";
 
-import { useState, useRef, SyntheticEvent, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import { ActionIcon, Group, Text, Box, Portal } from "@mantine/core";
 import { MdClose, MdMinimize, MdOpenInFull } from "react-icons/md";
-import { usePlaybackUrl } from "../query/useVideos";
 import { useVideoPlayerStore } from "@/store/useVideoPlayerStore";
+import { useVideoPlaybackRecovery } from "../hooks/useVideoPlaybackRecovery";
 
 export function FloatingVideoPlayer() {
   const { activeVideo, isMinimized, closeVideo, minimizeVideo, maximizeVideo } =
     useVideoPlayerStore();
   const [pos, setPos] = useState({ x: 20, y: 20 });
-  const [aspectRatio, setAspectRatio] = useState<number>(16 / 9);
-  const videoRef = useRef<HTMLVideoElement | null>(null);
-  const currentTimeRef = useRef<number>(0);
   const mousedownTargetRef = useRef<EventTarget | null>(null);
 
   const videoId = activeVideo?.id;
-  const { data: playback } = usePlaybackUrl(videoId ?? "", Boolean(videoId && activeVideo));
+  const {
+    aspectRatio,
+    videoElementRef,
+    playback,
+    handlePlaybackError,
+    handleTimeUpdate,
+    handleLoadedMetadata,
+  } = useVideoPlaybackRecovery(videoId, Boolean(videoId && activeVideo));
 
   const dragRef = useRef<{
     startX: number;
@@ -25,25 +29,11 @@ export function FloatingVideoPlayer() {
     initialY: number;
   } | null>(null);
 
-  const handleTimeUpdate = (e: SyntheticEvent<HTMLVideoElement>) => {
-    currentTimeRef.current = e.currentTarget.currentTime;
-  };
-
-  const handleLoadedMetadata = (e: SyntheticEvent<HTMLVideoElement>) => {
-    const video = e.currentTarget;
-    if (video.videoWidth && video.videoHeight) {
-      setAspectRatio(video.videoWidth / video.videoHeight);
-    }
-    if (currentTimeRef.current > 0) {
-      video.currentTime = currentTimeRef.current;
-    }
-  };
-
   useEffect(() => {
-    if (videoRef.current && currentTimeRef.current > 0) {
-      videoRef.current.currentTime = currentTimeRef.current;
+    if (videoElementRef.current && videoElementRef.current.currentTime > 0) {
+      // no-op or sync if needed
     }
-  }, [isMinimized]);
+  }, [isMinimized, videoElementRef]);
 
   if (!activeVideo) {
     return null;
@@ -116,7 +106,7 @@ export function FloatingVideoPlayer() {
               </Text>
             </Group>
 
-            <Group gap={4} className="flex-shrink-0" onPointerDown={(e) => e.stopPropagation()}>
+            <Group gap={4} className="shrink-0" onPointerDown={(e) => e.stopPropagation()}>
               <ActionIcon
                 variant="subtle"
                 color="gray"
@@ -149,10 +139,11 @@ export function FloatingVideoPlayer() {
             style={{ aspectRatio: `${aspectRatio}` }}
           >
             <video
-              ref={videoRef}
+              ref={videoElementRef}
               src={playback?.url}
               controls
               autoPlay
+              onError={handlePlaybackError}
               onTimeUpdate={handleTimeUpdate}
               onLoadedMetadata={handleLoadedMetadata}
               className="bg-black block w-full h-full object-fit pointer-events-auto"
@@ -168,7 +159,7 @@ export function FloatingVideoPlayer() {
   return (
     <Portal>
       <div
-        className="fixed inset-0 z-[1000] flex items-center justify-center bg-black/60"
+        className="fixed inset-0 z-1000 flex items-center justify-center bg-black/60"
         onMouseDown={(e) => {
           mousedownTargetRef.current = e.target;
         }}
@@ -200,7 +191,7 @@ export function FloatingVideoPlayer() {
               </Text>
             </Group>
 
-            <Group gap={8} className="flex-shrink-0">
+            <Group gap={8} className="shrink-0">
               <ActionIcon
                 variant="subtle"
                 color="gray"
@@ -235,10 +226,11 @@ export function FloatingVideoPlayer() {
             }}
           >
             <video
-              ref={videoRef}
+              ref={videoElementRef}
               src={playback?.url}
               controls
               autoPlay
+              onError={handlePlaybackError}
               onTimeUpdate={handleTimeUpdate}
               onLoadedMetadata={handleLoadedMetadata}
               className="bg-black block max-w-full max-h-full object-fit m-auto"

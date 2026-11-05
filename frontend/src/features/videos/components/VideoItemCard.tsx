@@ -14,10 +14,9 @@ import {
   Button,
 } from "@mantine/core";
 import { IconDotsVertical, IconTrash } from "@tabler/icons-react";
-import { getVideoThumbnailUrl, Video, deleteVideo } from "../api/videos";
+import { getVideoThumbnailUrl, Video } from "../api/videos";
 import { formatDuration, formatFileSize, formatDate } from "../utils/formatters";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useToastStore } from "@/store/useToastStore";
+import { useDeleteVideo } from "../query/useVideos";
 
 interface Props {
   video: Video;
@@ -35,21 +34,7 @@ export function VideoItemCard({
   isSelected = false,
 }: Props) {
   const [deleteModalOpened, setDeleteModalOpened] = useState(false);
-  const queryClient = useQueryClient();
-  const showToast = useToastStore((state) => state.success);
-  const showErrorToast = useToastStore((state) => state.error);
-
-  const deleteMutation = useMutation({
-    mutationFn: () => deleteVideo(video.id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["videos"] });
-      showToast("Video deleted successfully");
-      setDeleteModalOpened(false);
-    },
-    onError: (err) => {
-      showErrorToast(err?.message || "Failed to delete video");
-    },
-  });
+  const deleteMutation = useDeleteVideo();
 
   const thumbnailUrl = getVideoThumbnailUrl(video.id);
   const durationFormatted = formatDuration(video.duration_ms);
@@ -60,7 +45,11 @@ export function VideoItemCard({
 
   const handleDeleteConfirm = (e: React.MouseEvent) => {
     e.stopPropagation();
-    deleteMutation.mutate();
+    deleteMutation.mutate(video.id, {
+      onSuccess: () => {
+        setDeleteModalOpened(false);
+      },
+    });
   };
 
   const handleDeleteClick = (e: React.MouseEvent) => {
@@ -84,7 +73,7 @@ export function VideoItemCard({
           }
           className="cursor-pointer hover:shadow-sm transition-shadow flex flex-row items-center gap-4 relative"
         >
-          <div className="relative w-28 h-16 flex-shrink-0">
+          <div className="relative w-28 h-16 shrink-0">
             <Image
               src={thumbnailUrl}
               height={64}
@@ -100,7 +89,7 @@ export function VideoItemCard({
               {durationFormatted}
             </Badge>
           </div>
-          <div className="flex-grow min-w-0 grid grid-cols-5 gap-2 items-center">
+          <div className="grow min-w-0 grid grid-cols-5 gap-2 items-center">
             <div className="col-span-2 truncate">
               <Text fw={500} size="sm" lineClamp={1}>
                 {video.title}

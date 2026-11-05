@@ -13,8 +13,9 @@ export const historyKeys = {
 };
 
 export const authKeys = {
-  login: (email: string) => ["login", email] as const,
-  me: () => ["me"] as const,
+  all: ["auth"] as const,
+  login: (email: string) => ["auth", "login", email] as const,
+  me: () => ["auth", "me"] as const,
 };
 
 export const likedKeys = {
@@ -22,8 +23,17 @@ export const likedKeys = {
 };
 
 export const videoKeys = {
-  all: () => ["videos"] as const,
+  all: ["videos"] as const,
+  lists: () => [...videoKeys.all, "list"] as const,
   list: (limit: number, offset: number) => ["videos", "list", limit, offset] as const,
   detail: (videoId: string) => ["videos", "detail", videoId] as const,
   playbackUrl: (videoId: string) => ["videos", "playback-url", videoId] as const,
+  thumbnail: (videoId: string) => ["videos", "thumbnail", videoId] as const,
+};
+
+export const folderKeys = {
+  all: ["folders"] as const,
+  lists: () => [...folderKeys.all, "list"] as const,
+  contents: (id: string) => [...folderKeys.all, "contents", id] as const,
+  trash: () => [...folderKeys.all, "trash"] as const,
 };

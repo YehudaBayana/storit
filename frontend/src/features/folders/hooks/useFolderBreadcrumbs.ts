@@ -7,7 +7,7 @@ export function useFolderBreadcrumbs(
   folders: Folder[] | undefined,
 ): BreadcrumbItem[] {
   return useMemo(() => {
-    const rootBreadcrumb: BreadcrumbItem = { id: null, name: "My Library" };
+    const rootBreadcrumb: BreadcrumbItem = { id: null, name: "Folders" };
     if (!currentFolderID || !folders) {
       return [rootBreadcrumb];
     }

@@ -1,57 +1,10 @@
-// src/lib/api-client.ts
-import { clientApiUrl, serverApiUrl } from "@/config/constants";
+// src/api/apiClient.ts
+import { httpClient, RequestOptions } from "@/core/http/httpClient";
+import { ApiError } from "@/core/http/ApiError";
 
-export interface RequestOptions extends RequestInit {
-  params?: Record<string, string | number | boolean | undefined>;
-}
+export type { RequestOptions };
+export { ApiError };
 
 export async function apiClient<T>(endpoint: string, options: RequestOptions = {}): Promise<T> {
-  const { params, headers, ...customConfig } = options;
-
-  // 1. Build URL with query parameters automatically
-  const isServer = typeof window === "undefined";
-  const baseUrl = isServer ? serverApiUrl : clientApiUrl || window.location.origin;
-
-  const cleanEndpoint = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
-  const url =
-    endpoint.startsWith("http://") || endpoint.startsWith("https://")
-      ? new URL(endpoint)
-      : new URL(`${baseUrl}${cleanEndpoint}`);
-
-  if (params) {
-    Object.entries(params).forEach(([key, value]) => {
-      if (value !== undefined) {
-        url.searchParams.append(key, String(value));
-      }
-    });
-  }
-
-  // 2. Default configuration with custom override support
-  const config: RequestInit = {
-    method: customConfig.body ? "POST" : "GET",
-    headers: {
-      "Content-Type": "application/json",
-      ...headers, // Override defaults if specific headers are needed
-    },
-    ...customConfig,
-  };
-
-  const response = await fetch(url.toString(), config);
-
-  // 3. Centralized Error Handling
-  if (!response.ok) {
-    // You can parse custom error structures from your backend here if needed
-    const errorData = await response.json().catch(() => null);
-    if (response.status === 401) {
-      return null as T; // Return null for unauthorized access, allowing the caller to handle it
-    }
-    throw new Error(errorData?.message || `HTTP error! status: ${response.status}`);
-  }
-
-  if (response.status === 204) {
-    return undefined as T;
-  }
-
-  // 4. Return parsed response payload typed automatically
-  return response?.json() as Promise<T>;
+  return await httpClient<T>(endpoint, options);
 }

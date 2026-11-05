@@ -1,7 +1,9 @@
 "use client";
 import React, { useState, useMemo } from "react";
-import { Text, Stack, Box, Group } from "@mantine/core";
+import { Text, Stack, Box, Group, Overlay, Center, Modal, Button, Select } from "@mantine/core";
+import { Dropzone, MIME_TYPES } from "@mantine/dropzone";
 import { useRouter, useSearchParams, useParams } from "next/navigation";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   useFolders,
   useFolderContents,
@@ -14,6 +16,8 @@ import {
   useTrashItems,
 } from "../query/useFolders";
 import { LibraryItem } from "../api/folders";
+import { deleteVideo } from "@/features/videos/api/videos";
+import { useToastStore } from "@/store/useToastStore";
 import { LibraryItemTile } from "./LibraryItemTile";
 import { useVideoPlayerStore } from "@/store/useVideoPlayerStore";
 import { FolderBreadcrumbsHeader } from "./FolderBreadcrumbsHeader";
@@ -23,6 +27,7 @@ import { FolderItemMenu } from "./FolderItemMenu";
 import { useFolderKeyboardShortcuts } from "../hooks/useFolderKeyboardShortcuts";
 import { useFolderUpload } from "../hooks/useFolderUpload";
 import { useFolderBreadcrumbs } from "../hooks/useFolderBreadcrumbs";
+import { FiFolder } from "react-icons/fi";
 
 export function FolderView() {
   const router = useRouter();
@@ -40,6 +45,29 @@ export function FolderView() {
   const [renameValue, setRenameValue] = useState("");
   const [selectedIDs, setSelectedIDs] = useState<Set<string>>(new Set());
   const [cutIDs, setCutIDs] = useState<Set<string>>(new Set());
+  const [videoToDelete, setVideoToDelete] = useState<{ id: string; title: string } | null>(null);
+
+  // Move modal state at the view level
+  const [moveItem, setMoveItem] = useState<LibraryItem | null>(null);
+  const [targetFolderId, setTargetFolderId] = useState<string | null>(null);
+
+  const queryClient = useQueryClient();
+  const showToast = useToastStore((state) => state.success);
+  const showErrorToast = useToastStore((state) => state.error);
+
+  const deleteVideoMutation = useMutation({
+    mutationFn: (videoId: string) => deleteVideo(videoId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["folders"] });
+      queryClient.invalidateQueries({ queryKey: ["folderContents"] });
+      queryClient.invalidateQueries({ queryKey: ["videos"] });
+      showToast("Video deleted successfully");
+      setVideoToDelete(null);
+    },
+    onError: (err: Error) => {
+      showErrorToast(err?.message || "Failed to delete video");
+    },
+  });
 
   // Track previous folder/trash state to reset selection during render if changed
   const [prevFolderState, setPrevFolderState] = useState({ currentFolderID, viewTrash });
@@ -145,6 +173,93 @@ export function FolderView() {
     router.push(url);
   };
 
+  const handleMoveItemTo = (item: LibraryItem, targetFolderId: string | null) => {
+    if (viewTrash) return;
+    if (item.parent_id === targetFolderId || (!item.parent_id && !targetFolderId)) {
+      return;
+    }
+    const targetFolder = foldersData?.find((f) => f.id === targetFolderId);
+    const targetName = targetFolder ? targetFolder.name : "Home";
+    moveItemMut.mutate(
+      {
+        item_id: item.id,
+        item_type: item.type,
+        target_folder_id: targetFolderId,
+        version: item.version,
+      },
+      {
+        onSuccess: () => {
+          showToast(`Moved "${item.name}" to "${targetName}"`);
+        },
+        onError: (err: Error) => {
+          showErrorToast(err?.message || "Failed to move item");
+        },
+      },
+    );
+  };
+
+  const availableFolders = (foldersData || []).filter((f) => {
+    if (moveItem && moveItem.type === "folder" && f.id === moveItem.id) return false;
+    return !f.is_trash;
+  });
+
+  const selectData = [
+    { value: "root", label: "Home (Root Folder)" },
+    ...availableFolders.map((f) => ({ value: f.id, label: f.name })),
+  ];
+
+  const handleConfirmMove = () => {
+    if (!moveItem) return;
+    const finalTargetId = targetFolderId === "root" ? null : targetFolderId;
+    handleMoveItemTo(moveItem, finalTargetId);
+    setMoveItem(null);
+  };
+
+  const handleDropOnFolder = (draggedItem: LibraryItem, targetFolder: LibraryItem) => {
+    if (viewTrash) return;
+    moveItemMut.mutate(
+      {
+        item_id: draggedItem.id,
+        item_type: draggedItem.type,
+        target_folder_id: targetFolder.id,
+        version: draggedItem.version,
+      },
+      {
+        onSuccess: () => {
+          showToast(`Moved "${draggedItem.name}" to "${targetFolder.name}"`);
+        },
+        onError: (err: Error) => {
+          showErrorToast(err?.message || "Failed to move item");
+        },
+      },
+    );
+  };
+
+  const handleDropOnBreadcrumb = (draggedItem: LibraryItem, targetFolderId: string | null) => {
+    if (viewTrash) return;
+    if (draggedItem.parent_id === targetFolderId || (!draggedItem.parent_id && !targetFolderId)) {
+      return;
+    }
+    const targetName =
+      pathSegments.find((segment) => segment.id === targetFolderId)?.name || "Folder";
+    moveItemMut.mutate(
+      {
+        item_id: draggedItem.id,
+        item_type: draggedItem.type,
+        target_folder_id: targetFolderId,
+        version: draggedItem.version,
+      },
+      {
+        onSuccess: () => {
+          showToast(`Moved "${draggedItem.name}" to "${targetName}"`);
+        },
+        onError: (err: Error) => {
+          showErrorToast(err?.message || "Failed to move item");
+        },
+      },
+    );
+  };
+
   const openItem = (item: LibraryItem) => {
     if (viewTrash) return;
     if (item.type === "folder") {
@@ -172,89 +287,171 @@ export function FolderView() {
   const pathSegments = viewTrash ? [{ id: null, name: "Trash" }] : computedBreadcrumbs;
 
   return (
-    <Stack gap={0} h="100%" onClick={() => setSelectedIDs(new Set())}>
-      <FolderBreadcrumbsHeader
-        pathSegments={pathSegments}
-        viewTrash={viewTrash}
-        hasTrashItems={items.length > 0}
-        onNavigate={(folderId) => navigateToFolder(folderId)}
-        onOpenUpload={() => uploadHook.openUploadModal()}
-        onOpenCreateFolder={() => setCreateModalOpen(true)}
-        onEmptyTrash={() => emptyTrashMut.mutate()}
-      />
+    <>
+      <Dropzone.FullScreen
+        active={!viewTrash}
+        accept={[MIME_TYPES.mp4]}
+        onDrop={(files) => uploadHook.handleDropFiles(files)}
+      >
+        <Overlay color="#000" backgroundOpacity={0.65} zIndex={9999} fixed>
+          <Center style={{ width: "100%", height: "100%" }}>
+            <Text size="xl" fw={700} c="white">
+              drop to upload the video&apos;s
+            </Text>
+          </Center>
+        </Overlay>
+      </Dropzone.FullScreen>
 
-      {cutIDs.size > 0 && (
-        <Text size="xs" c="dimmed" px="md" pt="xs">
-          {cutIDs.size} item(s) cut. Press Cmd/Ctrl+V in the target folder to paste.
-        </Text>
-      )}
+      <Stack gap={0} h="100%" onClick={() => setSelectedIDs(new Set())}>
+        <FolderBreadcrumbsHeader
+          pathSegments={pathSegments}
+          viewTrash={viewTrash}
+          hasTrashItems={items.length > 0}
+          onNavigate={(folderId) => navigateToFolder(folderId)}
+          onOpenUpload={() => uploadHook.openUploadModal()}
+          onOpenCreateFolder={() => setCreateModalOpen(true)}
+          onEmptyTrash={() => emptyTrashMut.mutate()}
+          onDropItem={handleDropOnBreadcrumb}
+        />
 
-      <Box p="md" style={{ flex: 1 }}>
-        <Group gap="xs" align="flex-start">
-          {items.map((item) => (
-            <LibraryItemTile
-              key={item.id}
-              item={item}
-              isSelected={selectedIDs.has(item.id)}
-              isCut={cutIDs.has(item.id)}
-              isRenaming={renameFolderID === item.id}
-              renameValue={renameValue}
-              menuContent={
-                <FolderItemMenu
-                  item={item}
-                  viewTrash={viewTrash}
-                  onRestore={(itm) =>
-                    restoreItemMut.mutate({ item_id: itm.id, item_type: itm.type })
-                  }
-                  onStartRename={(itm) => {
-                    setRenameFolderID(itm.id);
-                    setRenameValue(itm.name);
-                  }}
-                  onDeleteFolder={(itm) => {
-                    if (itm.type === "folder") {
-                      deleteFolderMut.mutate(itm.id);
-                    }
-                  }}
-                />
-              }
-              onRenameValueChange={setRenameValue}
-              onRenameSubmit={() => handleRename(item)}
-              onRenameCancel={() => setRenameFolderID(null)}
-              onSelect={(event) => selectItem(item.id, event)}
-              onOpen={() => openItem(item)}
-            />
-          ))}
-        </Group>
-        {items.length === 0 && !isLoading && (
-          <Text c="dimmed" size="sm" ta="center" py="xl">
-            {viewTrash ? "Trash is empty." : "This folder is empty."}
+        {cutIDs.size > 0 && (
+          <Text size="xs" c="dimmed" px="md" pt="xs">
+            {cutIDs.size} item(s) cut. Press Cmd/Ctrl+V in the target folder to paste.
           </Text>
         )}
-      </Box>
 
-      <CreateFolderModal
-        opened={createModalOpen}
-        onClose={() => setCreateModalOpen(false)}
-        folderName={newFolderName}
-        onFolderNameChange={setNewFolderName}
-        onSubmit={handleCreate}
-      />
+        <Box p="md" style={{ flex: 1 }}>
+          <Group gap="xs" align="flex-start">
+            {items.map((item) => (
+              <LibraryItemTile
+                key={item.id}
+                item={item}
+                isSelected={selectedIDs.has(item.id)}
+                isCut={cutIDs.has(item.id)}
+                isRenaming={renameFolderID === item.id}
+                renameValue={renameValue}
+                menuContent={
+                  <FolderItemMenu
+                    item={item}
+                    viewTrash={viewTrash}
+                    folders={foldersData}
+                    onRestore={(itm) =>
+                      restoreItemMut.mutate({ item_id: itm.id, item_type: itm.type })
+                    }
+                    onStartRename={(itm) => {
+                      setRenameFolderID(itm.id);
+                      setRenameValue(itm.name);
+                    }}
+                    onDeleteFolder={(itm) => {
+                      if (itm.type === "folder") {
+                        deleteFolderMut.mutate(itm.id);
+                      }
+                    }}
+                    onDeleteVideo={() => {
+                      const videoId = item.video?.id ?? item.id;
+                      setVideoToDelete({ id: videoId, title: item.name });
+                    }}
+                    onMoveTo={handleMoveItemTo}
+                    onOpenMoveModal={(itm) => {
+                      setMoveItem(itm);
+                      setTargetFolderId(itm.parent_id || "root");
+                    }}
+                  />
+                }
+                onRenameValueChange={setRenameValue}
+                onRenameSubmit={() => handleRename(item)}
+                onRenameCancel={() => setRenameFolderID(null)}
+                onSelect={(event) => selectItem(item.id, event)}
+                onOpen={() => openItem(item)}
+                onDropItem={handleDropOnFolder}
+              />
+            ))}
+          </Group>
+          {items.length === 0 && !isLoading && (
+            <Text c="dimmed" size="sm" ta="center" py="xl">
+              {viewTrash ? "Trash is empty." : "This folder is empty."}
+            </Text>
+          )}
+        </Box>
 
-      <UploadVideoModal
-        opened={uploadHook.uploadModalOpen}
-        onClose={() => uploadHook.setUploadModalOpen(false)}
-        title={uploadHook.uploadTitle}
-        onTitleChange={uploadHook.setUploadTitle}
-        notes={uploadHook.uploadNotes}
-        onNotesChange={uploadHook.setUploadNotes}
-        onFileChange={uploadHook.handleFileChange}
-        error={uploadHook.uploadError}
-        isUploading={uploadHook.isUploading}
-        progress={uploadHook.uploadProgress}
-        onCancelUpload={uploadHook.cancelUpload}
-        onSubmit={uploadHook.handleUploadSubmit}
-        fileSelected={Boolean(uploadHook.uploadFile)}
-      />
-    </Stack>
+        <CreateFolderModal
+          opened={createModalOpen}
+          onClose={() => setCreateModalOpen(false)}
+          folderName={newFolderName}
+          onFolderNameChange={setNewFolderName}
+          onSubmit={handleCreate}
+        />
+
+        <UploadVideoModal
+          opened={uploadHook.uploadModalOpen}
+          onClose={() => uploadHook.setUploadModalOpen(false)}
+          title={uploadHook.uploadTitle}
+          onTitleChange={uploadHook.setUploadTitle}
+          notes={uploadHook.uploadNotes}
+          onNotesChange={uploadHook.setUploadNotes}
+          onFileChange={uploadHook.handleFileChange}
+          error={uploadHook.uploadError}
+          isUploading={uploadHook.isUploading}
+          progress={uploadHook.uploadProgress}
+          onCancelUpload={uploadHook.cancelUpload}
+          onSubmit={uploadHook.handleUploadSubmit}
+          fileSelected={Boolean(uploadHook.uploadFile)}
+        />
+
+        <Modal
+          opened={Boolean(moveItem)}
+          onClose={() => setMoveItem(null)}
+          title={`Move "${moveItem?.name || ""}" to...`}
+          centered
+          onClick={(e) => e.stopPropagation()}
+        >
+          <Stack gap="md">
+            <Select
+              label="Destination Folder"
+              placeholder="Select folder"
+              data={selectData}
+              value={targetFolderId}
+              onChange={setTargetFolderId}
+              leftSection={<FiFolder size={16} />}
+            />
+            <Group justify="end" mt="md">
+              <Button variant="default" onClick={() => setMoveItem(null)}>
+                Cancel
+              </Button>
+              <Button onClick={handleConfirmMove}>Move</Button>
+            </Group>
+          </Stack>
+        </Modal>
+
+        <Modal
+          opened={Boolean(videoToDelete)}
+          onClose={() => setVideoToDelete(null)}
+          title="Delete Video"
+          centered
+          onClick={(e) => e.stopPropagation()}
+        >
+          <Text size="sm" mb="lg">
+            Are you sure you want to delete &quot;{videoToDelete?.title}&quot;? This will remove the
+            video from your database and permanently delete its media files from storage.
+          </Text>
+          <Group justify="end">
+            <Button variant="default" onClick={() => setVideoToDelete(null)}>
+              Cancel
+            </Button>
+            <Button
+              color="red"
+              loading={deleteVideoMutation.isPending}
+              onClick={() => {
+                if (videoToDelete) {
+                  deleteVideoMutation.mutate(videoToDelete.id);
+                }
+              }}
+            >
+              Delete
+            </Button>
+          </Group>
+        </Modal>
+      </Stack>
+    </>
   );
 }

@@ -1,5 +1,4 @@
 import { apiClient, RequestOptions } from "@/api/apiClient";
-import { getCookie } from "@/features/auth/utils";
 
 export interface Folder {
   id: string;
@@ -32,29 +31,25 @@ export interface LibraryItem {
   };
 }
 
-type LibraryItemResponse = Omit<LibraryItem, "type" | "version"> & {
-  type?: "folder" | "video";
-  item_type?: "folder" | "media";
+export interface BackendLibraryItem {
+  id: string;
+  item_type: "folder" | "media";
   media_type?: string;
-  status?: VideoStatus;
-  version?: number;
-};
+  name: string;
+  folder_id?: string | null;
+  version: number;
+  status?: string;
+  created_at: string;
+  updated_at: string;
+}
 
 export function listFolders(options?: RequestOptions) {
-  return apiClient<Folder[]>("/api/folders", {
-    credentials: "include",
-    ...options,
-  });
+  return apiClient<Folder[]>("/api/folders", options);
 }
 
 export function createFolder(input: { name: string; parent_id?: string | null }) {
   return apiClient<Folder>("/api/folders", {
     method: "POST",
-    credentials: "include",
-    headers: {
-      "X-CSRF-Token": getCookie("csrf_token") ?? "",
-      "Content-Type": "application/json",
-    },
     body: JSON.stringify(input),
   });
 }
@@ -65,46 +60,41 @@ export function updateFolder(
 ) {
   return apiClient<Folder>(`/api/folders/${id}`, {
     method: "PATCH",
-    credentials: "include",
-    headers: {
-      "X-CSRF-Token": getCookie("csrf_token") ?? "",
-      "Content-Type": "application/json",
-    },
     body: JSON.stringify(patch),
   });
 }
 
 export function deleteFolder(id: string) {
-  return apiClient<void>(`/api/folders/${id}`, {
+  return apiClient<void>(`/api/folders/items/${id}?type=folder`, {
     method: "DELETE",
-    credentials: "include",
-    headers: {
-      "X-CSRF-Token": getCookie("csrf_token") ?? "",
-    },
   });
 }
 
-export function getFolderContents(id: string, options?: RequestOptions) {
-  return apiClient<LibraryItemResponse[]>(`/api/folders/${id}/contents`, {
-    credentials: "include",
-    ...options,
-  }).then((items) =>
-    items.map((item) => ({
-      ...item,
-      version: item.version ?? 1,
-      type: item.type ?? (item.item_type === "folder" ? "folder" : "video"),
-      video:
-        item.video ??
-        (item.item_type === "media"
-          ? {
-              id: item.id,
-              title: item.name,
-              status: item.status ?? "ready",
-              size_bytes: 0,
-            }
-          : undefined),
-    })),
-  );
+export async function getFolderContents(
+  id: string,
+  options?: RequestOptions,
+): Promise<LibraryItem[]> {
+  const rawItems = await apiClient<BackendLibraryItem[]>(`/api/folders/${id}/contents`, options);
+  return (rawItems || []).map((item) => {
+    const isFolder = item.item_type === "folder";
+    return {
+      id: item.id,
+      type: isFolder ? "folder" : "video",
+      name: item.name,
+      parent_id: item.folder_id,
+      version: item.version,
+      created_at: item.created_at,
+      updated_at: item.updated_at,
+      video: !isFolder
+        ? {
+            id: item.id,
+            title: item.name,
+            status: (item.status as VideoStatus) || "ready",
+            size_bytes: 0,
+          }
+        : undefined,
+    };
+  });
 }
 
 export function moveLibraryItem(input: {
@@ -113,42 +103,53 @@ export function moveLibraryItem(input: {
   target_folder_id?: string | null;
   version?: number;
 }) {
+  const backendType = input.item_type === "folder" ? "folder" : "media";
   return apiClient<void>("/api/library/move", {
     method: "POST",
-    credentials: "include",
-    headers: {
-      "X-CSRF-Token": getCookie("csrf_token") ?? "",
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(input),
+    body: JSON.stringify({
+      ...input,
+      item_type: backendType,
+    }),
   });
 }
 
-export function getTrashItems(options?: RequestOptions) {
-  return apiClient<LibraryItem[]>("/api/library/trash", {
-    credentials: "include",
-    ...options,
+export async function getTrashItems(options?: RequestOptions): Promise<LibraryItem[]> {
+  const rawItems = await apiClient<BackendLibraryItem[]>("/api/library/trash", options);
+  return (rawItems || []).map((item) => {
+    const isFolder = item.item_type === "folder";
+    return {
+      id: item.id,
+      type: isFolder ? "folder" : "video",
+      name: item.name,
+      parent_id: item.folder_id,
+      version: item.version,
+      created_at: item.created_at,
+      updated_at: item.updated_at,
+      video: !isFolder
+        ? {
+            id: item.id,
+            title: item.name,
+            status: (item.status as VideoStatus) || "ready",
+            size_bytes: 0,
+          }
+        : undefined,
+    };
   });
 }
 
 export function restoreLibraryItem(input: { item_id: string; item_type: "folder" | "video" }) {
+  const backendType = input.item_type === "folder" ? "folder" : "media";
   return apiClient<void>("/api/library/restore", {
     method: "POST",
-    credentials: "include",
-    headers: {
-      "X-CSRF-Token": getCookie("csrf_token") ?? "",
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(input),
+    body: JSON.stringify({
+      ...input,
+      item_type: backendType,
+    }),
   });
 }
 
 export function emptyTrashBin() {
   return apiClient<void>("/api/library/trash", {
     method: "DELETE",
-    credentials: "include",
-    headers: {
-      "X-CSRF-Token": getCookie("csrf_token") ?? "",
-    },
   });
 }

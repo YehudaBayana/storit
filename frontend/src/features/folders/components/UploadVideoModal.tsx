@@ -53,10 +53,11 @@ export function UploadVideoModal({
           />
           <div>
             <Text size="sm" fw={500} mb={4}>
-              Video File
+              Video File(s)
             </Text>
             <input
               type="file"
+              multiple
               accept="video/*,.mp4,.mov,.avi,.webm,.mkv,.m4v"
               onChange={onFileChange}
               required
@@ -82,7 +83,7 @@ export function UploadVideoModal({
                 Cancel
               </Button>
             )}
-            <Button type="submit" disabled={!fileSelected || isUploading}>
+            <Button type="submit" disabled={!fileSelected && !isUploading}>
               Upload
             </Button>
           </Group>
