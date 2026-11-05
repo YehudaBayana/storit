@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useMemo } from "react";
-import { Text, Stack, Box, Group } from "@mantine/core";
+import { Text, Stack, Box, Group, Overlay, Center } from "@mantine/core";
+import { Dropzone, MIME_TYPES } from "@mantine/dropzone";
 import { useRouter, useSearchParams, useParams } from "next/navigation";
 import {
   useFolders,
@@ -172,89 +173,105 @@ export function FolderView() {
   const pathSegments = viewTrash ? [{ id: null, name: "Trash" }] : computedBreadcrumbs;
 
   return (
-    <Stack gap={0} h="100%" onClick={() => setSelectedIDs(new Set())}>
-      <FolderBreadcrumbsHeader
-        pathSegments={pathSegments}
-        viewTrash={viewTrash}
-        hasTrashItems={items.length > 0}
-        onNavigate={(folderId) => navigateToFolder(folderId)}
-        onOpenUpload={() => uploadHook.openUploadModal()}
-        onOpenCreateFolder={() => setCreateModalOpen(true)}
-        onEmptyTrash={() => emptyTrashMut.mutate()}
-      />
+    <>
+      <Dropzone.FullScreen
+        active={!viewTrash}
+        accept={[MIME_TYPES.mp4]}
+        onDrop={(files) => uploadHook.handleDropFiles(files)}
+      >
+        <Overlay color="#000" backgroundOpacity={0.65} zIndex={9999} fixed>
+          <Center style={{ width: "100%", height: "100%" }}>
+            <Text size="xl" fw={700} c="white">
+              drop to upload the video&apos;s
+            </Text>
+          </Center>
+        </Overlay>
+      </Dropzone.FullScreen>
 
-      {cutIDs.size > 0 && (
-        <Text size="xs" c="dimmed" px="md" pt="xs">
-          {cutIDs.size} item(s) cut. Press Cmd/Ctrl+V in the target folder to paste.
-        </Text>
-      )}
+      <Stack gap={0} h="100%" onClick={() => setSelectedIDs(new Set())}>
+        <FolderBreadcrumbsHeader
+          pathSegments={pathSegments}
+          viewTrash={viewTrash}
+          hasTrashItems={items.length > 0}
+          onNavigate={(folderId) => navigateToFolder(folderId)}
+          onOpenUpload={() => uploadHook.openUploadModal()}
+          onOpenCreateFolder={() => setCreateModalOpen(true)}
+          onEmptyTrash={() => emptyTrashMut.mutate()}
+        />
 
-      <Box p="md" style={{ flex: 1 }}>
-        <Group gap="xs" align="flex-start">
-          {items.map((item) => (
-            <LibraryItemTile
-              key={item.id}
-              item={item}
-              isSelected={selectedIDs.has(item.id)}
-              isCut={cutIDs.has(item.id)}
-              isRenaming={renameFolderID === item.id}
-              renameValue={renameValue}
-              menuContent={
-                <FolderItemMenu
-                  item={item}
-                  viewTrash={viewTrash}
-                  onRestore={(itm) =>
-                    restoreItemMut.mutate({ item_id: itm.id, item_type: itm.type })
-                  }
-                  onStartRename={(itm) => {
-                    setRenameFolderID(itm.id);
-                    setRenameValue(itm.name);
-                  }}
-                  onDeleteFolder={(itm) => {
-                    if (itm.type === "folder") {
-                      deleteFolderMut.mutate(itm.id);
-                    }
-                  }}
-                />
-              }
-              onRenameValueChange={setRenameValue}
-              onRenameSubmit={() => handleRename(item)}
-              onRenameCancel={() => setRenameFolderID(null)}
-              onSelect={(event) => selectItem(item.id, event)}
-              onOpen={() => openItem(item)}
-            />
-          ))}
-        </Group>
-        {items.length === 0 && !isLoading && (
-          <Text c="dimmed" size="sm" ta="center" py="xl">
-            {viewTrash ? "Trash is empty." : "This folder is empty."}
+        {cutIDs.size > 0 && (
+          <Text size="xs" c="dimmed" px="md" pt="xs">
+            {cutIDs.size} item(s) cut. Press Cmd/Ctrl+V in the target folder to paste.
           </Text>
         )}
-      </Box>
 
-      <CreateFolderModal
-        opened={createModalOpen}
-        onClose={() => setCreateModalOpen(false)}
-        folderName={newFolderName}
-        onFolderNameChange={setNewFolderName}
-        onSubmit={handleCreate}
-      />
+        <Box p="md" style={{ flex: 1 }}>
+          <Group gap="xs" align="flex-start">
+            {items.map((item) => (
+              <LibraryItemTile
+                key={item.id}
+                item={item}
+                isSelected={selectedIDs.has(item.id)}
+                isCut={cutIDs.has(item.id)}
+                isRenaming={renameFolderID === item.id}
+                renameValue={renameValue}
+                menuContent={
+                  <FolderItemMenu
+                    item={item}
+                    viewTrash={viewTrash}
+                    onRestore={(itm) =>
+                      restoreItemMut.mutate({ item_id: itm.id, item_type: itm.type })
+                    }
+                    onStartRename={(itm) => {
+                      setRenameFolderID(itm.id);
+                      setRenameValue(itm.name);
+                    }}
+                    onDeleteFolder={(itm) => {
+                      if (itm.type === "folder") {
+                        deleteFolderMut.mutate(itm.id);
+                      }
+                    }}
+                  />
+                }
+                onRenameValueChange={setRenameValue}
+                onRenameSubmit={() => handleRename(item)}
+                onRenameCancel={() => setRenameFolderID(null)}
+                onSelect={(event) => selectItem(item.id, event)}
+                onOpen={() => openItem(item)}
+              />
+            ))}
+          </Group>
+          {items.length === 0 && !isLoading && (
+            <Text c="dimmed" size="sm" ta="center" py="xl">
+              {viewTrash ? "Trash is empty." : "This folder is empty."}
+            </Text>
+          )}
+        </Box>
 
-      <UploadVideoModal
-        opened={uploadHook.uploadModalOpen}
-        onClose={() => uploadHook.setUploadModalOpen(false)}
-        title={uploadHook.uploadTitle}
-        onTitleChange={uploadHook.setUploadTitle}
-        notes={uploadHook.uploadNotes}
-        onNotesChange={uploadHook.setUploadNotes}
-        onFileChange={uploadHook.handleFileChange}
-        error={uploadHook.uploadError}
-        isUploading={uploadHook.isUploading}
-        progress={uploadHook.uploadProgress}
-        onCancelUpload={uploadHook.cancelUpload}
-        onSubmit={uploadHook.handleUploadSubmit}
-        fileSelected={Boolean(uploadHook.uploadFile)}
-      />
-    </Stack>
+        <CreateFolderModal
+          opened={createModalOpen}
+          onClose={() => setCreateModalOpen(false)}
+          folderName={newFolderName}
+          onFolderNameChange={setNewFolderName}
+          onSubmit={handleCreate}
+        />
+
+        <UploadVideoModal
+          opened={uploadHook.uploadModalOpen}
+          onClose={() => uploadHook.setUploadModalOpen(false)}
+          title={uploadHook.uploadTitle}
+          onTitleChange={uploadHook.setUploadTitle}
+          notes={uploadHook.uploadNotes}
+          onNotesChange={uploadHook.setUploadNotes}
+          onFileChange={uploadHook.handleFileChange}
+          error={uploadHook.uploadError}
+          isUploading={uploadHook.isUploading}
+          progress={uploadHook.uploadProgress}
+          onCancelUpload={uploadHook.cancelUpload}
+          onSubmit={uploadHook.handleUploadSubmit}
+          fileSelected={Boolean(uploadHook.uploadFile)}
+        />
+      </Stack>
+    </>
   );
 }

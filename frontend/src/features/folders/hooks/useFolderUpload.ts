@@ -1,11 +1,9 @@
 import { useState, useRef } from "react";
-import { useQueryClient } from "@tanstack/react-query";
 import { useUploadVideo } from "@/features/videos/query/useVideos";
 import { useMoveLibraryItem } from "../query/useFolders";
 import { useUploadStore } from "@/features/videos/store/useUploadStore";
 
 export function useFolderUpload(currentFolderID: string | null) {
-  const queryClient = useQueryClient();
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
   const [uploadFiles, setUploadFiles] = useState<File[]>([]);
   const [uploadFile, setUploadFile] = useState<File | null>(null);
@@ -13,13 +11,25 @@ export function useFolderUpload(currentFolderID: string | null) {
   const [uploadTitle, setUploadTitle] = useState("");
   const [uploadNotes, setUploadNotes] = useState("");
   const [targetFolderID, setTargetFolderID] = useState<string | null>(null);
-  const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploadProgress] = useState(0);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const uploadAbortRef = useRef<AbortController | null>(null);
 
   const uploadVideoMutation = useUploadVideo();
   const moveItemMut = useMoveLibraryItem();
   const enqueueUpload = useUploadStore((state) => state.enqueueUpload);
+
+  const handleDropFiles = (files: File[]) => {
+    if (!files || files.length === 0) return;
+    for (const f of files) {
+      enqueueUpload({
+        file: f,
+        title: f.name.replace(/\.[^/.]+$/, ""),
+        notes: "",
+        targetFolderID: currentFolderID,
+      });
+    }
+  };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFilesList = Array.from(e.target.files ?? []);
@@ -94,6 +104,7 @@ export function useFolderUpload(currentFolderID: string | null) {
     uploadProgress,
     uploadError,
     isUploading: uploadVideoMutation.isPending,
+    handleDropFiles,
     handleFileChange,
     handleUploadSubmit,
     openUploadModal,
