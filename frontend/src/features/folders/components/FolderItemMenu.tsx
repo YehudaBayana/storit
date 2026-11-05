@@ -1,15 +1,19 @@
+"use client";
 import React from "react";
 import { Menu } from "@mantine/core";
-import { FiCornerUpRight, FiEdit2, FiTrash2 } from "react-icons/fi";
-import { LibraryItem } from "../api/folders";
+import { FiCornerUpRight, FiEdit2, FiFolderPlus, FiTrash2 } from "react-icons/fi";
+import { LibraryItem, Folder } from "../api/folders";
 
 interface FolderItemMenuProps {
   item: LibraryItem;
   viewTrash: boolean;
+  folders?: Folder[];
   onRestore: (item: LibraryItem) => void;
   onStartRename: (item: LibraryItem) => void;
   onDeleteFolder: (item: LibraryItem) => void;
   onDeleteVideo?: (videoID: string) => void;
+  onMoveTo?: (item: LibraryItem, targetFolderId: string | null) => void;
+  onOpenMoveModal?: (item: LibraryItem) => void;
 }
 
 export function FolderItemMenu({
@@ -19,6 +23,8 @@ export function FolderItemMenu({
   onStartRename,
   onDeleteFolder,
   onDeleteVideo,
+  onMoveTo,
+  onOpenMoveModal,
 }: FolderItemMenuProps) {
   if (viewTrash) {
     return (
@@ -44,6 +50,18 @@ export function FolderItemMenu({
           Rename
         </Menu.Item>
       )}
+
+      {onMoveTo && onOpenMoveModal && (
+        <Menu.Item
+          leftSection={<FiFolderPlus size={14} />}
+          onClick={() => {
+            onOpenMoveModal(item);
+          }}
+        >
+          Move to
+        </Menu.Item>
+      )}
+
       <Menu.Item leftSection={<FiTrash2 size={14} />} color="red" onClick={handleDelete}>
         {item.type === "video" ? "Delete" : "Move to Trash"}
       </Menu.Item>

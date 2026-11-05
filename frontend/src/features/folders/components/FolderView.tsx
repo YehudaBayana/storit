@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useMemo } from "react";
-import { Text, Stack, Box, Group, Overlay, Center, Modal, Button } from "@mantine/core";
+import { Text, Stack, Box, Group, Overlay, Center, Modal, Button, Select } from "@mantine/core";
 import { Dropzone, MIME_TYPES } from "@mantine/dropzone";
 import { useRouter, useSearchParams, useParams } from "next/navigation";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -27,6 +27,7 @@ import { FolderItemMenu } from "./FolderItemMenu";
 import { useFolderKeyboardShortcuts } from "../hooks/useFolderKeyboardShortcuts";
 import { useFolderUpload } from "../hooks/useFolderUpload";
 import { useFolderBreadcrumbs } from "../hooks/useFolderBreadcrumbs";
+import { FiFolder } from "react-icons/fi";
 
 export function FolderView() {
   const router = useRouter();
@@ -45,6 +46,10 @@ export function FolderView() {
   const [selectedIDs, setSelectedIDs] = useState<Set<string>>(new Set());
   const [cutIDs, setCutIDs] = useState<Set<string>>(new Set());
   const [videoToDelete, setVideoToDelete] = useState<{ id: string; title: string } | null>(null);
+
+  // Move modal state at the view level
+  const [moveItem, setMoveItem] = useState<LibraryItem | null>(null);
+  const [targetFolderId, setTargetFolderId] = useState<string | null>(null);
 
   const queryClient = useQueryClient();
   const showToast = useToastStore((state) => state.success);
@@ -168,6 +173,93 @@ export function FolderView() {
     router.push(url);
   };
 
+  const handleMoveItemTo = (item: LibraryItem, targetFolderId: string | null) => {
+    if (viewTrash) return;
+    if (item.parent_id === targetFolderId || (!item.parent_id && !targetFolderId)) {
+      return;
+    }
+    const targetFolder = foldersData?.find((f) => f.id === targetFolderId);
+    const targetName = targetFolder ? targetFolder.name : "Home";
+    moveItemMut.mutate(
+      {
+        item_id: item.id,
+        item_type: item.type,
+        target_folder_id: targetFolderId,
+        version: item.version,
+      },
+      {
+        onSuccess: () => {
+          showToast(`Moved "${item.name}" to "${targetName}"`);
+        },
+        onError: (err: Error) => {
+          showErrorToast(err?.message || "Failed to move item");
+        },
+      },
+    );
+  };
+
+  const availableFolders = (foldersData || []).filter((f) => {
+    if (moveItem && moveItem.type === "folder" && f.id === moveItem.id) return false;
+    return !f.is_trash;
+  });
+
+  const selectData = [
+    { value: "root", label: "Home (Root Folder)" },
+    ...availableFolders.map((f) => ({ value: f.id, label: f.name })),
+  ];
+
+  const handleConfirmMove = () => {
+    if (!moveItem) return;
+    const finalTargetId = targetFolderId === "root" ? null : targetFolderId;
+    handleMoveItemTo(moveItem, finalTargetId);
+    setMoveItem(null);
+  };
+
+  const handleDropOnFolder = (draggedItem: LibraryItem, targetFolder: LibraryItem) => {
+    if (viewTrash) return;
+    moveItemMut.mutate(
+      {
+        item_id: draggedItem.id,
+        item_type: draggedItem.type,
+        target_folder_id: targetFolder.id,
+        version: draggedItem.version,
+      },
+      {
+        onSuccess: () => {
+          showToast(`Moved "${draggedItem.name}" to "${targetFolder.name}"`);
+        },
+        onError: (err: Error) => {
+          showErrorToast(err?.message || "Failed to move item");
+        },
+      },
+    );
+  };
+
+  const handleDropOnBreadcrumb = (draggedItem: LibraryItem, targetFolderId: string | null) => {
+    if (viewTrash) return;
+    if (draggedItem.parent_id === targetFolderId || (!draggedItem.parent_id && !targetFolderId)) {
+      return;
+    }
+    const targetName =
+      pathSegments.find((segment) => segment.id === targetFolderId)?.name || "Folder";
+    moveItemMut.mutate(
+      {
+        item_id: draggedItem.id,
+        item_type: draggedItem.type,
+        target_folder_id: targetFolderId,
+        version: draggedItem.version,
+      },
+      {
+        onSuccess: () => {
+          showToast(`Moved "${draggedItem.name}" to "${targetName}"`);
+        },
+        onError: (err: Error) => {
+          showErrorToast(err?.message || "Failed to move item");
+        },
+      },
+    );
+  };
+
   const openItem = (item: LibraryItem) => {
     if (viewTrash) return;
     if (item.type === "folder") {
@@ -219,6 +311,7 @@ export function FolderView() {
           onOpenUpload={() => uploadHook.openUploadModal()}
           onOpenCreateFolder={() => setCreateModalOpen(true)}
           onEmptyTrash={() => emptyTrashMut.mutate()}
+          onDropItem={handleDropOnBreadcrumb}
         />
 
         {cutIDs.size > 0 && (
@@ -241,6 +334,7 @@ export function FolderView() {
                   <FolderItemMenu
                     item={item}
                     viewTrash={viewTrash}
+                    folders={foldersData}
                     onRestore={(itm) =>
                       restoreItemMut.mutate({ item_id: itm.id, item_type: itm.type })
                     }
@@ -257,6 +351,11 @@ export function FolderView() {
                       const videoId = item.video?.id ?? item.id;
                       setVideoToDelete({ id: videoId, title: item.name });
                     }}
+                    onMoveTo={handleMoveItemTo}
+                    onOpenMoveModal={(itm) => {
+                      setMoveItem(itm);
+                      setTargetFolderId(itm.parent_id || "root");
+                    }}
                   />
                 }
                 onRenameValueChange={setRenameValue}
@@ -264,6 +363,7 @@ export function FolderView() {
                 onRenameCancel={() => setRenameFolderID(null)}
                 onSelect={(event) => selectItem(item.id, event)}
                 onOpen={() => openItem(item)}
+                onDropItem={handleDropOnFolder}
               />
             ))}
           </Group>
@@ -297,6 +397,31 @@ export function FolderView() {
           onSubmit={uploadHook.handleUploadSubmit}
           fileSelected={Boolean(uploadHook.uploadFile)}
         />
+
+        <Modal
+          opened={Boolean(moveItem)}
+          onClose={() => setMoveItem(null)}
+          title={`Move "${moveItem?.name || ""}" to...`}
+          centered
+          onClick={(e) => e.stopPropagation()}
+        >
+          <Stack gap="md">
+            <Select
+              label="Destination Folder"
+              placeholder="Select folder"
+              data={selectData}
+              value={targetFolderId}
+              onChange={setTargetFolderId}
+              leftSection={<FiFolder size={16} />}
+            />
+            <Group justify="end" mt="md">
+              <Button variant="default" onClick={() => setMoveItem(null)}>
+                Cancel
+              </Button>
+              <Button onClick={handleConfirmMove}>Move</Button>
+            </Group>
+          </Stack>
+        </Modal>
 
         <Modal
           opened={Boolean(videoToDelete)}

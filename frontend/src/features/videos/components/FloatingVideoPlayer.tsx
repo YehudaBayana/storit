@@ -116,7 +116,7 @@ export function FloatingVideoPlayer() {
               </Text>
             </Group>
 
-            <Group gap={4} className="flex-shrink-0" onPointerDown={(e) => e.stopPropagation()}>
+            <Group gap={4} className="shrink-0" onPointerDown={(e) => e.stopPropagation()}>
               <ActionIcon
                 variant="subtle"
                 color="gray"
@@ -168,7 +168,7 @@ export function FloatingVideoPlayer() {
   return (
     <Portal>
       <div
-        className="fixed inset-0 z-[1000] flex items-center justify-center bg-black/60"
+        className="fixed inset-0 z-1000 flex items-center justify-center bg-black/60"
         onMouseDown={(e) => {
           mousedownTargetRef.current = e.target;
         }}
@@ -200,7 +200,7 @@ export function FloatingVideoPlayer() {
               </Text>
             </Group>
 
-            <Group gap={8} className="flex-shrink-0">
+            <Group gap={8} className="shrink-0">
               <ActionIcon
                 variant="subtle"
                 color="gray"

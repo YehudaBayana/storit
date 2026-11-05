@@ -84,7 +84,7 @@ export function VideoItemCard({
           }
           className="cursor-pointer hover:shadow-sm transition-shadow flex flex-row items-center gap-4 relative"
         >
-          <div className="relative w-28 h-16 flex-shrink-0">
+          <div className="relative w-28 h-16 shrink-0">
             <Image
               src={thumbnailUrl}
               height={64}
@@ -100,7 +100,7 @@ export function VideoItemCard({
               {durationFormatted}
             </Badge>
           </div>
-          <div className="flex-grow min-w-0 grid grid-cols-5 gap-2 items-center">
+          <div className="grow min-w-0 grid grid-cols-5 gap-2 items-center">
             <div className="col-span-2 truncate">
               <Text fw={500} size="sm" lineClamp={1}>
                 {video.title}

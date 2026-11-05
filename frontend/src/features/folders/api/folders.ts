@@ -75,7 +75,7 @@ export function updateFolder(
 }
 
 export function deleteFolder(id: string) {
-  return apiClient<void>(`/api/folders/${id}`, {
+  return apiClient<void>(`/api/folders/items/${id}?type=folder`, {
     method: "DELETE",
     credentials: "include",
     headers: {

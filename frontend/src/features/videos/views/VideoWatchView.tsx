@@ -89,7 +89,7 @@ export default function VideoWatchView() {
       <Box>
         <Stack gap="md">
           <Alert title="Error">Missing video id.</Alert>
-          <NavLink href="/videos">← Back to library</NavLink>
+          <NavLink href="/folders">← Back to folders</NavLink>
         </Stack>
       </Box>
     );
@@ -108,7 +108,7 @@ export default function VideoWatchView() {
       <Box>
         <Stack gap="md">
           <Alert title="Error">{error ?? "Video not found."}</Alert>
-          <NavLink href="/videos">← Back to library</NavLink>
+          <NavLink href="/folders">← Back to folders</NavLink>
         </Stack>
       </Box>
     );
@@ -118,7 +118,7 @@ export default function VideoWatchView() {
     <Box>
       <Stack gap="lg">
         <Flex justify="between" align="center" gap="md">
-          <NavLink href="/videos">← Back to library</NavLink>
+          <NavLink href="/folders">← Back to folders</NavLink>
           <Badge size="sm">{video.status}</Badge>
         </Flex>
 
