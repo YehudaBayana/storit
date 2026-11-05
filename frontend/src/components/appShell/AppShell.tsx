@@ -15,6 +15,7 @@ import { useDisclosure } from "@mantine/hooks";
 import Link from "next/link";
 import { FiFolder, FiLogOut, FiTrash2 } from "react-icons/fi";
 import { FloatingVideoPlayer } from "@/features/videos/components/FloatingVideoPlayer";
+import { GlobalUploadManager } from "@/features/videos/components/GlobalUploadManager";
 import { useGetCurrentUser, useLogout } from "@/features/auth/query/useAuth";
 import { useRouter } from "next/navigation";
 
@@ -105,6 +106,7 @@ export function ResizableAppShell({ children }: { children: React.ReactNode }) {
 
       {/* Global floating video player rendered inside AppShell */}
       <FloatingVideoPlayer />
+      <GlobalUploadManager />
     </AppShell>
   );
 }

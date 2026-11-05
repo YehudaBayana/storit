@@ -1,61 +1,60 @@
 "use client";
 
 import { ChangeEvent, FormEvent, useRef, useState } from "react";
-import { Grid, Stack, Alert, Button, Flex, Input, Progress, Text, Textarea } from "@mantine/core";
-import { isAbortError } from "@/features/videos/api/uploadParts";
+import { Grid, Stack, Alert, Button, Flex, Input, Text, Textarea } from "@mantine/core";
 import { useUploadVideo } from "@/features/videos/query/useVideos";
+import { useUploadStore } from "@/features/videos/store/useUploadStore";
 
 export function UploadVideoForm() {
   const [title, setTitle] = useState("");
   const [notes, setNotes] = useState("");
   const [file, setFile] = useState<File | null>(null);
+  const [files, setFiles] = useState<File[]>([]);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [progress, setProgress] = useState(0);
   const uploadAbortRef = useRef<AbortController | null>(null);
   const uploadVideoMutation = useUploadVideo();
+  const enqueueUpload = useUploadStore((state) => state.enqueueUpload);
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = event.target.files?.[0] ?? null;
-    setFile(selectedFile);
-    if (selectedFile) {
-      setTitle((current) => current || selectedFile.name.replace(/\.[^/.]+$/, ""));
+    const selectedFiles = Array.from(event.target.files ?? []);
+    setFiles(selectedFiles);
+    const first = selectedFiles[0] ?? null;
+    setFile(first);
+    setSelectedFile(first);
+    if (first) {
+      setTitle((current) => current || first.name.replace(/\.[^/.]+$/, ""));
     }
   };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!file) {
+    const uploadFiles =
+      files.length > 0 ? files : file ? [file] : selectedFile ? [selectedFile] : [];
+
+    if (uploadFiles.length === 0) {
       setError("Select a video file to upload.");
       return;
     }
 
     setError(null);
-    setProgress(0);
-    const uploadAbort = new AbortController();
-    uploadAbortRef.current = uploadAbort;
-    try {
-      await uploadVideoMutation.mutateAsync({
-        file,
-        title,
+
+    for (const f of uploadFiles) {
+      enqueueUpload({
+        file: f,
+        title: uploadFiles.length === 1 && title ? title : f.name.replace(/\.[^/.]+$/, ""),
         notes,
-        signal: uploadAbort.signal,
-        onProgress: setProgress,
       });
-      setTitle("");
-      setNotes("");
-      setFile(null);
-      const fileInput = document.getElementById("video-upload-input") as HTMLInputElement | null;
-      if (fileInput) {
-        fileInput.value = "";
-      }
-    } catch (submitError) {
-      if (isAbortError(submitError)) {
-        setError("Upload cancelled.");
-      } else {
-        setError(submitError instanceof Error ? submitError.message : "Upload failed.");
-      }
-    } finally {
-      uploadAbortRef.current = null;
+    }
+
+    setTitle("");
+    setNotes("");
+    setFile(null);
+    setFiles([]);
+    setSelectedFile(null);
+    const fileInput = document.getElementById("video-upload-input") as HTMLInputElement | null;
+    if (fileInput) {
+      fileInput.value = "";
     }
   };
 
@@ -64,10 +63,11 @@ export function UploadVideoForm() {
       <Stack gap="lg">
         <Grid columns={2} gap="lg">
           <Grid.Col span={2}>
-            <Input.Wrapper label="Video file">
+            <Input.Wrapper label="Video file(s)">
               <Input
                 id="video-upload-input"
                 type="file"
+                multiple
                 accept="video/*,.mp4,.mov,.avi,.webm,.mkv,.m4v"
                 onChange={handleFileChange}
               />
@@ -98,17 +98,16 @@ export function UploadVideoForm() {
 
         {error && <Alert title={error} variant="error" />}
 
-        {uploadVideoMutation.isPending && (
-          <Stack gap="sm">
-            <Progress value={Math.round(progress * 100)} />
-            <Text>
-              Uploading {Math.round(progress * 100)}%. Keep this tab open until it finishes.
-            </Text>
-          </Stack>
-        )}
-
         <Flex justify="between" align="center" gap="lg">
-          <Text>{file ? `Selected: ${file.name}` : "No file selected"}</Text>
+          <Text>
+            {files.length > 0
+              ? `${files.length} file(s) selected`
+              : file
+                ? `Selected: ${file.name}`
+                : selectedFile
+                  ? `Selected: ${selectedFile.name}`
+                  : "No file selected"}
+          </Text>
           <Flex align="center" gap="lg">
             {uploadVideoMutation.isPending && (
               <Button
@@ -122,7 +121,9 @@ export function UploadVideoForm() {
             <Button
               type="submit"
               variant="primary"
-              disabled={!file || uploadVideoMutation.isPending}
+              disabled={
+                files.length === 0 && !file && !selectedFile && !uploadVideoMutation.isPending
+              }
             >
               Upload video
             </Button>

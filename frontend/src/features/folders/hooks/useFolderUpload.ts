@@ -1,13 +1,15 @@
 import { useState, useRef } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useUploadVideo } from "@/features/videos/query/useVideos";
-import { isAbortError } from "@/features/videos/api/uploadParts";
-import { useMoveLibraryItem, folderKeys } from "../query/useFolders";
+import { useMoveLibraryItem } from "../query/useFolders";
+import { useUploadStore } from "@/features/videos/store/useUploadStore";
 
 export function useFolderUpload(currentFolderID: string | null) {
   const queryClient = useQueryClient();
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
+  const [uploadFiles, setUploadFiles] = useState<File[]>([]);
   const [uploadFile, setUploadFile] = useState<File | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploadTitle, setUploadTitle] = useState("");
   const [uploadNotes, setUploadNotes] = useState("");
   const [targetFolderID, setTargetFolderID] = useState<string | null>(null);
@@ -17,61 +19,54 @@ export function useFolderUpload(currentFolderID: string | null) {
 
   const uploadVideoMutation = useUploadVideo();
   const moveItemMut = useMoveLibraryItem();
+  const enqueueUpload = useUploadStore((state) => state.enqueueUpload);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = e.target.files?.[0] ?? null;
-    setUploadFile(selectedFile);
-    if (selectedFile) {
-      setUploadTitle((current) => current || selectedFile.name.replace(/\.[^/.]+$/, ""));
+    const selectedFilesList = Array.from(e.target.files ?? []);
+    setUploadFiles(selectedFilesList);
+    const selected = selectedFilesList[0] ?? null;
+    setUploadFile(selected);
+    setSelectedFile(selected);
+    if (selected) {
+      setUploadTitle((current) => current || selected.name.replace(/\.[^/.]+$/, ""));
     }
   };
 
   const handleUploadSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!uploadFile) {
+    const filesToUpload =
+      uploadFiles.length > 0
+        ? uploadFiles
+        : uploadFile
+          ? [uploadFile]
+          : selectedFile
+            ? [selectedFile]
+            : [];
+
+    if (filesToUpload.length === 0) {
       setUploadError("Select a video file to upload.");
       return;
     }
 
     setUploadError(null);
-    setUploadProgress(0);
-    const uploadAbort = new AbortController();
-    uploadAbortRef.current = uploadAbort;
-
     const destFolder = targetFolderID !== null ? targetFolderID : currentFolderID;
 
-    try {
-      const uploadedVideo = await uploadVideoMutation.mutateAsync({
-        file: uploadFile,
-        title: uploadTitle || uploadFile.name,
+    for (const f of filesToUpload) {
+      enqueueUpload({
+        file: f,
+        title:
+          filesToUpload.length === 1 && uploadTitle ? uploadTitle : f.name.replace(/\.[^/.]+$/, ""),
         notes: uploadNotes,
-        signal: uploadAbort.signal,
-        onProgress: setUploadProgress,
+        targetFolderID: destFolder,
       });
-
-      if (destFolder && uploadedVideo) {
-        await moveItemMut.mutateAsync({
-          item_id: uploadedVideo.id,
-          item_type: "video",
-          target_folder_id: destFolder,
-        });
-      }
-
-      setUploadFile(null);
-      setUploadTitle("");
-      setUploadNotes("");
-      setUploadModalOpen(false);
-      queryClient.invalidateQueries({ queryKey: folderKeys.all });
-      queryClient.invalidateQueries({ queryKey: ["videos"] });
-    } catch (submitError) {
-      if (isAbortError(submitError)) {
-        setUploadError("Upload cancelled.");
-      } else {
-        setUploadError(submitError instanceof Error ? submitError.message : "Upload failed.");
-      }
-    } finally {
-      uploadAbortRef.current = null;
     }
+
+    setUploadFile(null);
+    setSelectedFile(null);
+    setUploadFiles([]);
+    setUploadTitle("");
+    setUploadNotes("");
+    setUploadModalOpen(false);
   };
 
   const openUploadModal = () => {
@@ -83,10 +78,13 @@ export function useFolderUpload(currentFolderID: string | null) {
     uploadAbortRef.current?.abort();
   };
 
+  const uploadedVideo = null;
+
   return {
     uploadModalOpen,
     setUploadModalOpen,
     uploadFile,
+    selectedFile,
     uploadTitle,
     setUploadTitle,
     uploadNotes,
@@ -100,5 +98,9 @@ export function useFolderUpload(currentFolderID: string | null) {
     handleUploadSubmit,
     openUploadModal,
     cancelUpload,
+    moveItemMut,
+    uploadAbortRef,
+    uploadVideoMutation,
+    uploadedVideo,
   };
 }
