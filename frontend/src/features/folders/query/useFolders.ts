@@ -10,13 +10,9 @@ import {
   restoreLibraryItem,
   emptyTrashBin,
 } from "../api/folders";
+import { folderKeys, videoKeys } from "@/shared/api/keys";
 
-export const folderKeys = {
-  all: ["folders"] as const,
-  lists: () => [...folderKeys.all, "list"] as const,
-  contents: (id: string) => [...folderKeys.all, "contents", id] as const,
-  trash: () => [...folderKeys.all, "trash"] as const,
-};
+export { folderKeys };
 
 export function useFolders() {
   return useQuery({
@@ -82,7 +78,7 @@ export function useMoveLibraryItem() {
     mutationFn: moveLibraryItem,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: folderKeys.all });
-      queryClient.invalidateQueries({ queryKey: ["videos"] });
+      queryClient.invalidateQueries({ queryKey: videoKeys.all });
     },
   });
 }
@@ -93,7 +89,7 @@ export function useRestoreLibraryItem() {
     mutationFn: restoreLibraryItem,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: folderKeys.all });
-      queryClient.invalidateQueries({ queryKey: ["videos"] });
+      queryClient.invalidateQueries({ queryKey: videoKeys.all });
     },
   });
 }
@@ -104,7 +100,7 @@ export function useEmptyTrash() {
     mutationFn: emptyTrashBin,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: folderKeys.all });
-      queryClient.invalidateQueries({ queryKey: ["videos"] });
+      queryClient.invalidateQueries({ queryKey: videoKeys.all });
     },
   });
 }

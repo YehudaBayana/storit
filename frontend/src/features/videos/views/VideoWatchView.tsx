@@ -1,168 +1,120 @@
 "use client";
 
-import { useEffect, useRef, useState, SyntheticEvent } from "react";
 import { useParams } from "next/navigation";
 import { Alert, Badge, Box, Card, Flex, NavLink, Stack, Text, Title } from "@mantine/core";
-import { getVideo, type Video as VideoModel } from "@/features/videos/api/videos";
-import { usePlaybackUrl } from "@/features/videos/query/useVideos";
-
-const MAX_PLAYBACK_RECOVERIES = 3;
+import { useVideos } from "@/features/videos/query/useVideos";
+import { useVideoPlaybackRecovery } from "../hooks/useVideoPlaybackRecovery";
 
 export default function VideoWatchView() {
   const params = useParams<{ id: string }>();
   const videoId = params?.id;
-  const [video, setVideo] = useState<VideoModel | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [aspectRatio, setAspectRatio] = useState<number>(16 / 9);
-  const videoElementRef = useRef<HTMLVideoElement>(null);
-  const resumeRef = useRef<{ time: number; paused: boolean } | null>(null);
-  const recoveriesRef = useRef(0);
-  const { data: playback, refetch: refetchPlayback } = usePlaybackUrl(
-    videoId ?? "",
-    Boolean(videoId) && video?.status === "ready",
-  );
+  const { data: videos, isLoading: isVideosLoading, error: queryError } = useVideos();
+  const video = videos?.find((v) => v.id === videoId);
+  const error = queryError
+    ? queryError instanceof Error
+      ? queryError.message
+      : "Unable to load video."
+    : null;
 
-  // An expired signed URL makes the player fail on the next range request: fetch a new one and resume.
-  const handlePlaybackError = () => {
-    const element = videoElementRef.current;
-    if (!element || recoveriesRef.current >= MAX_PLAYBACK_RECOVERIES) {
-      return;
-    }
-    recoveriesRef.current += 1;
-    resumeRef.current = { time: element.currentTime, paused: element.paused };
-    void refetchPlayback();
-  };
-
-  const handleLoadedMetadata = (e: SyntheticEvent<HTMLVideoElement>) => {
-    recoveriesRef.current = 0;
-    const element = videoElementRef.current;
-    const videoTarget = e.currentTarget;
-    if (videoTarget.videoWidth && videoTarget.videoHeight) {
-      setAspectRatio(videoTarget.videoWidth / videoTarget.videoHeight);
-    }
-    const resume = resumeRef.current;
-    if (!element || !resume) {
-      return;
-    }
-    resumeRef.current = null;
-    element.currentTime = resume.time;
-    if (!resume.paused) {
-      void element.play().catch(() => undefined);
-    }
-  };
-
-  useEffect(() => {
-    if (!videoId) {
-      return;
-    }
-
-    let isMounted = true;
-
-    getVideo(videoId)
-      .then((data) => {
-        if (!isMounted) {
-          return;
-        }
-        setVideo(data);
-        setError(null);
-      })
-      .catch((requestError) => {
-        if (!isMounted) {
-          return;
-        }
-        setError(requestError instanceof Error ? requestError.message : "Unable to load video.");
-      })
-      .finally(() => {
-        if (isMounted) {
-          setIsLoading(false);
-        }
-      });
-
-    return () => {
-      isMounted = false;
-    };
-  }, [videoId]);
+  const {
+    aspectRatio,
+    videoElementRef,
+    playback,
+    handlePlaybackError,
+    handleTimeUpdate,
+    handleLoadedMetadata,
+  } = useVideoPlaybackRecovery(videoId ?? "", Boolean(videoId && video?.status === "ready"));
 
   if (!videoId) {
     return (
-      <Box>
+      <Box p="md">
         <Stack gap="md">
           <Alert title="Error">Missing video id.</Alert>
-          <NavLink href="/folders">← Back to folders</NavLink>
+          <NavLink href="/folders" label="Back to folders" />
         </Stack>
       </Box>
     );
   }
 
-  if (isLoading) {
+  if (isVideosLoading) {
     return (
-      <Box>
+      <Box p="md">
         <Text>Loading video…</Text>
       </Box>
     );
   }
 
-  if (error || !video) {
+  if (error || (!video && !isVideosLoading)) {
     return (
-      <Box>
+      <Box p="md">
         <Stack gap="md">
           <Alert title="Error">{error ?? "Video not found."}</Alert>
-          <NavLink href="/folders">← Back to folders</NavLink>
+          <NavLink href="/folders" label="Back to folders" />
         </Stack>
       </Box>
     );
   }
 
   return (
-    <Box>
+    <Box p="md">
       <Stack gap="lg">
-        <Flex justify="between" align="center" gap="md">
-          <NavLink href="/folders">← Back to folders</NavLink>
-          <Badge size="sm">{video.status}</Badge>
+        <Flex justify="space-between" align="center" gap="md">
+          <NavLink
+            href="/folders"
+            label="Back to folders"
+            style={{ flex: "none", width: "auto" }}
+          />
+          <Badge size="sm">{video?.status || "ready"}</Badge>
         </Flex>
 
-        <Card className="flex items-center justify-center bg-black p-0 overflow-hidden">
-          {playback ? (
-            <div
-              className="relative flex items-center justify-center w-full max-h-[80vh]"
-              style={{
-                aspectRatio: `${aspectRatio}`,
-              }}
-            >
+        <Card shadow="sm" p="0" radius="md" withBorder>
+          <Box
+            style={{
+              width: "100%",
+              aspectRatio: `${aspectRatio}`,
+              background: "#000",
+              position: "relative",
+            }}
+          >
+            {playback?.url && video ? (
               <video
                 key={video.id}
                 ref={videoElementRef}
-                controls
                 src={playback.url}
+                controls
+                autoPlay
+                style={{ width: "100%", height: "100%", objectFit: "contain" }}
                 onError={handlePlaybackError}
+                onTimeUpdate={handleTimeUpdate}
                 onLoadedMetadata={handleLoadedMetadata}
-                className="w-full h-full object-contain bg-black"
               >
                 <track kind="captions" />
               </video>
-            </div>
-          ) : (
-            <Flex align="center" justify="center" h={400}>
-              <Text>
-                {video.status === "ready" && "Loading video…"}
-                {video.status === "uploading" && "This video is still uploading."}
-                {video.status === "processing" && "This video is being prepared for playback."}
-                {video.status === "failed" &&
-                  `Processing failed${video.failure_reason ? `: ${video.failure_reason}` : "."}`}
-              </Text>
-            </Flex>
-          )}
+            ) : (
+              <Flex
+                justify="center"
+                align="center"
+                style={{ height: "100%", color: "#fff", flexDirection: "column", gap: "8px" }}
+              >
+                <Text>
+                  {video?.status === "ready" && "Loading video…"}
+                  {video?.status === "uploading" && "This video is still uploading."}
+                  {video?.status === "processing" && "This video is being prepared for playback."}
+                  {video?.status === "failed" &&
+                    `Processing failed${video?.failure_reason ? `: ${video.failure_reason}` : "."}`}
+                </Text>
+              </Flex>
+            )}
+          </Box>
         </Card>
 
-        <Card>
+        <Card shadow="sm" p="md" radius="md" withBorder>
           <Stack gap="md">
-            <Title>{video.title || video.original_name}</Title>
-
-            {video.notes ? (
+            <Title order={3}>{video?.title || video?.original_name || "Video"}</Title>
+            {video?.notes ? (
               <Text>{video.notes}</Text>
             ) : (
-              <Text>No notes recorded for this video.</Text>
+              <Text c="dimmed">No notes recorded for this video.</Text>
             )}
           </Stack>
         </Card>

@@ -1,11 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClient, QueryClientProvider, MutationCache, QueryCache } from "@tanstack/react-query";
+import { useToastStore } from "@/store/useToastStore";
 
 export default function QueryProvider({ children }: { children: React.ReactNode }) {
-  // useState ensures QueryClient is instantiated once per browser session
-  // and stays isolated during Server-Side Rendering.
   const [queryClient] = useState(
     () =>
       new QueryClient({
@@ -13,8 +12,29 @@ export default function QueryProvider({ children }: { children: React.ReactNode 
           queries: {
             staleTime: 1000 * 60 * 5, // 5 minutes default stale time
             refetchOnWindowFocus: false,
+            retry: 1,
           },
         },
+        queryCache: new QueryCache({
+          onError: (error) => {
+            const message = error?.message || "An error occurred while fetching data";
+            try {
+              useToastStore.getState().error(message);
+            } catch {
+              // fallback if store is not mounted
+            }
+          },
+        }),
+        mutationCache: new MutationCache({
+          onError: (error) => {
+            const message = error?.message || "An error occurred during the mutation";
+            try {
+              useToastStore.getState().error(message);
+            } catch {
+              // fallback if store is not mounted
+            }
+          },
+        }),
       }),
   );
 

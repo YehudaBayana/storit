@@ -1,5 +1,4 @@
 import { apiClient, RequestOptions } from "@/api/apiClient";
-import { getCookie } from "@/features/auth/utils";
 
 export interface Folder {
   id: string;
@@ -32,29 +31,13 @@ export interface LibraryItem {
   };
 }
 
-type LibraryItemResponse = Omit<LibraryItem, "type" | "version"> & {
-  type?: "folder" | "video";
-  item_type?: "folder" | "media";
-  media_type?: string;
-  status?: VideoStatus;
-  version?: number;
-};
-
 export function listFolders(options?: RequestOptions) {
-  return apiClient<Folder[]>("/api/folders", {
-    credentials: "include",
-    ...options,
-  });
+  return apiClient<Folder[]>("/api/folders", options);
 }
 
 export function createFolder(input: { name: string; parent_id?: string | null }) {
   return apiClient<Folder>("/api/folders", {
     method: "POST",
-    credentials: "include",
-    headers: {
-      "X-CSRF-Token": getCookie("csrf_token") ?? "",
-      "Content-Type": "application/json",
-    },
     body: JSON.stringify(input),
   });
 }
@@ -65,11 +48,6 @@ export function updateFolder(
 ) {
   return apiClient<Folder>(`/api/folders/${id}`, {
     method: "PATCH",
-    credentials: "include",
-    headers: {
-      "X-CSRF-Token": getCookie("csrf_token") ?? "",
-      "Content-Type": "application/json",
-    },
     body: JSON.stringify(patch),
   });
 }
@@ -77,34 +55,11 @@ export function updateFolder(
 export function deleteFolder(id: string) {
   return apiClient<void>(`/api/folders/items/${id}?type=folder`, {
     method: "DELETE",
-    credentials: "include",
-    headers: {
-      "X-CSRF-Token": getCookie("csrf_token") ?? "",
-    },
   });
 }
 
 export function getFolderContents(id: string, options?: RequestOptions) {
-  return apiClient<LibraryItemResponse[]>(`/api/folders/${id}/contents`, {
-    credentials: "include",
-    ...options,
-  }).then((items) =>
-    items.map((item) => ({
-      ...item,
-      version: item.version ?? 1,
-      type: item.type ?? (item.item_type === "folder" ? "folder" : "video"),
-      video:
-        item.video ??
-        (item.item_type === "media"
-          ? {
-              id: item.id,
-              title: item.name,
-              status: item.status ?? "ready",
-              size_bytes: 0,
-            }
-          : undefined),
-    })),
-  );
+  return apiClient<LibraryItem[]>(`/api/folders/${id}/contents`, options);
 }
 
 export function moveLibraryItem(input: {
@@ -115,30 +70,17 @@ export function moveLibraryItem(input: {
 }) {
   return apiClient<void>("/api/library/move", {
     method: "POST",
-    credentials: "include",
-    headers: {
-      "X-CSRF-Token": getCookie("csrf_token") ?? "",
-      "Content-Type": "application/json",
-    },
     body: JSON.stringify(input),
   });
 }
 
 export function getTrashItems(options?: RequestOptions) {
-  return apiClient<LibraryItem[]>("/api/library/trash", {
-    credentials: "include",
-    ...options,
-  });
+  return apiClient<LibraryItem[]>("/api/library/trash", options);
 }
 
 export function restoreLibraryItem(input: { item_id: string; item_type: "folder" | "video" }) {
   return apiClient<void>("/api/library/restore", {
     method: "POST",
-    credentials: "include",
-    headers: {
-      "X-CSRF-Token": getCookie("csrf_token") ?? "",
-      "Content-Type": "application/json",
-    },
     body: JSON.stringify(input),
   });
 }
@@ -146,9 +88,5 @@ export function restoreLibraryItem(input: { item_id: string; item_type: "folder"
 export function emptyTrashBin() {
   return apiClient<void>("/api/library/trash", {
     method: "DELETE",
-    credentials: "include",
-    headers: {
-      "X-CSRF-Token": getCookie("csrf_token") ?? "",
-    },
   });
 }
