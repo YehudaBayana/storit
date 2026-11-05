@@ -31,6 +31,18 @@ export interface LibraryItem {
   };
 }
 
+export interface BackendLibraryItem {
+  id: string;
+  item_type: "folder" | "media";
+  media_type?: string;
+  name: string;
+  folder_id?: string | null;
+  version: number;
+  status?: string;
+  created_at: string;
+  updated_at: string;
+}
+
 export function listFolders(options?: RequestOptions) {
   return apiClient<Folder[]>("/api/folders", options);
 }
@@ -58,8 +70,31 @@ export function deleteFolder(id: string) {
   });
 }
 
-export function getFolderContents(id: string, options?: RequestOptions) {
-  return apiClient<LibraryItem[]>(`/api/folders/${id}/contents`, options);
+export async function getFolderContents(
+  id: string,
+  options?: RequestOptions,
+): Promise<LibraryItem[]> {
+  const rawItems = await apiClient<BackendLibraryItem[]>(`/api/folders/${id}/contents`, options);
+  return (rawItems || []).map((item) => {
+    const isFolder = item.item_type === "folder";
+    return {
+      id: item.id,
+      type: isFolder ? "folder" : "video",
+      name: item.name,
+      parent_id: item.folder_id,
+      version: item.version,
+      created_at: item.created_at,
+      updated_at: item.updated_at,
+      video: !isFolder
+        ? {
+            id: item.id,
+            title: item.name,
+            status: (item.status as VideoStatus) || "ready",
+            size_bytes: 0,
+          }
+        : undefined,
+    };
+  });
 }
 
 export function moveLibraryItem(input: {
@@ -68,20 +103,48 @@ export function moveLibraryItem(input: {
   target_folder_id?: string | null;
   version?: number;
 }) {
+  const backendType = input.item_type === "folder" ? "folder" : "media";
   return apiClient<void>("/api/library/move", {
     method: "POST",
-    body: JSON.stringify(input),
+    body: JSON.stringify({
+      ...input,
+      item_type: backendType,
+    }),
   });
 }
 
-export function getTrashItems(options?: RequestOptions) {
-  return apiClient<LibraryItem[]>("/api/library/trash", options);
+export async function getTrashItems(options?: RequestOptions): Promise<LibraryItem[]> {
+  const rawItems = await apiClient<BackendLibraryItem[]>("/api/library/trash", options);
+  return (rawItems || []).map((item) => {
+    const isFolder = item.item_type === "folder";
+    return {
+      id: item.id,
+      type: isFolder ? "folder" : "video",
+      name: item.name,
+      parent_id: item.folder_id,
+      version: item.version,
+      created_at: item.created_at,
+      updated_at: item.updated_at,
+      video: !isFolder
+        ? {
+            id: item.id,
+            title: item.name,
+            status: (item.status as VideoStatus) || "ready",
+            size_bytes: 0,
+          }
+        : undefined,
+    };
+  });
 }
 
 export function restoreLibraryItem(input: { item_id: string; item_type: "folder" | "video" }) {
+  const backendType = input.item_type === "folder" ? "folder" : "media";
   return apiClient<void>("/api/library/restore", {
     method: "POST",
-    body: JSON.stringify(input),
+    body: JSON.stringify({
+      ...input,
+      item_type: backendType,
+    }),
   });
 }
 
