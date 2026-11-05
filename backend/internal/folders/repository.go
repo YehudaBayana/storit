@@ -76,7 +76,7 @@ func (r *Repository) GetOrCreateRoot(ctx context.Context, ownerID uuid.UUID) (Fo
 	rootID := uuid.New()
 	err = r.db.QueryRow(ctx, `
 		INSERT INTO folders (id, owner_id, parent_id, name, name_normalized, is_root, depth, version)
-		VALUES ($1, $2, NULL, 'My Library', 'my library', true, 0, 1)
+		VALUES ($1, $2, NULL, 'Folders', 'folders', true, 0, 1)
 		RETURNING `+folderColumns, rootID, ownerID).Scan(
 		&f.ID, &f.OwnerID, &f.ParentID, &f.Name, &f.NameNormalized, &f.IsRoot, &f.Depth, &f.Version, &f.TrashedAt, &f.DeletedBatchID, &f.OriginalParentID, &f.OriginalName, &f.CreatedAt, &f.UpdatedAt,
 	)

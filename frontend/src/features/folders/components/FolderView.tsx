@@ -1,8 +1,9 @@
 "use client";
 import React, { useState, useMemo } from "react";
-import { Text, Stack, Box, Group, Overlay, Center } from "@mantine/core";
+import { Text, Stack, Box, Group, Overlay, Center, Modal, Button } from "@mantine/core";
 import { Dropzone, MIME_TYPES } from "@mantine/dropzone";
 import { useRouter, useSearchParams, useParams } from "next/navigation";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   useFolders,
   useFolderContents,
@@ -15,6 +16,8 @@ import {
   useTrashItems,
 } from "../query/useFolders";
 import { LibraryItem } from "../api/folders";
+import { deleteVideo } from "@/features/videos/api/videos";
+import { useToastStore } from "@/store/useToastStore";
 import { LibraryItemTile } from "./LibraryItemTile";
 import { useVideoPlayerStore } from "@/store/useVideoPlayerStore";
 import { FolderBreadcrumbsHeader } from "./FolderBreadcrumbsHeader";
@@ -41,6 +44,25 @@ export function FolderView() {
   const [renameValue, setRenameValue] = useState("");
   const [selectedIDs, setSelectedIDs] = useState<Set<string>>(new Set());
   const [cutIDs, setCutIDs] = useState<Set<string>>(new Set());
+  const [videoToDelete, setVideoToDelete] = useState<{ id: string; title: string } | null>(null);
+
+  const queryClient = useQueryClient();
+  const showToast = useToastStore((state) => state.success);
+  const showErrorToast = useToastStore((state) => state.error);
+
+  const deleteVideoMutation = useMutation({
+    mutationFn: (videoId: string) => deleteVideo(videoId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["folders"] });
+      queryClient.invalidateQueries({ queryKey: ["folderContents"] });
+      queryClient.invalidateQueries({ queryKey: ["videos"] });
+      showToast("Video deleted successfully");
+      setVideoToDelete(null);
+    },
+    onError: (err: Error) => {
+      showErrorToast(err?.message || "Failed to delete video");
+    },
+  });
 
   // Track previous folder/trash state to reset selection during render if changed
   const [prevFolderState, setPrevFolderState] = useState({ currentFolderID, viewTrash });
@@ -231,6 +253,10 @@ export function FolderView() {
                         deleteFolderMut.mutate(itm.id);
                       }
                     }}
+                    onDeleteVideo={() => {
+                      const videoId = item.video?.id ?? item.id;
+                      setVideoToDelete({ id: videoId, title: item.name });
+                    }}
                   />
                 }
                 onRenameValueChange={setRenameValue}
@@ -271,6 +297,35 @@ export function FolderView() {
           onSubmit={uploadHook.handleUploadSubmit}
           fileSelected={Boolean(uploadHook.uploadFile)}
         />
+
+        <Modal
+          opened={Boolean(videoToDelete)}
+          onClose={() => setVideoToDelete(null)}
+          title="Delete Video"
+          centered
+          onClick={(e) => e.stopPropagation()}
+        >
+          <Text size="sm" mb="lg">
+            Are you sure you want to delete &quot;{videoToDelete?.title}&quot;? This will remove the
+            video from your database and permanently delete its media files from storage.
+          </Text>
+          <Group justify="end">
+            <Button variant="default" onClick={() => setVideoToDelete(null)}>
+              Cancel
+            </Button>
+            <Button
+              color="red"
+              loading={deleteVideoMutation.isPending}
+              onClick={() => {
+                if (videoToDelete) {
+                  deleteVideoMutation.mutate(videoToDelete.id);
+                }
+              }}
+            >
+              Delete
+            </Button>
+          </Group>
+        </Modal>
       </Stack>
     </>
   );

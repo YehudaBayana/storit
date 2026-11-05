@@ -9,6 +9,7 @@ interface FolderItemMenuProps {
   onRestore: (item: LibraryItem) => void;
   onStartRename: (item: LibraryItem) => void;
   onDeleteFolder: (item: LibraryItem) => void;
+  onDeleteVideo?: (videoID: string) => void;
 }
 
 export function FolderItemMenu({
@@ -17,6 +18,7 @@ export function FolderItemMenu({
   onRestore,
   onStartRename,
   onDeleteFolder,
+  onDeleteVideo,
 }: FolderItemMenuProps) {
   if (viewTrash) {
     return (
@@ -26,6 +28,15 @@ export function FolderItemMenu({
     );
   }
 
+  const handleDelete = () => {
+    if (item.type === "folder") {
+      onDeleteFolder(item);
+    } else if (onDeleteVideo) {
+      const videoId = item.video?.id ?? item.id;
+      onDeleteVideo(videoId);
+    }
+  };
+
   return (
     <>
       {item.type === "folder" && (
@@ -33,12 +44,8 @@ export function FolderItemMenu({
           Rename
         </Menu.Item>
       )}
-      <Menu.Item
-        leftSection={<FiTrash2 size={14} />}
-        color="red"
-        onClick={() => onDeleteFolder(item)}
-      >
-        Move to Trash
+      <Menu.Item leftSection={<FiTrash2 size={14} />} color="red" onClick={handleDelete}>
+        {item.type === "video" ? "Delete" : "Move to Trash"}
       </Menu.Item>
     </>
   );
